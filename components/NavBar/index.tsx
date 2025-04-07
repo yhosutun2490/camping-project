@@ -1,11 +1,9 @@
 'use client'
 import Link from "next/link"
 import DialogModal from "@/components/DialogModal"
-import { useState } from "react"
+
 export default function NavBar() {
-  if (true) {
-    const [name, setName] = useState('')
-  }
+
   return (
     < div className="navbar bg-base-100 shadow-sm" >
       <div className="flex-none">
