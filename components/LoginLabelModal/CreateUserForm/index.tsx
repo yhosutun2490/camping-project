@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useForm } from "react-hook-form";
 import { useImperativeHandle } from "react";
 import React from "react";
@@ -13,7 +12,7 @@ type FormType = {
   password: string ;
 };
 type Props = {
-  ref: any;
+  ref: React.Ref<FormHandle>; 
 };
 
 export type FormHandle = {
@@ -70,7 +69,7 @@ export default function CreateUserForm({ref}:Props) {
         register={register("password", { required: "密碼為必填" })}
         error={errors.password}
       />
-      <button type="submit" className="btn btn-primary">送出</button>
+      <button type="submit" className="btn btn-primary">創建會員</button>
     </form>
   );
 }
