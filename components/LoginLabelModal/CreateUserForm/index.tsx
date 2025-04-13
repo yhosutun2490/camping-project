@@ -66,10 +66,16 @@ export default function CreateUserForm({ref}:Props) {
         label="密碼"
         type="password"
         placeholder="請填入密碼"
-        register={register("password", { required: "密碼為必填" })}
+        register={register("password", { 
+          required: "密碼為必填", 
+          pattern: {
+            value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
+            message: "密碼需至少8位，且包含英文字母與數字"
+          } 
+        })}
         error={errors.password}
       />
-      <button type="submit" className="btn btn-primary">創建會員</button>
+      <button type="submit" className="btn btn-primary w-full">創建會員</button>
     </form>
   );
 }
