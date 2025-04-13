@@ -1,5 +1,6 @@
 "use client"
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import clsx from 'clsx';
 
 type InputFieldProps = {
   label: string;
@@ -7,11 +8,12 @@ type InputFieldProps = {
   placeholder?: string;
   register: UseFormRegisterReturn;
   error?: FieldError;
+  className?: string
 };
 
-export default function FormHookInput({ label, type ,placeholder, register, error }: InputFieldProps) {
+export default function FormHookInput({ label, type ,placeholder, register, error, className }: InputFieldProps) {
   return (
-    <div className="flex flex-col mb-4">
+    <div className={clsx("flex flex-col mb-4", className)}>
       <label className="label text-black mb-1">{label}</label>
       <input
         type={type}

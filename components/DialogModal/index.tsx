@@ -14,7 +14,7 @@ export default function DialogModal({
     <>
       <input type="checkbox" ref={modalRef} id={id} className="modal-toggle" />
       <div className="modal" role="dialog">
-        <div className="modal-box mb-[25dvh] bg-gray-50">{children}</div>
+        <div className="modal-box  bg-gray-50">{children}</div>
         <label className="modal-backdrop" htmlFor={id}>
           Close
         </label>

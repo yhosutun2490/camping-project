@@ -1,81 +1,129 @@
-"use client"
-
+"use client";
 import { useForm } from "react-hook-form";
 import { useImperativeHandle } from "react";
 import React from "react";
-import FormHookInput from  "@/components/FormHookInput"
+import FormHookInput from "@/components/FormHookInput";
+import { useCreateMember } from "@/swr/auth/useCreateMember";
 
 type FormType = {
   account: string;
   firstName: string;
   lastName: string;
-  password: string ;
+  email: string;
+  password: string;
 };
 type Props = {
-  ref: React.Ref<FormHandle>; 
+  ref: React.Ref<FormHandle>;
 };
 
 export type FormHandle = {
   resetForm: () => void;
 };
 
-export default function CreateUserForm({ref}:Props) {
+export default function CreateUserForm({ ref }: Props) {
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     clearErrors,
     formState: { errors },
   } = useForm<FormType>();
+  const { isMutating, trigger } = useCreateMember();
 
-  const onSubmit = (data: FormType) => {
-    console.log("表單資料：", data);
+  const onSubmit = async (data: FormType) => {
+    if (isMutating) return
+    try {
+      await trigger({
+        provider: "local",
+        username: data.account,
+        firstname: data.firstName,
+        lastname: data.lastName,
+        email: data.email,
+        password: data.password,
+      });
+    } catch (err) {
+      if ((err as Error).message === "Email已被使用") {
+        setError("email", {
+          type: "manual",
+          message: "Email 已被使用",
+        });
+      }
+      if ((err as Error).message === "username已被使用") {
+        setError("account", {
+          type: "manual",
+          message: "username已被使用",
+        });
+      }
+    }
   };
 
-  useImperativeHandle(ref, () => ({
-    resetForm: () => {
-      reset();
-      clearErrors();
-    },
-  }), [reset,clearErrors]);
- 
+  useImperativeHandle(
+    ref,
+    () => ({
+      resetForm: () => {
+        reset();
+        clearErrors();
+      },
+    }),
+    [reset, clearErrors]
+  );
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <FormHookInput
-        label="帳號"
+        label="帳號*"
         type="text"
         placeholder="請填入您的帳號"
         register={register("account", { required: "標題為必填" })}
         error={errors.account}
       />
-       <FormHookInput
-        label="姓氏"
-        type="text"
-        placeholder="請填入您姓氏"
-        register={register("firstName", { required: "姓氏為必填" })}
-        error={errors.firstName}
-      />
-       <FormHookInput
-        label="姓名"
-        type="text"
-        placeholder="請填入您的姓名"
-        register={register("lastName", { required: "姓名為必填" })}
-        error={errors.lastName}
+      <div className="name-row flex gap-3.5 justify-between">
+        <FormHookInput
+          label="姓氏*"
+          type="text"
+          placeholder="請填入您的姓氏"
+          register={register("firstName", { required: "姓氏為必填" })}
+          error={errors.firstName}
+          className="flex-grow-1"
+        />
+        <FormHookInput
+          label="姓名*"
+          type="text"
+          placeholder="請填入您的姓名"
+          register={register("lastName", { required: "姓名為必填" })}
+          error={errors.lastName}
+          className="flex-grow-1"
+        />
+      </div>
+
+      <FormHookInput
+        label="Email*"
+        type="email"
+        placeholder="請填入您的email"
+        register={register("email", { required: "email為必填" })}
+        error={errors.email}
       />
       <FormHookInput
-        label="密碼"
+        label="密碼*"
         type="password"
         placeholder="請填入密碼"
-        register={register("password", { 
-          required: "密碼為必填", 
+        register={register("password", {
+          required: "密碼為必填",
           pattern: {
             value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-            message: "密碼需至少8位，且包含英文字母與數字"
-          } 
+            message: "密碼需至少8位，且包含英文字母與數字",
+          },
         })}
         error={errors.password}
       />
-      <button type="submit" className="btn btn-primary w-full">創建會員</button>
+        <button
+          type="submit"
+          className="btn btn-primary w-full"
+          disabled={isMutating}
+        >
+          { isMutating ? <span className="loading loading-spinner"></span> : '創建會員' }
+        </button>
     </form>
   );
 }
