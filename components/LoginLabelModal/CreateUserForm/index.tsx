@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { useImperativeHandle } from "react";
 import React from "react";
 import FormHookInput from "@/components/FormHookInput";
-import { useCreateMember } from "@/swr/auth/useCreateMember";
+import { useCreateMember } from "@/swr/auth/useAuth";
+import toast from 'react-hot-toast';
 
 type FormType = {
   account: string;
@@ -14,13 +15,14 @@ type FormType = {
 };
 type Props = {
   ref: React.Ref<FormHandle>;
+  close: ()=>void
 };
 
 export type FormHandle = {
   resetForm: () => void;
 };
 
-export default function CreateUserForm({ ref }: Props) {
+export default function CreateUserForm({ ref,close }: Props) {
   const {
     register,
     handleSubmit,
@@ -42,14 +44,19 @@ export default function CreateUserForm({ ref }: Props) {
         email: data.email,
         password: data.password,
       });
+      close()
+      reset()
+      toast.success("創建會員成功")
     } catch (err) {
       if ((err as Error).message === "Email已被使用") {
+        toast.error("Email 已被使用")
         setError("email", {
           type: "manual",
           message: "Email 已被使用",
         });
       }
       if ((err as Error).message === "username已被使用") {
+        toast.error("username已被使用")
         setError("account", {
           type: "manual",
           message: "username已被使用",

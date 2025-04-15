@@ -1,14 +1,17 @@
 import axiosInstance from "@/api/axiosIntance";
-import type { UserRegister } from "@/types/auth";
+import type { UserLogin, UserRegister } from "@/types/auth";
 import { formatAxiosError } from "@/utils/erros";
 const endpoint = "/auth";
 
-export const userLogin = async () => {
-  const response = await axiosInstance.post(endpoint + "/login");
+export const userLogin = async ({ username, password, email }: UserLogin) => {
+  const response = await axiosInstance.post(endpoint + "/login", {
+    username,
+    password,
+    email
+  });
   return response.data;
 };
 
-export const userVerifyToken = async () => {};
 
 export const userRegister = async ({
   provider,
@@ -29,6 +32,8 @@ export const userRegister = async ({
     });
     return response.data;
   } catch (err) {
-     throw formatAxiosError(err)
-    };
-}
+    throw formatAxiosError(err);
+  }
+};
+
+export const userVerifyToken = async ({}) => {};

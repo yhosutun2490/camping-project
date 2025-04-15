@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/HeaderNavBar";
+import Toast from "@/components/Toast";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
           Go to nextjs.org →
         </a>
       </footer>
+      <Toast />
       </body>
     </html>
   );

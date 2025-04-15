@@ -12,6 +12,12 @@ export default function LoginLabelModal() {
   const modalRef = useRef<HTMLInputElement>(null);
   const createFormRef =  useRef<FormHandle>(null);
   const loginFromRef = useRef<FormHandle>(null);
+
+  function closeModal():void {
+    if (modalRef.current) {
+      modalRef.current.checked = false; // 關閉 modal
+    }
+  }
   useEffect(()=>{
     const modal = modalRef.current
     const handleChange = ()=>{
@@ -37,8 +43,8 @@ export default function LoginLabelModal() {
           {step === 'createUser'? '成為~森森不息的~會員': '登入'}
         </p>
         { step === 'createUser'?
-         <CreateUserForm ref={createFormRef} />: 
-         <LoginForm ref={loginFromRef} />
+         <CreateUserForm ref={createFormRef} close={closeModal}/>: 
+         <LoginForm ref={loginFromRef} close={closeModal}/>
         }
         <div className="divider divider-neutral"></div>
         { step === 'createUser'?
