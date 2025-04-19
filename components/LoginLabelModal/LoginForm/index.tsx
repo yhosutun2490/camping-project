@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation"
 
 
 type FormType = {
-  account: string;
   password: string ;
   email: string
 };
@@ -42,9 +41,8 @@ export default function LoginForm({ref,close}:Props) {
     try {
       await trigger( {
         provider: 'local',
-        username: data.account,
+        email: data.email,
         password: data.password,
-        email: data.email
       })
       toast.success('登入成功')
       close()
@@ -52,10 +50,6 @@ export default function LoginForm({ref,close}:Props) {
     } catch(err) {
       const customErr = err as CustomError;
       if (customErr.status === 401) {
-        setError("account", {
-          type: "manual",
-          message: "",
-        });
         setError("email", {
           type: "manual",
           message: "",
@@ -78,13 +72,6 @@ export default function LoginForm({ref,close}:Props) {
  
   return (
     <form onSubmit={handleSubmit(onSubmit)} >
-      <FormHookInput
-        label="帳號"
-        type="text"
-        placeholder="請填入您的帳號"
-        register={register("account", { required: "標題為必填" })}
-        error={errors.account}
-      />
       <FormHookInput
         label="Email"
         type="email"

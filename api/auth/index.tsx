@@ -3,9 +3,8 @@ import type { UserLogin, UserRegister } from "@/types/auth";
 import { formatAxiosError } from "@/utils/erros";
 const endpoint = "/auth";
 
-export const userLogin = async ({ username, password, email }: UserLogin) => {
+export const userLogin = async ({password, email }: UserLogin) => {
   const response = await axiosInstance.post(endpoint + "/login", {
-    username,
     password,
     email
   });
@@ -18,6 +17,7 @@ export const userRegister = async ({
   username,
   firstname,
   lastname,
+  phone,
   email,
   password,
 }: UserRegister) => {
@@ -27,6 +27,7 @@ export const userRegister = async ({
       username,
       firstname,
       lastname,
+      phone,
       email,
       password,
     });

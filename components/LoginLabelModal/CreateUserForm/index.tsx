@@ -11,6 +11,7 @@ type FormType = {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
   password: string;
 };
 type Props = {
@@ -41,6 +42,7 @@ export default function CreateUserForm({ ref,close }: Props) {
         username: data.account,
         firstname: data.firstName,
         lastname: data.lastName,
+        phone: data.phone,
         email: data.email,
         password: data.password,
       });
@@ -109,6 +111,13 @@ export default function CreateUserForm({ ref,close }: Props) {
         type="email"
         placeholder="請填入您的email"
         register={register("email", { required: "email為必填" })}
+        error={errors.email}
+      />
+      <FormHookInput
+        label="Phone*"
+        type="phone"
+        placeholder="請填入您的連絡電話"
+        register={register("phone", { required: "phone為必填" })}
         error={errors.email}
       />
       <FormHookInput
