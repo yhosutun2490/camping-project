@@ -1,9 +1,12 @@
-'use client'
 import Link from "next/link"
 import LoginLabelModal from "@/components/LoginLabelModal"
 import MemberMenu from "@/components/HeaderNavBar/MemberMenu"
-export default function HeaderNavBar() {
+import { UserRole } from "@/types/page/main/user"
 
+interface PropsType {
+  user: UserRole | null
+}
+export default async function HeaderNavBar({user}:PropsType) {
   return (
     < div className="navbar bg-primary shadow-sm px-[5%]" >
       <div className="flex-none">
@@ -21,8 +24,8 @@ export default function HeaderNavBar() {
         <Link href="/event">
           <button className="btn btn-outline">辦活動</button>
         </Link>
-        <LoginLabelModal />
-        <MemberMenu />
+      
+        { user? <MemberMenu user={user}/> : <LoginLabelModal />} 
       </div>
     </div >
 

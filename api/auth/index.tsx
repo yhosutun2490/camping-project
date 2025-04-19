@@ -1,5 +1,6 @@
+
 import axiosInstance from "@/api/axiosIntance";
-import type { UserLogin, UserRegister } from "@/types/auth";
+import type { UserLogin, UserRegister } from "@/types/api/auth";
 import { formatAxiosError } from "@/utils/erros";
 const endpoint = "/auth";
 
@@ -37,4 +38,8 @@ export const userRegister = async ({
   }
 };
 
-export const userVerifyToken = async ({}) => {};
+export const userLogout = async () => {
+  const response = await axiosInstance.post(endpoint + "/logout", );
+  return response.data;
+}
+

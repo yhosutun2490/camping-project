@@ -1,5 +1,5 @@
-import { userRegister,userLogin } from '@/api/auth'
-import type { UserRegister, UserLogin } from '@/types/auth'
+import { userRegister, userLogin, userLogout } from '@/api/auth'
+import { UserRegister, UserLogin } from '@/types/api/auth'
 import useSWRMutation from 'swr/mutation'
 
 
@@ -32,4 +32,19 @@ export function useMemberLogin() {
       data,
       error
   }
+}
+
+
+export function useUserLogout() {
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    "/api/auth/logout",
+    async () => await userLogout()
+  );
+
+  return {
+    trigger,
+    isMutating,
+    data,
+    error,
+  };
 }

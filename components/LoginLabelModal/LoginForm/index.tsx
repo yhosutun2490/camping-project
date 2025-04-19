@@ -46,7 +46,7 @@ export default function LoginForm({ref,close}:Props) {
       })
       toast.success('登入成功')
       close()
-      router.push('/')
+      router.refresh()
     } catch(err) {
       const customErr = err as CustomError;
       if (customErr.status === 401) {
