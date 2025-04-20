@@ -7,12 +7,12 @@ import FormHookInput from  "@/components/FormHookInput"
 import { useMemberLogin } from "@/swr/auth/useAuth";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod"
+import { loginSchema } from "@/schema/AuthForm";
 
-
-type FormType = {
-  password: string ;
-  email: string
-};
+// zod schema 轉換為typescript 
+type FormType = z.infer<typeof loginSchema >
 type Props = {
   ref: React.Ref<FormHandle>; 
   close: ()=>void
@@ -33,7 +33,11 @@ export default function LoginForm({ref,close}:Props) {
     clearErrors,
     setError,
     formState: { errors },
-  } = useForm<FormType>();
+  } = useForm<FormType>(
+    {
+      resolver: zodResolver(loginSchema)
+    }
+  );
 
   const {trigger, isMutating} = useMemberLogin()
 
@@ -56,7 +60,7 @@ export default function LoginForm({ref,close}:Props) {
         });
         setError("password", {
           type: "manual",
-          message: "帳號、email或密碼錯誤",
+          message: "Email或密碼錯誤",
         });
       }
       toast.error('登入失敗')
@@ -71,14 +75,12 @@ export default function LoginForm({ref,close}:Props) {
   }), [reset,clearErrors]);
  
   return (
-    <form onSubmit={handleSubmit(onSubmit)} >
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <FormHookInput
         label="Email"
         type="email"
         placeholder="請填入Email"
-        register={register("email", { 
-            required: "email為必填", 
-        })}
+        register={register("email")}
         error={errors.email}
       />
     
@@ -86,13 +88,7 @@ export default function LoginForm({ref,close}:Props) {
         label="密碼"
         type="password"
         placeholder="請填入密碼"
-        register={register("password", { 
-            required: "密碼為必填",
-            pattern: {
-                value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-                message: "密碼需至少8位，且包含英文字母與數字"
-            }  
-        })}
+        register={register("password")}
         error={errors.password}
       />
       <p className="text-base text-end mb-1.5 text-gray-500">忘記密碼?</p>

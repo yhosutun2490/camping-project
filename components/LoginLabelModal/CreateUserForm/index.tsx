@@ -5,15 +5,11 @@ import React from "react";
 import FormHookInput from "@/components/FormHookInput";
 import { useCreateMember } from "@/swr/auth/useAuth";
 import toast from 'react-hot-toast';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod"
+import { registerSchema } from "@/schema/AuthForm";
 
-type FormType = {
-  account: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-};
+type FormType = z.infer<typeof registerSchema>
 type Props = {
   ref: React.Ref<FormHandle>;
   close: ()=>void
@@ -31,7 +27,9 @@ export default function CreateUserForm({ ref,close }: Props) {
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<FormType>();
+  } = useForm<FormType>({
+    resolver: zodResolver(registerSchema)
+  });
   const { isMutating, trigger } = useCreateMember();
 
   const onSubmit = async (data: FormType) => {
@@ -39,9 +37,9 @@ export default function CreateUserForm({ ref,close }: Props) {
     try {
       await trigger({
         provider: "local",
-        username: data.account,
-        firstname: data.firstName,
-        lastname: data.lastName,
+        username: data.username,
+        firstname: data.firstname,
+        lastname: data.lastname,
         phone: data.phone,
         email: data.email,
         password: data.password,
@@ -50,18 +48,18 @@ export default function CreateUserForm({ ref,close }: Props) {
       reset()
       toast.success("創建會員成功")
     } catch (err) {
-      if ((err as Error).message === "Email已被使用") {
-        toast.error("Email 已被使用")
+      if ((err as Error).message === "Email 已被使用") {
+        toast.error("Email 已經註冊過")
         setError("email", {
           type: "manual",
-          message: "Email 已被使用",
+          message: "Email已經註冊過",
         });
       }
-      if ((err as Error).message === "username已被使用") {
+      if ((err as Error).message === "username 已被使用") {
         toast.error("username已被使用")
-        setError("account", {
+        setError("username", {
           type: "manual",
-          message: "username已被使用",
+          message: "帳號名稱已經註冊過",
         });
       }
     }
@@ -84,24 +82,24 @@ export default function CreateUserForm({ ref,close }: Props) {
         label="帳號*"
         type="text"
         placeholder="請填入您的帳號"
-        register={register("account", { required: "標題為必填" })}
-        error={errors.account}
+        register={register("username")}
+        error={errors.username}
       />
       <div className="name-row flex gap-3.5 justify-between">
         <FormHookInput
           label="姓氏*"
           type="text"
           placeholder="請填入您的姓氏"
-          register={register("firstName", { required: "姓氏為必填" })}
-          error={errors.firstName}
+          register={register("firstname",)}
+          error={errors.firstname}
           className="flex-grow-1"
         />
         <FormHookInput
           label="姓名*"
           type="text"
           placeholder="請填入您的姓名"
-          register={register("lastName", { required: "姓名為必填" })}
-          error={errors.lastName}
+          register={register("lastname")}
+          error={errors.lastname}
           className="flex-grow-1"
         />
       </div>
@@ -110,27 +108,21 @@ export default function CreateUserForm({ ref,close }: Props) {
         label="Email*"
         type="email"
         placeholder="請填入您的email"
-        register={register("email", { required: "email為必填" })}
+        register={register("email")}
         error={errors.email}
       />
       <FormHookInput
         label="Phone*"
         type="phone"
         placeholder="請填入您的連絡電話"
-        register={register("phone", { required: "phone為必填" })}
-        error={errors.email}
+        register={register("phone")}
+        error={errors.phone}
       />
       <FormHookInput
         label="密碼*"
         type="password"
         placeholder="請填入密碼"
-        register={register("password", {
-          required: "密碼為必填",
-          pattern: {
-            value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
-            message: "密碼需至少8位，且包含英文字母與數字",
-          },
-        })}
+        register={register("password")}
         error={errors.password}
       />
         <button
