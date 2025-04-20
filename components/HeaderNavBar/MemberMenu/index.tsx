@@ -53,11 +53,11 @@ export default function MemberMenu({user}:PropsType) {
     <>
       <div
         ref={menuRef}
-        className="avatar relative flex space-x-5 items-center"
+        className="avatar relative flex items-center"
       >
         <div className="w-[35px] h-[35px] rounded-full">
           <Image
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            src="/header/user_image.jpg"
             width={35}
             height={35}
             alt="Picture of the author"
@@ -70,7 +70,7 @@ export default function MemberMenu({user}:PropsType) {
             <p onClick={handleLogOut}>登出</p>
           </MenuList>
         )}
-        <p className="text-xl text-gray-300">Hi {user?.username}</p>
+        <p className="text-xl text-primary-700 ml-[0.5rem]">{user?.username} 您好</p>
       </div>
     </>
   );

@@ -1,14 +1,25 @@
 @import "tailwindcss";
+/* 自訂樣式區塊 */
+@import "../styles/button.css";
 @plugin "daisyui";
 
 :root {
   --background: #ffffff;
+}
+@theme {
+  --color-primary-700: #354738;
+  --color-primary-500: #5C795F;
+  --color-primary-50: #F3F6F3;
+  --color-neutral-950: #121212;
+  --color-neutral-white: #FFFFFF;
+  ;
 }
 
 @theme inline {
   --color-background: var(--background);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+ 
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,5 +40,15 @@ body {
   input:-moz-autofill {
     background-color: var(--input-bg) !important;
     color: var(--input-text) !important;
+  }
+}
+
+@layer utilities {
+  .text-base {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    font-family: 'Noto Sans TC', sans-serif;
+    letter-spacing: 0;
   }
 }

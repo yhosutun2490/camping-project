@@ -1,0 +1,5 @@
+@layer components {
+    .btn-primary {
+        @apply px-4 py-2 rounded bg-primary-500 font-semibold text-neutral-white cursor-pointer;
+      }
+}

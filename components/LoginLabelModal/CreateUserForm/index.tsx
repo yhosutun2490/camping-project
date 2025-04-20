@@ -127,7 +127,7 @@ export default function CreateUserForm({ ref,close }: Props) {
       />
         <button
           type="submit"
-          className="btn btn-primary w-full"
+          className="btn-primary w-full"
           disabled={isMutating}
         >
           { isMutating ? <span className="loading loading-spinner"></span> : '創建會員' }

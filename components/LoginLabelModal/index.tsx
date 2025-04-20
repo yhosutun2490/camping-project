@@ -35,7 +35,7 @@ export default function LoginLabelModal() {
   })
   return (
     <>
-      <label htmlFor="login_modal" className="btn btn-outline">
+      <label htmlFor="login_modal" className="btn-primary btn-outline">
         登入
       </label>
       <DialogModal id="login_modal" modalRef={modalRef}>
@@ -50,12 +50,12 @@ export default function LoginLabelModal() {
         { step === 'createUser'?
         <div className="flex justify-between">
           <span className="text-2xl text-gray-500">已經是森森不息會員?</span>
-          <button className='btn' onClick={()=>setStep('login')}>登入</button>
+          <button className='btn-primary' onClick={()=>setStep('login')}>登入</button>
         </div>
          :  
         <div className="flex justify-between">
           <span className="text-2xl text-gray-500">還不是森森不息會員?</span>
-          <button className='btn'  onClick={()=>setStep('createUser')}>註冊</button>
+          <button className='btn-primary'  onClick={()=>setStep('createUser')}>註冊</button>
         </div>
       
         }
