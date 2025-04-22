@@ -5,7 +5,11 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['img.daisyui.com'],
   },
-  
+  experimental: {
+    allowedDevOrigins: [
+      "https://compromise-found-consistency-open.trycloudflare.com",
+    ],
+  },
   // async rewrites(): Promise<Rewrite[]> {
   //   return [
   //     {

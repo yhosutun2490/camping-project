@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useImperativeHandle } from "react";
 import React from "react";
 import FormHookInput from  "@/components/FormHookInput"
-import { useMemberLogin } from "@/swr/auth/useAuth";
+import { useMemberLogin } from "@/swr/auth/useAuthServer";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod";
