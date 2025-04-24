@@ -35,7 +35,8 @@ export default function LoginForm({ref,close}:Props) {
     formState: { errors },
   } = useForm<FormType>(
     {
-      resolver: zodResolver(loginSchema)
+      resolver: zodResolver(loginSchema), 
+      shouldUnregister: true, 
     }
   );
 
