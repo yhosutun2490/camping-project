@@ -5,8 +5,7 @@ import { isAxiosError } from "axios";
 export async function POST(req: NextRequest) {
   try {
     // 取出body參數
-    const body = await req.json();
-    const backEndRes = await axiosInstance.post("/auth/login", body);
+    const backEndRes = await axiosInstance.post("/auth/refresh");
 
     // 從後端 response 拿 cookie
     const setCookies = backEndRes.headers["set-cookie"];

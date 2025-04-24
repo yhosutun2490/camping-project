@@ -27,7 +27,14 @@ export default async function HeaderNavBar({user}:PropsType) {
           <p className="text-neutral-950 text-base">辦活動</p>
         </Link>
       
-        { user? <MemberMenu user={user}/> : <LoginLabelModal />} 
+        { user? <MemberMenu user={user}/> : 
+        <div className="flex space-x-3">
+           <LoginLabelModal defaultModalType="login" />
+           <LoginLabelModal defaultModalType="createUser" />
+        </div>
+        } 
+        
+       
       </div>
     </div >
 

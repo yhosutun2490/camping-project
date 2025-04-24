@@ -6,12 +6,17 @@ import type { FormHandle } from "@/components/LoginLabelModal/CreateUserForm";
 import { useRef, useEffect, useState } from "react";
 
 type StepType = 'createUser' | 'login';
-
-export default function LoginLabelModal() {
-  const [step, setStep] = useState<StepType>('createUser')
+interface Props {
+  defaultModalType: StepType,
+}
+export default function LoginLabelModal({defaultModalType}: Props) {
+  const [step, setStep] = useState<StepType>(defaultModalType)
   const modalRef = useRef<HTMLInputElement>(null);
   const createFormRef =  useRef<FormHandle>(null);
   const loginFromRef = useRef<FormHandle>(null);
+
+  // 根據 type 或 customId 產生唯一 id
+  const modalId = `${defaultModalType}_modal`;
 
   function closeModal():void {
     if (modalRef.current) {
@@ -25,7 +30,7 @@ export default function LoginLabelModal() {
       if (!isChecked) {
         setTimeout(()=>{
           createFormRef?.current?.resetForm()
-          setStep('createUser')
+          setStep(defaultModalType)
         },200)
         
       }
@@ -33,12 +38,13 @@ export default function LoginLabelModal() {
     modal?.addEventListener('change',handleChange)
     return ()=> modal?.removeEventListener('change',handleChange)
   })
+
   return (
     <>
-      <label htmlFor="login_modal" className="btn-primary btn-outline">
-        登入
+      <label htmlFor={modalId} className="btn-primary btn-outline">
+        { defaultModalType === 'login'? '登入' : '註冊' } 
       </label>
-      <DialogModal id="login_modal" modalRef={modalRef}>
+      <DialogModal id={modalId} modalRef={modalRef}>
         <p className="text-3xl text-base-200 text-center">
           {step === 'createUser'? '成為~森森不息的~會員': '登入'}
         </p>
@@ -50,12 +56,18 @@ export default function LoginLabelModal() {
         { step === 'createUser'?
         <div className="flex justify-between">
           <span className="text-2xl text-gray-500">已經是森森不息會員?</span>
-          <button className='btn-primary' onClick={()=>setStep('login')}>登入</button>
+          <p className='text-gray-500 text-xl pb-[4px] border-b-1 cursor-pointer' 
+          onClick={()=>setStep('login')}>
+            登入 ⭢
+          </p>
         </div>
          :  
         <div className="flex justify-between">
           <span className="text-2xl text-gray-500">還不是森森不息會員?</span>
-          <button className='btn-primary'  onClick={()=>setStep('createUser')}>註冊</button>
+          <p className='text-gray-500 text-xl pb-[4px] border-b-1 cursor-pointer'  
+          onClick={()=>setStep('createUser')}>
+            註冊 ⭢
+          </p>
         </div>
       
         }
