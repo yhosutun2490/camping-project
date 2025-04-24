@@ -11,6 +11,7 @@ export function useCreateMember() {
       ) => {
         return await userRegister(arg)
       });
+
     return {
         isMutating,
         trigger,
@@ -19,20 +20,6 @@ export function useCreateMember() {
     }
 }
 
-// export function useMemberLogin() {
-//   const { isMutating, trigger, error, data } = useSWRMutation('/api/auth/login', async (
-//       _key: string,
-//       { arg }: { arg: UserLogin }
-//     ) => {
-//       return await userLogin(arg)
-//     });
-//   return {
-//       isMutating,
-//       trigger,
-//       data,
-//       error
-//   }
-// }
 
 
 export function useUserLogout() {
