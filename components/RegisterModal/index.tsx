@@ -1,12 +1,14 @@
 "use client";
 import DialogModal from "@/components/DialogModal";
-import LoginForm from "@/components/LoginLabelModal/LoginForm";
-import type { FormHandle } from "@/components/LoginLabelModal/CreateUserForm";
-import { useRef, useEffect, } from "react";
+import CreateUserForm from "@/components/LoginLabelModal/CreateUserForm";
 
-export default function LoginLabelModal() {
+import type { FormHandle } from "@/components/LoginLabelModal/CreateUserForm";
+import { useRef, useEffect} from "react";
+
+
+export default function RegisterModal() {
   const modalRef = useRef<HTMLInputElement>(null);
-  const loginFromRef = useRef<FormHandle>(null);
+  const createFormRef = useRef<FormHandle>(null);
 
   function closeModal():void {
     if (modalRef.current) {
@@ -19,7 +21,7 @@ export default function LoginLabelModal() {
       const isChecked = modal?.checked
       if (!isChecked) {
         setTimeout(()=>{
-          loginFromRef?.current?.resetForm()
+          createFormRef?.current?.resetForm()
         },200)
         
       }
@@ -30,14 +32,14 @@ export default function LoginLabelModal() {
 
   return (
     <>
-      <label htmlFor='login' className="btn-primary btn-outline">
-         登入
+      <label htmlFor='modal-register' className="btn-primary btn-outline">
+         註冊
       </label>
-      <DialogModal id='login' modalRef={modalRef}>
+      <DialogModal id='modal-register' modalRef={modalRef}>
         <p className="text-3xl text-base-200 text-center">
-           登入
+          成為~森森不息的~會員
         </p>
-         <LoginForm ref={loginFromRef} close={closeModal}/>
+         <CreateUserForm ref={createFormRef} close={closeModal}/>: 
       </DialogModal>
     </>
   );

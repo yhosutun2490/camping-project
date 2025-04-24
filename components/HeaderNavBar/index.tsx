@@ -1,6 +1,7 @@
 import Link from "next/link"
 import Image from "next/image";
 import LoginLabelModal from "@/components/LoginLabelModal"
+import RegisterModal from "@/components/RegisterModal";
 import MemberMenu from "@/components/HeaderNavBar/MemberMenu"
 import { UserRole } from "@/types/page/main/user"
 
@@ -29,12 +30,10 @@ export default async function HeaderNavBar({user}:PropsType) {
       
         { user? <MemberMenu user={user}/> : 
         <div className="flex space-x-3">
-           <LoginLabelModal defaultModalType="login" />
-           <LoginLabelModal defaultModalType="createUser" />
+           <LoginLabelModal />
+           <RegisterModal />
         </div>
-        } 
-        
-       
+        }  
       </div>
     </div >
 
