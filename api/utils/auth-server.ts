@@ -1,5 +1,5 @@
 import axiosInstance from "@/api/axiosIntance";
-import { formatAxiosError } from "@/utils/erros"
+import { formatAxiosError } from "@/utils/errors"
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { UserRole } from "@/types/page/main/user";

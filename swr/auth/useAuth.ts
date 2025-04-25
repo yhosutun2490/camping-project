@@ -1,5 +1,5 @@
 import { userRegister, userLogout } from '@/api/auth'
-import { UserRegister } from '@/types/api/auth'
+import { UserRegister, UserRegisterResponse, UserLogoutResponse } from '@/types/api/auth'
 import useSWRMutation from 'swr/mutation'
 
 
@@ -8,8 +8,9 @@ export function useCreateMember() {
     const { isMutating, trigger, error, data } = useSWRMutation('/api/auth/register', async (
         _key: string,
         { arg }: { arg: UserRegister }
-      ) => {
-        return await userRegister(arg)
+      ):Promise<UserRegisterResponse> => {
+         const data = await userRegister(arg)
+         return data
       });
 
     return {
@@ -21,11 +22,10 @@ export function useCreateMember() {
 }
 
 
-
 export function useUserLogout() {
   const { trigger, isMutating, data, error } = useSWRMutation(
     "/api/auth/logout",
-    async () => await userLogout()
+    async ():Promise<UserLogoutResponse> => await userLogout()
   );
 
   return {

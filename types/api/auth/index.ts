@@ -1,6 +1,5 @@
 import {
   SuccessResponse,
-  ErrorResponse,
   SuccessResponseNoData,
 } from "@/types/api/response";
 
@@ -10,18 +9,16 @@ export interface UserLogin {
   password: string;
   email: string;
 }
-export type UserLoginResponse =
-  | SuccessResponse<{
-      member_info: {
-        id: string;
-        username: string;
-        firstname: string;
-        lastname: string;
-        email: string;
-        role: "member" | "host" | "admin";
-      };
-    }>
-  | ErrorResponse;
+export type UserLoginResponse = SuccessResponse<{
+  member_info: {
+    id: string;
+    username: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    role: "member" | "host" | "admin";
+  };
+}>;
 
 export interface UserRegister extends UserLogin {
   username: string;
@@ -30,19 +27,17 @@ export interface UserRegister extends UserLogin {
   lastname: string;
 }
 
-export type UserRegisterResponse = SuccessResponseNoData | ErrorResponse;
+export type UserRegisterResponse = SuccessResponseNoData;
 
-export type UserRefreshTokenResponse = SuccessResponseNoData | ErrorResponse;
+export type UserRefreshTokenResponse = SuccessResponseNoData;
 
-export type UserLogoutResponse = SuccessResponseNoData | ErrorResponse;
+export type UserLogoutResponse = SuccessResponseNoData;
 
-export type UserCheckResponse =
-  | SuccessResponse<{
-      member_info: {
-        id: string;
-        username: string;
-        email: string;
-        role: string;
-      };
-    }>
-  | ErrorResponse;
+export type UserCheckResponse = SuccessResponse<{
+  member_info: {
+    id: string;
+    username: string;
+    email: string;
+    role: string;
+  };
+}>;

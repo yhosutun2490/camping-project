@@ -1,46 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import axiosInstance from "@/api/axiosIntance";
-import { isAxiosError } from "axios";
+import { formatAxiosError } from "@/utils/errors";
 import { UserRefreshTokenResponse } from "@/types/api/auth/index";
+import { ErrorResponse } from "@/types/api/response";
 
-export async function POST(req: NextRequest):Promise<NextResponse<UserRefreshTokenResponse>> {
+export async function POST(
+  req: NextRequest
+): Promise<NextResponse<UserRefreshTokenResponse | ErrorResponse>> {
   try {
     const cookieHeader = req.headers.get("cookie") ?? "";
     // 不須body參數，但須夾帶cookies
-    const backEndRes = await axiosInstance.post("/auth/refresh", {},
+    const backEndRes = await axiosInstance.post<UserRefreshTokenResponse>(
+      "/auth/refresh",
+      {},
       {
         headers: {
           Cookie: cookieHeader,
         },
         withCredentials: true,
-      });
+      }
+    );
 
-
-     // response data
-     const res = NextResponse.json<UserRefreshTokenResponse>({
+    // response data
+    const res = NextResponse.json<UserRefreshTokenResponse>({
       message: backEndRes.data.message,
-      status: backEndRes.data.status
+      status: backEndRes.data.status,
     });
 
     return res;
-  } catch (err) {
-    console.log("api err", err);
-    if (isAxiosError(err)) {
-      const status = err.response?.status || 500;
-      const message =
-        (err.response?.data as { message?: string })?.message ||
-        err.message ||
-        "伺服器錯誤，請稍後再試";
-      const errorPayload: UserRefreshTokenResponse = {
-          status: "failed",       
-          message: message, 
-      };
-      return NextResponse.json(errorPayload, {status});
-    }
-
-    return NextResponse.json<UserRefreshTokenResponse>(
-      { status: "error", message: "伺服器錯誤" },
-      { status: 500 }
+  } catch (err: unknown) {
+    const apiErr = formatAxiosError(err);
+    return NextResponse.json<ErrorResponse>(
+      {
+        status: apiErr.status, // failed / error
+        message: apiErr.message, // 錯誤訊息
+      },
+      { status: apiErr.httpCode } // HTTP 回傳碼
     );
   }
 }

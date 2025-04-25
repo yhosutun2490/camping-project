@@ -1,9 +1,8 @@
 
 import axiosInstance from "@/api/axiosIntance";
-import type { UserRegister,UserRegisterResponse } from "@/types/api/auth";
-import { formatAxiosError } from "@/utils/erros";
+import type { UserRegister,UserRegisterResponse, UserLogoutResponse } from "@/types/api/auth";
+import { formatAxiosError } from "@/utils/errors";
 const endpoint = "/auth";
-
 
 
 /**
@@ -40,9 +39,14 @@ export const userRegister = async ({
  * 清空使用者cookies資料
  */
 
-export const userLogout = async () => {
-  const response = await axiosInstance.post(endpoint + "/logout", );
-  return response.data;
+export const userLogout = async ():Promise<UserLogoutResponse> => {
+  try {
+    const response = await axiosInstance.post<UserLogoutResponse>(endpoint + "/logout", );
+    return response.data;
+  } catch (err) {
+    throw formatAxiosError(err);
+  }
+
 }
 
 

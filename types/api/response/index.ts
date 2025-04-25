@@ -16,6 +16,6 @@ export interface SuccessResponseNoData {
   
 // 3. 失敗回傳（不帶 data）
 export interface ErrorResponse {
-   status: "failed" | "error";    // 或 "error"、"warning"… 看你後端定義
+   status: "failed" | "error";    
    message: string;
  }
