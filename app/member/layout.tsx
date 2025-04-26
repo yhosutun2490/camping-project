@@ -1,3 +1,5 @@
+import AvatarCard from "@/components/Member/AvatarCard";
+
 export default async function MemberLayout({
   children,
 }: Readonly<{
@@ -6,22 +8,13 @@ export default async function MemberLayout({
   return (
     <div
       className="member_pag_layout
-    lg:grid lg:grid-cols-[300px_1fr] overflow-hidden pt-[60px]"
+    lg:grid lg:grid-cols-[300px_1fr] h-full overflow-hidden pt-[60px]"
     >
-      <aside>
-        <ul className="menu bg-base-200 rounded-box w-full">
-          <li>
-            <a>Item 1</a>
-          </li>
-          <li>
-            <a>Item 2</a>
-          </li>
-          <li>
-            <a>Item 3</a>
-          </li>
-        </ul>
+      <aside className="border-r-1 border-primary h-full pt-4">
+        <AvatarCard username="Rafael"/>
+    
       </aside>
-      <main>{children}</main>
+      <main className="h-full pt-6">{children}</main>
     </div>
   );
 }
