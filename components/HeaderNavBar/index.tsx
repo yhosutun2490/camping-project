@@ -1,15 +1,22 @@
+"use client"
 import Link from "next/link"
 import Image from "next/image";
 import LoginLabelModal from "@/components/LoginLabelModal"
 import RegisterModal from "@/components/RegisterModal";
 import MemberMenu from "@/components/HeaderNavBar/MemberMenu"
+import { usePathname } from 'next/navigation'
 
 interface PropsType {
   username: string
 }
-export default async function HeaderNavBar({username}:PropsType) {
+export default function HeaderNavBar({username}:PropsType) {
+  const pathname = usePathname()
+  const isHome = pathname === '/'
   return (
-    < div className="navbar fixed top-0 left-0 w-full px-[16%]" >
+    < div className={[
+      'navbar fixed inset-x-0  w-full px-[16%] z-10',
+      isHome ? 'bg-transparent' : 'bg-white shadow-md'
+    ].join(' ')} >
       <div className="flex flex-1 items-center">
         <Image src='/header/logo_icon.svg'
             width={35}

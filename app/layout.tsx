@@ -24,11 +24,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
       >
         <HeaderNavBar username={user?.data?.member?.username??''}/>
-        {children}
-        <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+        <main className="flex-1 overflow-auto">
+          {children}
+          <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
           <a
             className="flex items-center gap-2 hover:underline hover:underline-offset-4"
             href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
@@ -38,6 +39,8 @@ export default async function RootLayout({
             Go to nextjs.org →
           </a>
         </footer>
+        </main>
+     
         <Toast />
       </body>
     </html>
