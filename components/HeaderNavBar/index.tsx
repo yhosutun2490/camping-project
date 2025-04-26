@@ -3,12 +3,11 @@ import Image from "next/image";
 import LoginLabelModal from "@/components/LoginLabelModal"
 import RegisterModal from "@/components/RegisterModal";
 import MemberMenu from "@/components/HeaderNavBar/MemberMenu"
-import { UserRole } from "@/types/page/main/user"
 
 interface PropsType {
-  user: UserRole | null
+  username: string
 }
-export default async function HeaderNavBar({user}:PropsType) {
+export default async function HeaderNavBar({username}:PropsType) {
   return (
     < div className="navbar fixed top-0 left-0 w-full px-[16%]" >
       <div className="flex flex-1 items-center">
@@ -28,7 +27,7 @@ export default async function HeaderNavBar({user}:PropsType) {
           <p className="text-neutral-950 text-base">辦活動</p>
         </Link>
       
-        { user? <MemberMenu user={user}/> : 
+        { username? <MemberMenu user={username}/> : 
         <div className="flex space-x-3">
            <LoginLabelModal />
            <RegisterModal />

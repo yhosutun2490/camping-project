@@ -26,7 +26,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HeaderNavBar user={user}/>
+        <HeaderNavBar username={user?.data?.member?.username??''}/>
         {children}
         <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
           <a

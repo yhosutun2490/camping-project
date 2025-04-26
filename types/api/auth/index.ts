@@ -10,7 +10,7 @@ export interface UserLogin {
   email: string;
 }
 export type UserLoginResponse = SuccessResponse<{
-  member_info: {
+  member: {
     id: string;
     username: string;
     firstname: string;
@@ -34,10 +34,10 @@ export type UserRefreshTokenResponse = SuccessResponseNoData;
 export type UserLogoutResponse = SuccessResponseNoData;
 
 export type UserCheckResponse = SuccessResponse<{
-  member_info: {
+  member: {
     id: string;
     username: string;
     email: string;
-    role: string;
+    role: "member" | "host" | "admin";
   };
 }>;
