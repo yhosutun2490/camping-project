@@ -10,6 +10,7 @@ import {
 import { memberInfoSchema } from "@/schema/MemberInfoForm";
 import { z } from "zod";
 import toast from 'react-hot-toast';
+import { useUpdateMemberAvatar } from "@/swr/member/profile/useMemberProfile"
 
 type FormType = z.infer<typeof memberInfoSchema>;
 type Props = {
@@ -31,12 +32,14 @@ export default function UserAvatarUpload({
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(initialLink);
   // inputRef
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const {trigger} = useUpdateMemberAvatar() // 上傳圖片api custom hook
+
 
   function handleClickUpload() {
     inputRef?.current?.click();
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -51,7 +54,7 @@ export default function UserAvatarUpload({
       return;
     }
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-    console.log("avatar 檔案類型", file.type);
+  
     if (!allowedTypes.includes(file.type)) {
       setError?.("photo_url", {
         type: "manual",
@@ -63,10 +66,20 @@ export default function UserAvatarUpload({
     // 本機預覽
     const previewURL = URL.createObjectURL(file);
     setAvatarUrl(previewURL);
-    setValue('photo_url',previewURL)
     // upload avatar api
+    try {
+      const res = await trigger(file)
+      toast.success('個人大頭照上傳成功')
+      setValue('photo_url',res.data.avatar_url)
 
-    toast.success('個人大頭照暫存成功')
+    } catch(err) {
+      if (err instanceof Error) {
+        const message = err?.message
+        toast.success(`個人大頭照上傳失敗-${message}`)
+      }
+ 
+    }
+   
   }
 
   return (

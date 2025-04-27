@@ -2,20 +2,31 @@ import {
     SuccessResponse,
   } from "@/types/api/response";
 
-export interface MemberInfo {
+export interface MemberProfile {
+  firstname: string,
+  lastname: string,
+  username: string,
+  birth?: string,
+  gender?: string,
+  photo_url?: string,
+ }
+export interface MemberInfo extends MemberProfile {
     id: string,
-    firstname: string,
-    lastname: string,
-    username: string,
-    birth: string,
-    gender: string,
     phone: string,
     email: string,
     role: string,
-    photo_url: string,
     is_verified: boolean,
   }
 
-  export type MemberGetProfileResponse = SuccessResponse<{
-    member: MemberInfo
-  }>;
+export type MemberGetProfileResponse = SuccessResponse<{
+  member: MemberInfo
+}>;
+
+export type MemberUpdateProfileResponse = SuccessResponse<{
+  member: MemberInfo
+}>;
+
+export type MemberUpdateAvatarResponse = SuccessResponse<{
+  avatar_url: string
+}>
+
