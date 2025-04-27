@@ -1,5 +1,7 @@
 "use client"
 import { FieldError, UseFormRegisterReturn } from "react-hook-form";
+import { useState } from "react";
+import { Icon } from "@iconify/react";
 import clsx from 'clsx';
 
 type InputFieldProps = {
@@ -13,11 +15,16 @@ type InputFieldProps = {
 };
 
 export default function FormHookInput({ label, type ,placeholder, register, error, className, disabled=false}: InputFieldProps) {
+   // 只有 password 欄位才需要這個 state
+   const [show, setShow] = useState<boolean>(false)
+   // 根據 state 切換 input type
+   const inputType = type === 'password' ? (show ? 'text' : 'password') : type
+
   return (
-    <div className={clsx("flex flex-col mb-4", className)}>
+    <div className={clsx("flex flex-col mb-4 relative", className)}>
       <label className="label text-black mb-1">{label}</label>
       <input
-        type={type}
+        type={inputType}
         placeholder={placeholder}
         disabled={disabled}
         className={`input text-black bg-orange-50 input-bordered w-full 
@@ -29,6 +36,18 @@ export default function FormHookInput({ label, type ,placeholder, register, erro
           ${error ? "input-error border-red-500" : ""}`}
         {...register}
       />
+       {type === 'password' && (
+          <button
+            type="button"
+            onClick={() => setShow(v => !v)}
+            className="absolute top-[50%] right-2 flex items-center p-1"
+          >
+            <Icon
+              icon={show ? 'mdi:eye' : 'mdi:eye-off'}
+              className="text-xl text-zinc-500"
+            />
+          </button>
+        )}
       {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
     </div>
   );
