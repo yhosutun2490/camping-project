@@ -18,7 +18,7 @@ export const memberInfoSchema = z.object({
     .min(1, { message: "電話號碼為必填" })
     .max(72, { message: "最多72字元" }),
   email: z.string({ required_error: "Email為必填" }).email("Email格式錯誤"),
-  gender: z.enum(['male','female']).optional(),
+  gender: z.enum(['male','female','']).optional(),
   photo_url: z.string().url({ message: "photo_url 必須是有效的 URL" }).optional(),
   birth: z.string().refine(
     (val) => {
