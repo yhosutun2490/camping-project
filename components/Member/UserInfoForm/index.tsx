@@ -8,7 +8,13 @@ import FormHookInput from "@/components/FormHookInput";
 import { memberInfoSchema } from "@/schema/MemberInfoForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-export default function MemberInfoForm() {
+import { MemberInfo } from "@/types/api/member/profile"
+
+type Props = {
+  initialProfile: MemberInfo | undefined
+}
+
+export default function MemberInfoForm( {initialProfile}: Props) {
   // zod schema 轉換為typescript
   type FormType = z.infer<typeof memberInfoSchema>;
   const {
@@ -22,10 +28,10 @@ export default function MemberInfoForm() {
     resolver: zodResolver(memberInfoSchema),
     shouldUnregister: true,
     defaultValues: {
-      firstname: '小明',
-      lastname: '王',
-      email: 'example@mail.com',
-      phone: '0978414768'
+      firstname: initialProfile?.firstname,
+      lastname: initialProfile?.lastname,
+      email: initialProfile?.email,
+      phone: initialProfile?.phone
       // … 其他預設值
     },
   });
