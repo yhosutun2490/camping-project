@@ -5,15 +5,16 @@ import {
 export interface MemberProfile {
   firstname: string,
   lastname: string,
+  email: string,
+  phone: string,
   username: string,
   birth?: string,
   gender?: string,
   photo_url?: string,
+
  }
 export interface MemberInfo extends MemberProfile {
     id: string,
-    phone: string,
-    email: string,
     role: string,
     is_verified: boolean,
   }

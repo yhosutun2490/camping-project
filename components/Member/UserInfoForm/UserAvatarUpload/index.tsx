@@ -65,12 +65,13 @@ export default function UserAvatarUpload({
 
     // 本機預覽
     const previewURL = URL.createObjectURL(file);
-    setAvatarUrl(previewURL);
+ 
     // upload avatar api
     try {
       const res = await trigger(file)
       toast.success('個人大頭照上傳成功')
       setValue('photo_url',res.data.avatar_url)
+      setAvatarUrl(previewURL);
 
     } catch(err) {
       if (err instanceof Error) {

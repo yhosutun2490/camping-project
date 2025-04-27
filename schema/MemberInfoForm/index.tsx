@@ -19,7 +19,7 @@ export const memberInfoSchema = z.object({
     .max(72, { message: "最多72字元" }),
   email: z.string({ required_error: "Email為必填" }).email("Email格式錯誤"),
   gender: z.enum(['male','female','']).optional(),
-  photo_url: z.string().url({ message: "photo_url 必須是有效的 URL" }).optional(),
+  photo_url: z.string().url({ message: "photo_url 必須是有效的 URL" }),
   birth: z.string().refine(
     (val) => {
       // 簡單檢查 YYYY-MM-DD 格式，並能被 Date.parse()

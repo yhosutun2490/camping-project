@@ -4,11 +4,13 @@ import useSWRMutation from 'swr/mutation'
 
 
 export function useUpdateMemberProfile() {
-    const { isMutating, trigger, error, data } = useSWRMutation('/api/member/profile/update', async (
-        _key: string,
-        { arg }: { arg: MemberProfile }
-      ):Promise<MemberUpdateProfileResponse> => {
-         const data  = await memberUpdateProfile(arg)
+    const { isMutating, trigger, error, data } = 
+    useSWRMutation<MemberUpdateProfileResponse,
+    Error,
+    string, 
+    MemberProfile
+    >('/api/member/profile/update', async (_key: string, { arg: payload }: { arg: MemberProfile })=> {
+         const data  = await memberUpdateProfile(payload)
          return data
       });
 
