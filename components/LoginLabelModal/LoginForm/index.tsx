@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useImperativeHandle } from "react";
 import React from "react";
 import FormHookInput from  "@/components/FormHookInput"
-import { useMemberLogin } from "@/swr/auth/useAuth";
+import { useMemberLogin } from "@/swr/auth/useLoginAndRefreshToken";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,7 +35,8 @@ export default function LoginForm({ref,close}:Props) {
     formState: { errors },
   } = useForm<FormType>(
     {
-      resolver: zodResolver(loginSchema)
+      resolver: zodResolver(loginSchema), 
+      shouldUnregister: true, 
     }
   );
 
@@ -91,7 +92,7 @@ export default function LoginForm({ref,close}:Props) {
         register={register("password")}
         error={errors.password}
       />
-      <p className="text-base text-end mb-1.5 text-gray-500">忘記密碼?</p>
+      <p className="text-base text-end mb-1.5 text-gray-500 underline decoration-1 cursor-pointer">忘記密碼?</p>
       <button type="submit" className="btn-primary w-full">
       { isMutating ? <span className="loading loading-spinner"></span> : '登入' }
       </button>

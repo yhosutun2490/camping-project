@@ -1,20 +1,9 @@
 
 import axiosInstance from "@/api/axiosIntance";
-import type { UserLogin, UserRegister } from "@/types/api/auth";
-import { formatAxiosError } from "@/utils/erros";
+import type { UserRegister,UserRegisterResponse, UserLogoutResponse } from "@/types/api/auth";
+import { formatAxiosError } from "@/utils/errors";
 const endpoint = "/auth";
 
-/**
- * 使用者登入 API 請求
- * 回傳登入成功後的使用者資料
- */
-export const userLogin = async ({password, email }: UserLogin) => {
-  const response = await axiosInstance.post(endpoint + "/login", {
-    password,
-    email
-  });
-  return response.data;
-};
 
 /**
  * 使用者註冊 API 請求
@@ -27,9 +16,9 @@ export const userRegister = async ({
   phone,
   email,
   password,
-}: UserRegister) => {
+}: UserRegister):Promise<UserRegisterResponse> => {
   try {
-    const response = await axiosInstance.post(endpoint + "/register", {
+    const response = await axiosInstance.post<UserRegisterResponse>(endpoint + "/register", {
       provider,
       username,
       firstname,
@@ -50,17 +39,15 @@ export const userRegister = async ({
  * 清空使用者cookies資料
  */
 
-export const userLogout = async () => {
-  const response = await axiosInstance.post(endpoint + "/logout", );
-  return response.data;
+export const userLogout = async ():Promise<UserLogoutResponse> => {
+  try {
+    const response = await axiosInstance.post<UserLogoutResponse>(endpoint + "/logout", );
+    return response.data;
+  } catch (err) {
+    throw formatAxiosError(err);
+  }
+
 }
 
-/**
- * 使用者刷新token
- */
-export const userRefreshToken = async () => {
-  const response = await axiosInstance.post(endpoint + "/refresh", );
-  return response.data;
-}
 
 

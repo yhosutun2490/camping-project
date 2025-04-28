@@ -3,9 +3,18 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['img.daisyui.com'],
+    domains: ['img.daisyui.com','storage.googleapis.com'],
   },
-  
+  compiler: {
+    removeConsole: {
+      exclude: ['error', 'warn'], 
+    },
+  },
+  experimental: {
+    allowedDevOrigins: [
+      "https://compromise-found-consistency-open.trycloudflare.com",
+    ]
+  },
   // async rewrites(): Promise<Rewrite[]> {
   //   return [
   //     {

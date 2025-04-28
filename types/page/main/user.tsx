@@ -1,6 +1,6 @@
-export interface UserRole {
+export interface MemberInfo {
     id: string,
     username: string,
     email: string,
-    role: string
+    role: "member" | "host" | "admin";
  }

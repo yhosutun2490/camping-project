@@ -4,13 +4,12 @@ import MenuList from "@/components/MenuList";
 import useClickOutSide from "@/hook/useClickOutSide";
 import { useRouter } from "next/navigation"
 import { useState, useRef } from "react";
-import { UserRole } from "@/types/page/main/user"
 import { useUserLogout } from "@/swr/auth/useAuth"
 import toast from 'react-hot-toast';
 
 type OpenState = true | false;
 type PropsType = {
-  user?: UserRole | null
+  user?: string
 }
 export default function MemberMenu({user}:PropsType) {
   const [isOpenMenu, setIsOpenMenu] = useState<OpenState>(false);
@@ -70,7 +69,7 @@ export default function MemberMenu({user}:PropsType) {
             <p onClick={handleLogOut}>登出</p>
           </MenuList>
         )}
-        <p className="text-xl text-primary-700 ml-[0.5rem]">{user?.username} 您好</p>
+        <p className="text-xl text-primary-700 ml-[0.5rem]">{user} 您好</p>
       </div>
     </>
   );

@@ -26,9 +26,10 @@ export default function CreateUserForm({ ref,close }: Props) {
     reset,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isValidating },
   } = useForm<FormType>({
-    resolver: zodResolver(registerSchema)
+    resolver: zodResolver(registerSchema),
+    shouldUnregister: true, 
   });
   const { isMutating, trigger } = useCreateMember();
 
@@ -128,7 +129,7 @@ export default function CreateUserForm({ ref,close }: Props) {
         <button
           type="submit"
           className="btn-primary w-full"
-          disabled={isMutating}
+          disabled={isMutating || isValidating}
         >
           { isMutating ? <span className="loading loading-spinner"></span> : '創建會員' }
         </button>
