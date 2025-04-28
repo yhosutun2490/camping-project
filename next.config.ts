@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['img.daisyui.com','storage.googleapis.com'],
   },
+  compiler: {
+    removeConsole: {
+      exclude: ['error', 'warn'], 
+    },
+  },
   experimental: {
     allowedDevOrigins: [
       "https://compromise-found-consistency-open.trycloudflare.com",
