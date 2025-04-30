@@ -25,6 +25,7 @@ export async function POST(
     // 手動轉發 cookies
     if (setCookies) {
       const cookieArray = Array.isArray(setCookies) ? setCookies : [setCookies];
+      console.log('cookieArray',cookieArray)
       for (const cookie of cookieArray) {
         res.headers.append("Set-Cookie", cookie);
       }
