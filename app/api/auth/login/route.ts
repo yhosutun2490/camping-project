@@ -4,6 +4,7 @@ import { formatAxiosError } from "@/utils/errors"
 import { UserLoginResponse } from "@/types/api/auth/index";
 import { ErrorResponse } from "@/types/api/response"
 
+
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<UserLoginResponse | ErrorResponse>> {
@@ -25,7 +26,6 @@ export async function POST(
     // 手動轉發 cookies
     if (setCookies) {
       const cookieArray = Array.isArray(setCookies) ? setCookies : [setCookies];
-      console.log('cookieArray',cookieArray)
       for (const cookie of cookieArray) {
         res.headers.append("Set-Cookie", cookie);
       }
