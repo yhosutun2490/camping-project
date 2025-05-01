@@ -1,6 +1,6 @@
 import UserInfoForm from "@/components/Member/UserInfoForm"
 import ChangePasswordForm from "@/components/Member/ChangePasswordForm"
-import { memberGetProfile } from "@/api/utils/member/profile"
+import { memberGetProfile } from "@/api/server-components/member/profile"
 
 export default async function MemberPage() {
   const memberInfo = await memberGetProfile()

@@ -1,4 +1,3 @@
-import { userRegister } from '@/api/auth'
 import { UserRegister, UserRegisterResponse, UserLogoutResponse } from '@/types/api/auth'
 import axios from "axios";
 import useSWRMutation from 'swr/mutation'
@@ -10,8 +9,12 @@ export function useCreateMember() {
         _key: string,
         { arg }: { arg: UserRegister }
       ):Promise<UserRegisterResponse> => {
-         const data = await userRegister(arg)
-         return data
+        const res = await axios.post<UserLogoutResponse>("/api/auth/register",arg, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return res.data
       });
 
     return {
