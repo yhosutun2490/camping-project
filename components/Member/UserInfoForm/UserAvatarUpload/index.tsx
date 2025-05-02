@@ -11,6 +11,7 @@ import { memberInfoSchema } from "@/schema/MemberInfoForm";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { useUpdateMemberAvatar } from "@/swr/member/profile/useMemberProfile";
+import { useRouter } from "next/navigation"
 
 type FormType = z.infer<typeof memberInfoSchema>;
 type Props = {
@@ -29,6 +30,7 @@ export default function UserAvatarUpload({
   clearErrors,
   error,
 }: Props) {
+  const router = useRouter()
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(initialLink);
   // inputRef
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -69,6 +71,7 @@ export default function UserAvatarUpload({
     try {
       const res = await trigger(file);
       toast.success("個人大頭照上傳成功");
+      router.refresh()
       setValue("photo_url", res.data.avatar_url);
       setAvatarUrl(previewURL);
     } catch (err) {

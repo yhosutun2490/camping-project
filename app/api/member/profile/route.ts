@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatAxiosError } from "@/utils/errors";
-import { MemberUpdateAvatarResponse } from "@/types/api/member/profile";
+import { MemberProfile,MemberUpdateProfileResponse} from "@/types/api/member/profile";
 import { ErrorResponse } from "@/types/api/response";
 import axiosInstance from "@/api/axiosIntance";
-import apiParseToken from "@/api/apiParseToken"
 
-// member profile avatar 上傳
-export async function POST(
+// member profile update 個人資料
+export async function PATCH(
   req: NextRequest
-): Promise<NextResponse<MemberUpdateAvatarResponse | ErrorResponse>> {
-  const form = await req.formData()
-  const accessToken = apiParseToken(req)
- 
+): Promise<NextResponse<MemberUpdateProfileResponse | ErrorResponse>> {
+  const {firstname, lastname,gender,username, birth, photo_url} = await req.json() as MemberProfile
+  const accessToken = req.headers.get('access_token')
    if (!accessToken) {
      return NextResponse.json(
        { status: "error", message: "取不到 token,請重新登入" },
@@ -19,10 +17,21 @@ export async function POST(
      );
    }
   
+   const payload: Record<string, unknown> = {
+    firstname,
+    lastname,
+    gender,
+    username,
+    birth,
+    photo_url
+  }
+  const cleanPayload = Object.fromEntries(
+    Object.entries(payload).filter(([, v]) => v !== "")
+  )
   try {
-    const backEndRes = await axiosInstance.post<MemberUpdateAvatarResponse>(
-      "/member/profile/avatar",
-      form,
+    const backEndRes = await axiosInstance.patch<MemberUpdateProfileResponse>(
+      "/member/profile",
+      cleanPayload,
       {
         headers: {
           Cookie: `access_token=${accessToken}`,
@@ -31,7 +40,7 @@ export async function POST(
       }
     );
     // response data
-    const res = NextResponse.json<MemberUpdateAvatarResponse>({
+    const res = NextResponse.json<MemberUpdateProfileResponse>({
       data: backEndRes.data.data,
       message: backEndRes.data.message,
       status: backEndRes.data.status,

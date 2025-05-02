@@ -11,7 +11,7 @@ export function useUpdateMemberProfile() {
     "/api/member/profile/update",
     async (_key: string, { arg: payload }: { arg: MemberProfile }) => {
       const data = await axios.patch<MemberUpdateProfileResponse>(
-        "api/member/profile/update",
+        "api/member/profile",
         payload
       );
       return data;

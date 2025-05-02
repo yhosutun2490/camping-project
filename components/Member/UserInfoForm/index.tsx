@@ -39,6 +39,7 @@ export default function MemberInfoForm({ initialProfile }: Props) {
       email: initialProfile?.email,
       phone: initialProfile?.phone,
       birth: initialProfile?.birth,
+      gender: initialProfile?.gender as 'male' | 'female' | undefined | null
       // … 其他預設值
     },
   });
@@ -66,29 +67,29 @@ export default function MemberInfoForm({ initialProfile }: Props) {
         firstname: data.firstname,
         lastname: data.lastname,
         username: data.username,
-        gender: data.gender,
-        photo_url: data.photo_url,
+        gender: data.gender ?? '',
+        photo_url: data.photo_url ?? '',
         phone: data.phone,
         email: data.email,
-        birth: data.birth,
+        birth: data.birth ?? '',
       });
 
-      console.log("修改個人資料成功結果", res);
+      console.log("修改個人資料成功結果", res.data.message);
       toast.success("修改個人資料成功");
       router.refresh()
     } catch (err) {
       if (err instanceof Error) {
-        const message = err?.message;
-        toast.error(`修改個人資料失敗-${message}`);
+        toast.error(`修改個人資料失敗`);
       }
     }
   }
 
   return (
     <div className="member_info_form border-1 border-gray-300 rounded-2xl py-3 px-6">
+      <p className="text-primary-500 text-2xl">管理個人資料</p>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-3"
+        className="grid grid-cols-2 gap-2"
       >
         <div className="avatar_wrapper col-span-2">
           <UserAvatarUpload
@@ -126,13 +127,13 @@ export default function MemberInfoForm({ initialProfile }: Props) {
         <Controller
           name="gender"
           control={control}
-          defaultValue=""
           render={({ field }) => (
             <FormHookDropDown
               {...field}
               label="性別"
               options={genderOptions}
               placeholder="請選擇"
+              value={field.value ?? undefined}
             />
           )}
         />
