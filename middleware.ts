@@ -46,14 +46,24 @@ export async function middleware(request: NextRequest) {
 
       // 3. 把所有 Set-Cookie 的「name=value」合併成一條 Cookie header
       const cookiePairs = cookies.map((raw) => raw.split(";")[0]);
-      // ["access_token=AAA", "refresh_token=BBB"]
       newReqHeaders.set("cookie", cookiePairs.join("; "));
 
+      // 4. 直接把最新的 access_token 提煉出來
+      const newAccessToken = cookiePairs
+       .find((c) => c.startsWith("access_token="))
+       ?.split("=")[1]
+
+     // 並把它塞到 Authorization header（或自訂 header）
+     if (newAccessToken) {
+       newReqHeaders.set("access_token", newAccessToken)
+     }
+      
+      // 5. next() 傳接給下一個api route 
       const response = NextResponse.next({
         request: { headers: newReqHeaders },
       });
 
-      // 4) **同时** 把所有 Set-Cookie 傳給瀏覽器(最後後續api route請求完成時)
+      // 6. 把所有 Set-Cookie 傳給瀏覽器(最後後續api route請求完成時)
       for (const header of cookies) {
         response.headers.append("Set-Cookie", header);
       }

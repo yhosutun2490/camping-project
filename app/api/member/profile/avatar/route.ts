@@ -3,13 +3,12 @@ import { formatAxiosError } from "@/utils/errors";
 import { MemberUpdateAvatarResponse } from "@/types/api/member/profile";
 import { ErrorResponse } from "@/types/api/response";
 import axiosInstance from "@/api/axiosIntance";
-import apiParseToken from "@/api/apiParseHeaderToken"
 
 // member profile avatar 上傳
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<MemberUpdateAvatarResponse | ErrorResponse>> {
-  const accessToken = apiParseToken(req)
+  const accessToken = req.headers.get('access_token')
   const form = await req.formData();
 
   if (!accessToken) {
