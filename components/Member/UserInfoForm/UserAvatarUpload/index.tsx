@@ -74,7 +74,7 @@ export default function UserAvatarUpload({
     } catch (err) {
       if (err instanceof Error) {
         const message = err?.message;
-        toast.success(`個人大頭照上傳失敗-${message}`);
+        toast.error(`個人大頭照上傳失敗-${message}`);
       }
     }
   }

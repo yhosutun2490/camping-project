@@ -2,17 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { formatAxiosError } from "@/utils/errors";
 import { MemberUpdateAvatarResponse } from "@/types/api/member/profile";
 import { ErrorResponse } from "@/types/api/response";
-import nextApiInstance from "@/api/axiosIntance/nextApiInstance";
+import axiosInstance from "@/api/axiosIntance";
+import apiParseToken from "@/api/apiParseHeaderToken"
 
 // member profile avatar 上傳
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<MemberUpdateAvatarResponse | ErrorResponse>> {
-  const form = await req.formData()
+  const accessToken = apiParseToken(req)
+  const form = await req.formData();
+
+  if (!accessToken) {
+    return NextResponse.json(
+      { status: "error", message: "取不到 token,請重新登入" },
+      { status: 401 }
+    );
+  }
+
   try {
-    const backEndRes = await nextApiInstance.post<MemberUpdateAvatarResponse>(
+    const backEndRes = await axiosInstance.post<MemberUpdateAvatarResponse>(
       "/member/profile/avatar",
-      form
+      form,
+      {
+        headers: {
+          Cookie: `access_token=${accessToken}`,
+        },
+        withCredentials: true,
+      }
     );
     // response data
     const res = NextResponse.json<MemberUpdateAvatarResponse>({

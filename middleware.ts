@@ -11,8 +11,6 @@ const excludeApiList = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next(); // 統一回傳物件
-
   const { pathname } = request.nextUrl;
 
   if (excludeApiList.includes(pathname)) {
@@ -42,14 +40,28 @@ export async function middleware(request: NextRequest) {
       const cookies = Array.isArray(rawSetCookies)
         ? rawSetCookies
         : [rawSetCookies];
-      for (const cookie of cookies) {
-        response.headers.append("Set-Cookie", cookie);
+
+      // 2. 複製原本的 request headers
+      const newReqHeaders = new Headers(request.headers);
+
+      // 3. 把所有 Set-Cookie 的「name=value」合併成一條 Cookie header
+      const cookiePairs = cookies.map((raw) => raw.split(";")[0]);
+      // ["access_token=AAA", "refresh_token=BBB"]
+      newReqHeaders.set("cookie", cookiePairs.join("; "));
+
+      const response = NextResponse.next({
+        request: { headers: newReqHeaders },
+      });
+
+      // 4) **同时** 把所有 Set-Cookie 傳給瀏覽器(最後後續api route請求完成時)
+      for (const header of cookies) {
+        response.headers.append("Set-Cookie", header);
       }
+    
+      return response;
     }
   }
-
-  // return 最終 response
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
@@ -58,6 +70,6 @@ export const config = {
     "/host/:path*",
     "/create-event/:path*",
     "/edit-event/:path*",
-    "/api/:path",
+    "/api/:path*",
   ],
 };
