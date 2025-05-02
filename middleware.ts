@@ -71,7 +71,15 @@ export async function middleware(request: NextRequest) {
       return response;
     }
   }
-  return NextResponse.next();
+  // 一般token未過期情況
+  const newReqHeaders = new Headers(request.headers);
+  newReqHeaders.set("access_token", accessToken || "");
+
+  return NextResponse.next({
+    request: {
+      headers: newReqHeaders,
+    },
+  });
 }
 
 export const config = {
