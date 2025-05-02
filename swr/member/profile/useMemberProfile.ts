@@ -1,4 +1,5 @@
-import { memberUpdateProfile, memberUpdateAvatar } from '@/api/member/profile'
+import axios from 'axios';
+import { memberUpdateProfile } from '@/api/member/profile'
 import { MemberUpdateProfileResponse, MemberProfile, MemberUpdateAvatarResponse } from '@/types/api/member/profile'
 import useSWRMutation from 'swr/mutation'
 
@@ -27,8 +28,15 @@ export function useUpdateMemberAvatar() {
         _key: string,
         { arg }: { arg: File }
       ):Promise<MemberUpdateAvatarResponse> => {
-         const data  = await memberUpdateAvatar(arg)
-         return data
+        const formData = new FormData();
+        formData.append("file", arg);
+  
+         const res = await axios.post<MemberUpdateAvatarResponse>("/api/member/profile/avatar",formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+         return res.data
       },
        { throwOnError: true }   
     );

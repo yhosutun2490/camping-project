@@ -8,28 +8,20 @@ import nextApiInstance from "@/api/axiosIntance/nextApiInstance";
 export async function POST(
   req: NextRequest
 ): Promise<NextResponse<MemberUpdateAvatarResponse | ErrorResponse>> {
+  const form = await req.formData()
   try {
-
-    // 取出body參數 圖片file圖片file
-    const body:File = await req.json();
-
-    // 轉換成form表單格式
-    const form = new FormData();
-    form.append("file", body);
-
     const backEndRes = await nextApiInstance.post<MemberUpdateAvatarResponse>(
-      "/profile/avatar",
-      form,
+      "/member/profile/avatar",
+      form
     );
     // response data
     const res = NextResponse.json<MemberUpdateAvatarResponse>({
-      data:  backEndRes.data.data,
+      data: backEndRes.data.data,
       message: backEndRes.data.message,
-      status: backEndRes.data.status
+      status: backEndRes.data.status,
     });
 
     return res;
-    
   } catch (err: unknown) {
     const apiErr = formatAxiosError(err);
     return NextResponse.json<ErrorResponse>(
