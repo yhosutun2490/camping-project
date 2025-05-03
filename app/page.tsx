@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <div className="flex flex-col items-center min-h-screen divide-5 font-[family-name:var(--font-geist-sans)]">
-      <section id="search-section" className="w-full h-[100dvh] relative px-4 scroll-mt-24 bg-[url('/main/main_bg_top.jpg')] bg-fixed bg-cover bg-center bg-no-repeat">
+      <section id="search-section">
         <SearchSection />
       </section>
       <section id="search-section" className="w-full h-[100dvh] px-4 scroll-mt-24 bg-primary-50">
