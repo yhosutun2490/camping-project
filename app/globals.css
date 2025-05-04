@@ -10,6 +10,7 @@
   --color-primary-700: #354738;
   --color-primary-500: #5C795F;
   --color-primary-50: #F3F6F3;
+  --color-neutral-300: #B0B0B0;
   --color-neutral-950: #121212;
   --color-neutral-white: #FFFFFF;
   ;
@@ -51,4 +52,6 @@ body {
     font-family: 'Noto Sans TC', sans-serif;
     letter-spacing: 0;
   }
+ 
 }
+

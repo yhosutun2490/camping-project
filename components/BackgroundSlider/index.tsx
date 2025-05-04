@@ -51,7 +51,7 @@ export default function BackgroundSlider() {
         ))}
       </div>
       <h1 className={`absolute text-5xl font-bold text-center 
-        top-[40%] left-[50%] translate-[-50%] 
+        top-[45%] left-[50%] translate-[-50%] 
         ${currentSlide == 1 && "text-zinc-300"}
         ${currentSlide == 2 && "text-primary-500"}`}>
           走進森林 <br/> 享受不息的感動
