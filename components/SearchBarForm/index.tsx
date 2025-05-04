@@ -1,11 +1,12 @@
 "use client";
+import { Icon } from "@iconify/react";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { searchBarFormSchema } from "@/schema/SearBarForm";
 import Dropdown from "./DropDown";
 import PersonCounter from "./PersonCounter";
-// import DatePickerField from "@/components/DatePickerFIeld";
+import DatePickerField from "./DatePickerFIeld";
 
 type FormType = z.infer<typeof searchBarFormSchema>;
 
@@ -14,7 +15,7 @@ export default function SearchBarForm() {
     resolver: zodResolver(searchBarFormSchema),
     shouldUnregister: true,
     defaultValues: {
-      location: '',
+      location: 'Taipei',
       price: 0,
       person: {
         adults: 0,
@@ -25,10 +26,6 @@ export default function SearchBarForm() {
     },
   });
 
-  //   const dateRange = useWatch({
-  //     control: form.control,
-  //     name: "dateRange",
-  //   }); // 型別是 { from?: Date; to?: Date }
 
   // 地點選擇
   const locationOptions = [
@@ -63,18 +60,30 @@ export default function SearchBarForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex">
           <div className="form_input_wrapper flex flex-grow-1 gap-4 items-center divide-x divide-white/30">
             <div className="flex flex-col bg-grey grow-1 relative">
-              <p>地點</p>
+              <div className="flex items-center gap-1">
+                <Icon icon='mdi:location' className="text-white" width={20} height={20} />
+                <span>地點</span>
+              </div>
               <Dropdown options={locationOptions} fieldName="location"/>
             </div>
             <div className="flex flex-col bg-grey grow-1 relative">
-              <p>人數</p>
+              <div className="flex items-center gap-1">
+                <Icon icon='mdi:account-multiple-outline' className="text-white" width={20} height={20} />
+                <span>人數</span>
+              </div>
               <PersonCounter />
             </div>
             <div className="flex flex-col bg-grey grow-1 relative">
-              <p>日期</p>
+              <div className="flex items-center gap-1">
+                <Icon icon='mynaui:calendar' className="text-white" width={20} height={20} />
+                <span>日期</span>
+              </div>
+              <DatePickerField />
             </div>
           </div>
-          <button className="bg-primary-500 rounded-full w-[3rem] h-[3rem]"></button>
+          <button className="bg-primary-500 rounded-full w-[3rem] h-[3rem] flex justify-center items-center">
+            <Icon icon='material-symbols:search' className="text-white" width={30} height={30} />
+          </button>
         </form>
       </FormProvider>
     </div>

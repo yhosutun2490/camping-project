@@ -9,6 +9,8 @@
 @theme {
   --color-primary-700: #354738;
   --color-primary-500: #5C795F;
+  --color-primary-300: #A1B4A2;
+  --color-primary-100: #E3E9E2;
   --color-primary-50: #F3F6F3;
   --color-neutral-300: #B0B0B0;
   --color-neutral-950: #121212;
@@ -42,6 +44,8 @@ body {
     background-color: var(--input-bg) !important;
     color: var(--input-text) !important;
   }
+
+ 
 }
 
 @layer utilities {
@@ -54,4 +58,3 @@ body {
   }
  
 }
-
