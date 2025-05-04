@@ -5,12 +5,13 @@ import {
   UseFormSetValue,
   UseFormSetError,
   FieldError,
-  UseFormClearErrors
+  UseFormClearErrors,
 } from "react-hook-form";
 import { memberInfoSchema } from "@/schema/MemberInfoForm";
 import { z } from "zod";
-import toast from 'react-hot-toast';
-import { useUpdateMemberAvatar } from "@/swr/member/profile/useMemberProfile"
+import toast from "react-hot-toast";
+import { useUpdateMemberAvatar } from "@/swr/member/profile/useMemberProfile";
+import { useRouter } from "next/navigation"
 
 type FormType = z.infer<typeof memberInfoSchema>;
 type Props = {
@@ -18,7 +19,7 @@ type Props = {
   error?: FieldError;
   setValue: UseFormSetValue<FormType>;
   setError: UseFormSetError<FormType>; // react form 設定錯誤 setError
-  clearErrors: UseFormClearErrors<FormType>; // react form 清除錯誤 
+  clearErrors: UseFormClearErrors<FormType>; // react form 清除錯誤
   onUpload?: (url: string) => void; //上傳api回傳成功的圖片url
 };
 
@@ -29,11 +30,11 @@ export default function UserAvatarUpload({
   clearErrors,
   error,
 }: Props) {
+  const router = useRouter()
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(initialLink);
   // inputRef
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const {trigger} = useUpdateMemberAvatar() // 上傳圖片api custom hook
-
+  const { trigger, isMutating } = useUpdateMemberAvatar(); // 上傳圖片api custom hook
 
   function handleClickUpload() {
     inputRef?.current?.click();
@@ -44,7 +45,7 @@ export default function UserAvatarUpload({
     if (!file) return;
 
     // 清除舊有錯誤
-    clearErrors('photo_url')
+    clearErrors("photo_url");
 
     if (file && file.size > 2 * 1024 * 1024 && setError) {
       setError("photo_url", {
@@ -54,7 +55,7 @@ export default function UserAvatarUpload({
       return;
     }
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-  
+
     if (!allowedTypes.includes(file.type)) {
       setError?.("photo_url", {
         type: "manual",
@@ -65,22 +66,20 @@ export default function UserAvatarUpload({
 
     // 本機預覽
     const previewURL = URL.createObjectURL(file);
- 
+
     // upload avatar api
     try {
-      const res = await trigger(file)
-      toast.success('個人大頭照上傳成功')
-      setValue('photo_url',res.data.avatar_url)
+      const res = await trigger(file);
+      toast.success("個人大頭照上傳成功");
+      router.refresh()
+      setValue("photo_url", res.data.avatar_url);
       setAvatarUrl(previewURL);
-
-    } catch(err) {
+    } catch (err) {
       if (err instanceof Error) {
-        const message = err?.message
-        toast.success(`個人大頭照上傳失敗-${message}`)
+        const message = err?.message;
+        toast.error(`個人大頭照上傳失敗-${message}`);
       }
- 
     }
-   
   }
 
   return (
@@ -99,10 +98,22 @@ export default function UserAvatarUpload({
           }`}
           onClick={handleClickUpload}
         >
-          {error ? error.message : "點擊上傳個人圖片"}
+          {isMutating ? "上傳中…" : error ? error.message : "點擊上傳個人圖片"}
         </label>
-        <div className="avatar">
-          <div className="w-24 rounded-full" onClick={handleClickUpload}>
+        <div className="avatar relative w-24 h-24 rounded-full overflow-hidden">
+          {isMutating && (
+            <div className="absolute w-full h-full inset-0 bg-white/50 
+              flex items-center justify-center rounded-full"
+            >
+              <div className="absolute inset-[50%] translate-[-50%] loading loading-spinner loading-lg text-primary-500"></div>
+            </div>
+          )}
+          <div
+            className={`${
+              isMutating ? "opacity-50  pointer-events-none" : ""
+            }`}
+            onClick={handleClickUpload}
+          >
             <Image
               src={avatarUrl || "/header/user_image.jpg"}
               width={35}

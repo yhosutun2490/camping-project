@@ -22,9 +22,11 @@ export default function MemberMenu({user}:PropsType) {
 
   async function handleLogOut() {
     try {
-      await trigger()
+      await trigger(null)
       toast.success('登出成功')
-      router.refresh()
+      router.push('/')
+      // 重新整理所有 app-router 的 data fetching
+      router.refresh();
     } catch(err) {
       console.warn('登出err',err)
       toast.error('登出失敗')

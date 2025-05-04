@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderNavBar from "@/components/HeaderNavBar";
 import Toast from "@/components/Toast";
-import {userVerifyToken} from "@/api/utils/auth-server"
+import { getUserInfo } from "@/api/server-components/checkUser"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,12 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 
+
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await userVerifyToken();
+  const user = await getUserInfo()
+
   return (
     <html lang="en">
       <body

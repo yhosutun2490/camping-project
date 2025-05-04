@@ -1,12 +1,13 @@
 import AvatarCard from "@/components/Member/AvatarCard";
 import SideBarMenu from "@/components/Member/SideBarMenu";
-
+import { memberGetProfile } from "@/api/server-components/member/profile"
+export const dynamic = 'force-dynamic' 
 export default async function MemberLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
+  const memberInfo = await memberGetProfile()
   const menuLists = [
     {
         id: '1',
@@ -51,9 +52,8 @@ export default async function MemberLayout({
     lg:grid lg:grid-cols-[300px_1fr] h-full overflow-hidden pt-[60px]"
     >
       <aside className="border-r-1 h-full pt-4 shadow-md bg-primary-50">
-        <AvatarCard username="Rafael"/>
+        <AvatarCard userInfo={{photo_url: memberInfo?.data.member.photo_url, username: memberInfo?.data.member.username}}/>
         <SideBarMenu lists={menuLists}/>
-    
       </aside>
       <main className="h-full pt-6 px-[5%]">{children}</main>
     </div>
