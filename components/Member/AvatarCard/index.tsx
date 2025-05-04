@@ -3,9 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 type Props = {
-  username: string;
+  userInfo: {
+    username?: string ,
+    photo_url?: string 
+  }
 };
-export default function AvatarCard({ username }: Props) {
+export default function AvatarCard({ userInfo }: Props) {
   return (
     <div
       className="member_info_avatar_card flex flex-col 
@@ -14,7 +17,7 @@ export default function AvatarCard({ username }: Props) {
       <div className="avatar">
         <div className="w-24 rounded-full">
           <Image
-            src="/header/user_image.jpg"
+            src={userInfo.photo_url || "/header/user_image.jpg"}
             width={35}
             height={35}
             alt="Picture of the author"
@@ -22,7 +25,7 @@ export default function AvatarCard({ username }: Props) {
           />
         </div>
       </div>
-      <p className="text-primary-500">{username}</p>
+      <p className="text-primary-500">{userInfo.username}</p>
       <Link href="/member" className="flex items-center pl-[15px] space-x-1 text-primary-500 underline decoration-1">
         <p>管理個人資料 </p>
         <Icon icon="maki:arrow" width={20} height={20}></Icon>
