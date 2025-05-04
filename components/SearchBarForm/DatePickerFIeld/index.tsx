@@ -1,6 +1,7 @@
 "use client";
 import { Icon } from "@iconify/react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { useState } from "react";
 import {
   DayPicker,
   DateRange,
@@ -13,13 +14,16 @@ import "react-day-picker/dist/style.css";
 
 
 
-function CustomFooter() {
+function CustomFooter({ onSave }: { onSave: () => void }) {
   return (
     <div className="flex justify-center gap-3 p-4 border-t">
       <button className="px-4 py-2 w-[200px] border-1 border-neutral-700 bg-white text-neutral-700 rounded-lg hover:bg-gray-100">
         彈性時間
       </button>
-      <button className="px-6 py-2 w-[200px] bg-primary-500 text-white rounded-lg hover:bg-gray-700">
+      <button  
+        onClick={onSave}
+        className="px-6 py-2 w-[200px] bg-primary-500 text-white rounded-lg hover:bg-gray-700"
+      >
         儲存
       </button>
     </div>
@@ -77,12 +81,16 @@ export default function DatePickerField() {
   const today = new Date(); // “now” reference
   // 1. 從 Context 拿到 control
   const { register, setValue } = useFormContext();
-  const dateRangeValue = useWatch({ name: "dateRange" });
+  const [localRange, setLocalRange] = useState<DateRange>();
+  const formDateRange = useWatch({ name: "dateRange" });
 
-  function handleSelectDate(date: DateRange) {
-    console.log("選擇日期", date);
-    setValue("dateRange", date);
+  function handleSelectDate(range?: DateRange) {
+    setLocalRange(range);
   }
+  function handleSave() {
+    setValue('dateRange', localRange);
+  }
+
 
   return (
     <div className="dropdown dropdown-left w-full" {...register("dateRange")}>
@@ -91,7 +99,9 @@ export default function DatePickerField() {
         role="button"
         className="options w-full min-h-[30px] flex items-center"
       >
-        日期123
+          {formDateRange?.from && formDateRange?.to
+          ? `${formDateRange.from.toLocaleDateString()} - ${formDateRange.to.toLocaleDateString()}`
+          : "選擇日期範圍"}
       </div>
       <div
         tabIndex={0}
@@ -100,22 +110,24 @@ export default function DatePickerField() {
         <DayPicker
           required
           mode="range"
-          selected={dateRangeValue}
+          selected={localRange ?? formDateRange}
           onSelect={(date) => handleSelectDate(date)}
           numberOfMonths={2}
           footer
           fixedWeeks
           className="p-4 bg-white/100 rounded-2xl"
+          disabled={{ before: today }}
           classNames={{
             months: "flex space-x-4", // space-x-4 加一點左右間距
             weekday:  "text-neutral-300",
             selected: "border-none bg-primary-100 text-neutral-950",  // 套给所有 selected
-            day: "text-neutral-950"
+            day: "text-neutral-950",
+            disabled: 'opacity-30 pointer-events-none',
           }}
           components={{
             Nav: () => <></>,
             MonthCaption: CustomCaption,
-            Footer: CustomFooter
+            Footer: ()=> <CustomFooter onSave={handleSave}/>
           }}
           modifiers={{
             past: { before: today },
