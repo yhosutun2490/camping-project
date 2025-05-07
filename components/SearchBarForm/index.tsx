@@ -8,9 +8,14 @@ import Dropdown from "./DropDown";
 import PersonCounter from "./PersonCounter";
 import DatePickerField from "./DatePickerFIeld";
 
+interface Props {
+  isBgBlur?: boolean,
+  bgColor?: string,
+}
 type FormType = z.infer<typeof searchBarFormSchema>;
 
-export default function SearchBarForm() {
+
+export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
   const form = useForm<FormType>({
     resolver: zodResolver(searchBarFormSchema),
     shouldUnregister: true,
@@ -53,8 +58,13 @@ export default function SearchBarForm() {
   return (
     <div
       id="search_bar_form"
-      className="w-full px-[24px] py-[12px] overflow-visible select-none cursor-pointer
-    bg-white/40 backdrop-blur-sm border-2 border-neutral-300 rounded-full"
+      className={`
+        w-full px-[24px] py-[12px] overflow-visible 
+        select-none cursor-pointer border-2 border-neutral-300 
+        rounded-full
+        ${bgColor}
+        ${isBgBlur ? 'bg-white/40 backdrop-blur-sm' : ''}
+      `}
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex">

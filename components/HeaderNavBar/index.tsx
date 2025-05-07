@@ -27,10 +27,10 @@ export default function HeaderNavBar({username}:PropsType) {
         <a className="text-neutral-950 text-base ml-[0.5rem]">森森不息</a>
       </div>
       <div className="flex item-center space-x-4 h-full">
-        <Link href="/" className="flex items-center">
+        <Link href="/event" className="flex items-center">
           <p className="text-neutral-950 text-base">活動列表</p>
         </Link>
-        <Link href="/event" className="flex items-center">
+        <Link href="/create-activity" className="flex items-center">
           <p className="text-neutral-950 text-base">辦活動</p>
         </Link>
       

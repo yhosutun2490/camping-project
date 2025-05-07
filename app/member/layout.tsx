@@ -48,7 +48,7 @@ export default async function MemberLayout({
   ]
   return (
     <div
-      className="member_pag_layout
+      className="member_page_layout
     lg:grid lg:grid-cols-[300px_1fr] h-full overflow-hidden pt-[60px]"
     >
       <aside className="border-r-1 h-full pt-4 shadow-md bg-primary-50">
