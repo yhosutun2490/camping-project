@@ -4,14 +4,23 @@ import Image from "next/image";
 import LoginLabelModal from "@/components/LoginLabelModal"
 import RegisterModal from "@/components/RegisterModal";
 import MemberMenu from "@/components/HeaderNavBar/MemberMenu"
-import { usePathname } from 'next/navigation'
+
+import { usePathname, useRouter } from 'next/navigation'
+import CreateHostModal from "../CreateHostModal";
 
 interface PropsType {
-  username: string
+  username: string;
+  userRole?: string;
 }
-export default function HeaderNavBar({username}:PropsType) {
-  const pathname = usePathname()
-  const isHome = pathname === '/'
+
+export default function HeaderNavBar({username, userRole}:PropsType) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHome = pathname === '/';
+  
+  // 檢查使用者是否為主辦方
+  const isHost = userRole === 'host';
+  
   return (
     < div className={[
       'navbar fixed inset-x-0  w-full px-[16%] z-10',
@@ -30,11 +39,21 @@ export default function HeaderNavBar({username}:PropsType) {
         <Link href="/" className="flex items-center">
           <p className="text-neutral-950 text-base">活動列表</p>
         </Link>
-        <Link href="/event" className="flex items-center">
-          <p className="text-neutral-950 text-base">辦活動</p>
-        </Link>
+        
+        {username ? (
+          isHost ? (
+            <Link href="/create-activity" className="flex items-center">
+              <p className="text-neutral-950 text-base">辦活動</p>
+            </Link>
+          ) : (
+            <CreateHostModal onSuccess={() => {
+              router.refresh();
+              router.push('/create-activity')
+            }} />
+          )
+        ) : null }
       
-        { username? <MemberMenu user={username}/> : 
+        { username ? <MemberMenu user={username}/> : 
         <div className="flex space-x-3">
            <LoginLabelModal />
            <RegisterModal />
