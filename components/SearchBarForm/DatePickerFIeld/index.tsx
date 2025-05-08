@@ -12,15 +12,13 @@ import {
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 
-
-
 function CustomFooter({ onSave }: { onSave: () => void }) {
   return (
     <div className="flex justify-center gap-3 p-4 border-t">
       <button className="px-4 py-2 w-[200px] border-1 border-neutral-700 bg-white text-neutral-700 rounded-lg hover:bg-gray-100">
         彈性時間
       </button>
-      <button  
+      <button
         onClick={onSave}
         className="px-6 py-2 w-[200px] bg-primary-500 text-white rounded-lg hover:bg-gray-700"
       >
@@ -29,7 +27,6 @@ function CustomFooter({ onSave }: { onSave: () => void }) {
     </div>
   );
 }
-
 
 function CustomCaption({ calendarMonth, displayIndex }: MonthCaptionProps) {
   // 1. 拿到真正的 JS Date
@@ -81,27 +78,46 @@ export default function DatePickerField() {
   const today = new Date(); // “now” reference
   // 1. 從 Context 拿到 control
   const { register, setValue } = useFormContext();
-  const [localRange, setLocalRange] = useState<DateRange>();
+  const [localRange, setLocalRange] = useState<{
+    to?: string;
+    from?: string;
+  }>();
   const formDateRange = useWatch({ name: "dateRange" });
+  const activeRange =
+    // 有 local preview 時就優先用它
+    localRange?.from && localRange?.to
+      ? localRange
+      : // 否則就 fallback 回 RHF 裡的值
+        formDateRange;
+
+  // 2. 再把 activeRange 轉回 DateRange
+  const selectedRange: DateRange = {
+    from: activeRange?.from ? new Date(activeRange.from) : undefined,
+    to: activeRange?.to ? new Date(activeRange.to) : undefined,
+  };
 
   function handleSelectDate(range?: DateRange) {
-    setLocalRange(range);
+    if (!range) return;
+    // 1. range.from/to 是 Date | undefined
+    const fromStr = range.from ? format(range.from, "yyyy-MM-dd") : undefined;
+    const toStr = range.to ? format(range.to, "yyyy-MM-dd") : undefined;
+    setLocalRange({ from: fromStr, to: toStr });
   }
   function handleSave() {
-    console.log('儲存的日期',localRange)
-    setValue('dateRange', localRange);
+    console.log("儲存的日期", localRange);
+    setValue("dateRange", localRange);
   }
 
-
   return (
-    <div className="dropdown dropdown-left w-full" {...register("dateRange")}>
+    <div className="dropdown dropdown-left w-full">
       <div
         tabIndex={0}
         role="button"
         className="options w-full min-h-[30px] flex items-center"
+        {...register("dateRange")}
       >
-          {formDateRange?.from && formDateRange?.to
-          ? `${formDateRange.from.toLocaleDateString()} - ${formDateRange.to.toLocaleDateString()}`
+        {formDateRange?.from && formDateRange?.to
+          ? `${formDateRange.from} - ${formDateRange.to}`
           : "選擇日期範圍"}
       </div>
       <div
@@ -111,7 +127,7 @@ export default function DatePickerField() {
         <DayPicker
           required
           mode="range"
-          selected={localRange ?? formDateRange}
+          selected={selectedRange}
           onSelect={(date) => handleSelectDate(date)}
           numberOfMonths={2}
           footer
@@ -120,15 +136,15 @@ export default function DatePickerField() {
           disabled={{ before: today }}
           classNames={{
             months: "flex space-x-4", // space-x-4 加一點左右間距
-            weekday:  "text-neutral-300",
-            selected: "border-none bg-primary-100 text-neutral-950",  // 套给所有 selected
+            weekday: "text-neutral-300",
+            selected: "border-none bg-primary-100 text-neutral-950", // 套给所有 selected
             day: "text-neutral-950",
-            disabled: 'opacity-30 pointer-events-none',
+            disabled: "opacity-30 pointer-events-none",
           }}
           components={{
             Nav: () => <></>,
             MonthCaption: CustomCaption,
-            Footer: ()=> <CustomFooter onSave={handleSave}/>
+            Footer: () => <CustomFooter onSave={handleSave} />,
           }}
           modifiers={{
             past: { before: today },
@@ -136,7 +152,7 @@ export default function DatePickerField() {
           modifiersClassNames={{
             range_start: "bg-primary-300 rounded-full",
             range_end: "bg-primary-300 rounded-full",
-            past: "text-grey-500"
+            past: "text-grey-500",
           }}
         />
       </div>
