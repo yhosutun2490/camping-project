@@ -1,13 +1,13 @@
 "use client";
 import { Icon } from "@iconify/react";
-import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
+import { useForm, FormProvider, SubmitHandler,SubmitErrorHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { searchBarFormSchema } from "@/schema/SearBarForm";
 import Dropdown from "./DropDown";
 import PersonCounter from "./PersonCounter";
 import DatePickerField from "./DatePickerFIeld";
-
+import { useRouter } from "next/navigation";
 interface Props {
   isBgBlur?: boolean,
   bgColor?: string,
@@ -30,6 +30,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       dateRange: { from: undefined, to: undefined },
     },
   });
+  const router = useRouter()
 
 
   // 地點選擇
@@ -51,9 +52,34 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       value: "Taichung",
     },
   ];
-
+  
+  const onError: SubmitErrorHandler<FormType> = (errors) => {
+    console.log("驗證失敗欄位：", errors);
+  };
+  
   const onSubmit: SubmitHandler<FormType> = (data) => {
-    console.log("搜尋參數：", data);
+    try {
+      console.log("搜尋參數：", data); 
+      // 1. 把 data 攤平／序列化成 key=value
+      const params = new URLSearchParams();
+      params.set("location", data?.location ?? '');
+      params.set("price", String(data.price));
+      params.set("adults", String(data.person.adults));
+      params.set("children", String(data.person.children));
+      params.set("pets", String(data.person.pets));
+      if (data.dateRange.from) {
+        params.set("from", data.dateRange.from);
+      }
+      if (data.dateRange.to) {
+        params.set("to", data.dateRange.to);
+      }
+  
+      // 2. 用 router.push 帶參數跳頁
+      router.push(`/event?${params.toString()}`);
+    } catch(err) {
+      console.warn('導向活動列表頁有誤',err)
+    }
+   
   };
   return (
     <div
@@ -67,7 +93,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       `}
     >
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex">
+        <form onSubmit={form.handleSubmit(onSubmit,onError)} className="flex">
           <div className="form_input_wrapper flex flex-grow-1 gap-4 items-center divide-x divide-white/30">
             <div className="flex flex-col bg-grey grow-1 relative">
               <div className="flex items-center gap-1">
@@ -91,7 +117,8 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
               <DatePickerField />
             </div>
           </div>
-          <button className="bg-primary-500 rounded-full w-[3rem] h-[3rem] flex justify-center items-center">
+          <button type="submit" className="bg-primary-500 rounded-full w-[3rem] h-[3rem] flex 
+          cursor-pointer justify-center items-center hover:shadow-lg">
             <Icon icon='material-symbols:search' className="text-white" width={30} height={30} />
           </button>
         </form>

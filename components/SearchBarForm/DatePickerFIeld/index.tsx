@@ -88,6 +88,7 @@ export default function DatePickerField() {
     setLocalRange(range);
   }
   function handleSave() {
+    console.log('儲存的日期',localRange)
     setValue('dateRange', localRange);
   }
 

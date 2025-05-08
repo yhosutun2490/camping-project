@@ -52,7 +52,8 @@ export default function PersonCounter() {
     }))
   }
   return (
-    <div className="dropdown dropdown-start w-full" {...register('person')}>
+    <div className="dropdown dropdown-start w-full" 
+    {...register('person')}>
       <div
         tabIndex={0}
         role="button"
