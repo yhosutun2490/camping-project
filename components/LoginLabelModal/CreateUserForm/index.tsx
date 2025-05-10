@@ -7,6 +7,7 @@ import { useCreateMember } from "@/swr/auth/useAuth";
 import toast from 'react-hot-toast';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod"
+import axios from "axios";
 import { registerSchema } from "@/schema/AuthForm";
 
 type FormType = z.infer<typeof registerSchema>
@@ -49,20 +50,34 @@ export default function CreateUserForm({ ref,close }: Props) {
       reset()
       toast.success("註冊完成，請重新登入")
     } catch (err) {
-      if ((err as Error).message === "Email 已被使用") {
-        toast.error("Email 已經註冊過")
-        setError("email", {
-          type: "manual",
-          message: "Email已經註冊過",
-        });
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data?.message;
+        console.log("message", message);
+        if (message === "Email 已被使用") {
+          toast.error("Email 已經註冊過")
+          setError("email", {
+            type: "manual",
+            message: "Email已經註冊過",
+          });
+        }
+        else if (message === "Username 已被使用") {
+          toast.error("帳號名稱已被註冊過")
+          setError("username", {
+            type: "manual",
+            message: "帳號名稱已經註冊過",
+          });
+        }
+        else if (message === "手機號碼已被使用") {
+            toast.error("手機號碼已被註冊過")
+            setError("phone", {
+              type: "manual",
+              message: "手機號碼已經註冊過",
+            });
+        } else {
+          toast.error("註冊失敗，請稍後再試")
+        }   
       }
-      if ((err as Error).message === "username 已被使用") {
-        toast.error("username已被使用")
-        setError("username", {
-          type: "manual",
-          message: "帳號名稱已經註冊過",
-        });
-      }
+     
     }
   };
 

@@ -30,7 +30,7 @@ export default function FormHookInput({
 
   return (
     <>
-      <div className={clsx("relative flex flex-col mb-4", className)}>
+      <div className={clsx("relative flex flex-col mb-3", className)}>
         <label className="label text-black mb-1">{label}</label>
 
         <input

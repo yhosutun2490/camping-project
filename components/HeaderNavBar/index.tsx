@@ -37,10 +37,7 @@ export default function HeaderNavBar({ username, userRole }: PropsType) {
             alt="Logo"
           />
              <p
-            className="relative ml-2 inline-block text-neutral-950 text-base transition-all duration-300 ease-in-out 
-  after:content-[''] after:absolute after:bottom-[-4px] after:left-1/2 after:-translate-x-1/2 
-  after:h-[2px] after:w-0 after:bg-primary-100 after:transition-all after:duration-300 
-  hover:after:w-full hover:text-primary-500"
+            className="relative ml-2 inline-block text-neutral-950 text-base hover:text-primary-500"
           >
            森森不息
           </p>
@@ -49,10 +46,7 @@ export default function HeaderNavBar({ username, userRole }: PropsType) {
       <div className="flex item-center space-x-4 h-full">
         <Link href="/event" className="flex items-center">
           <p
-            className="relative inline-block text-neutral-950 text-base transition-all duration-300 ease-in-out 
-  after:content-[''] after:absolute after:bottom-[-4px] after:left-1/2 after:-translate-x-1/2 
-  after:h-[2px] after:w-0 after:bg-primary-100 after:transition-all after:duration-300 
-  hover:after:w-full hover:text-primary-500"
+            className="relative inline-block text-neutral-950 text-base hover:text-primary-500"
           >
             活動列表
           </p>
@@ -62,10 +56,7 @@ export default function HeaderNavBar({ username, userRole }: PropsType) {
           isHost ? (
             <Link href="/create-activity" className="flex items-center">
                  <p
-            className="relative inline-block text-neutral-950 text-base transition-all duration-300 ease-in-out 
-  after:content-[''] after:absolute after:bottom-[-4px] after:left-1/2 after:-translate-x-1/2 
-  after:h-[2px] after:w-0 after:bg-primary-100 after:transition-all after:duration-300 
-  hover:after:w-full hover:text-primary-500"
+            className="relative inline-block text-neutral-950 text-base hover:text-primary-500"
           >
            辦活動
           </p>
