@@ -47,7 +47,7 @@ export default function CreateUserForm({ ref,close }: Props) {
       });
       close()
       reset()
-      toast.success("創建會員成功")
+      toast.success("註冊完成，請重新登入")
     } catch (err) {
       if ((err as Error).message === "Email 已被使用") {
         toast.error("Email 已經註冊過")
