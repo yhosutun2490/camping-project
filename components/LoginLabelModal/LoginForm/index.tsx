@@ -93,7 +93,7 @@ export default function LoginForm({ref,close}:Props) {
         error={errors.password}
       />
       <p className="text-base text-end mb-1.5 text-gray-500 underline decoration-1 cursor-pointer">忘記密碼?</p>
-      <button type="submit" className="btn-primary w-full">
+      <button type="submit" className="btn-primary w-full" disabled={isMutating}>
       { isMutating ? <span className="loading loading-spinner"></span> : '登入' }
       </button>
     </form>
