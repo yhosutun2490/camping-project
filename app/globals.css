@@ -4,9 +4,7 @@
 @plugin "daisyui" {
   exclude: rootscrollgutter;
 }
-:root {
-  --background: #ffffff;
-}
+
 
 
 @theme {

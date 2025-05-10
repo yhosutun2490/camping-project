@@ -26,13 +26,13 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden antialiased flex flex-col h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased flex flex-col`}
       >
         <HeaderNavBar 
           username={user?.data?.member?.username ?? ''} 
           userRole={user?.data?.member?.role}
         />
-        <main className="flex-1">
+        <main className="flex-1 h-auto">
           {children}
         </main>
         <Toast />

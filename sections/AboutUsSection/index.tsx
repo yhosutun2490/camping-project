@@ -1,3 +1,3 @@
 export default function AboutUsSection() {
-    return <main>關於我們</main>
+    return <main className="h-full">關於我們</main>
 }
