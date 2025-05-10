@@ -1,20 +1,24 @@
 "use client";
 import React from "react";
 
-export default function DialogModal({
-  id,
-  children,
-  modalRef
-}: {
+type DialogModalProps = {
   id: string;
   children: React.ReactNode;
   modalRef?: React.RefObject<HTMLInputElement | null>;
-}) {
+  modalWidth?: `max-w-${string}`;
+};
+
+export default function DialogModal({
+  id,
+  children,
+  modalRef,
+  modalWidth
+}: DialogModalProps) {
   return (
     <>
       <input type="checkbox" ref={modalRef} id={id} className="modal-toggle" />
       <div className="modal" role="dialog">
-        <div className="modal-box  bg-gray-50">{children}</div>
+        <div className={`modal-box bg-gray-50 ${modalWidth}`}>{children}</div>
         <label className="modal-backdrop" htmlFor={id}>
           Close
         </label>
