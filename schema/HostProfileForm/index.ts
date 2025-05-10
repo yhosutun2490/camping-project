@@ -16,11 +16,17 @@ export const hostProfileSchema = z.object({
   phone: z.string()
     .regex(/^09\d{8}$/, { message: "請輸入有效的台灣手機號碼，格式為09XXXXXXXX" }),
   
-  photo: z.instanceof(File, { message: "請上傳主辦方頭像" })
-    .refine(
-      (file) => file.size <= 2 * 1024 * 1024,
-      { message: "照片大小不得超過 2MB" }
-    )
+  photo: z.any()
+    .refine((file) => {
+      // 伺服器端渲染時跳過檢查
+      if (typeof window === 'undefined') return true;
+      return file instanceof File;
+    }, { message: "請上傳主辦方頭像" })
+    .refine((file) => {
+      // 伺服器端渲染或無檔案時跳過檢查
+      if (typeof window === 'undefined' || !(file instanceof File)) return true;
+      return file.size <= 2 * 1024 * 1024;
+    }, { message: "照片大小不得超過 2MB" })
     .optional()
     .or(z.literal(null))
     .superRefine((val, ctx) => {
@@ -32,11 +38,17 @@ export const hostProfileSchema = z.object({
       }
     }),
   
-  photo_background: z.instanceof(File, { message: "請上傳主辦方背景圖片" })
-    .refine(
-      (file) => file.size <= 2 * 1024 * 1024,
-      { message: "背景照片大小不得超過 2MB" }
-    )
+  photo_background: z.any()
+    .refine((file) => {
+      // 伺服器端渲染時跳過檢查
+      if (typeof window === 'undefined') return true;
+      return file instanceof File;
+    }, { message: "請上傳主辦方背景圖片" })
+    .refine((file) => {
+      // 伺服器端渲染或無檔案時跳過檢查
+      if (typeof window === 'undefined' || !(file instanceof File)) return true;
+      return file.size <= 2 * 1024 * 1024;
+    }, { message: "背景照片大小不得超過 2MB" })
     .optional()
     .or(z.literal(null))
     .superRefine((val, ctx) => {
