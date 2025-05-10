@@ -29,10 +29,9 @@ export default function FormHookInput({
   const inputType = type === "password" ? (show ? "text" : "password") : type;
 
   return (
-    <>
-      <div className={clsx("relative flex flex-col mb-3", className)}>
-        <label className="label text-black mb-1">{label}</label>
-
+    <div className={clsx("relative flex flex-col mb-3", className)}>
+      <label className="label text-black mb-1">{label}</label>
+      <div className="input_wrap relative">
         <input
           type={inputType}
           placeholder={placeholder}
@@ -50,7 +49,7 @@ export default function FormHookInput({
           <button
             type="button"
             onClick={() => setShow((v) => !v)}
-            className="absolute cursor-pointer top-[50%] right-2 flex items-center p-1"
+            className="absolute cursor-pointer top-[50%] translate-y-[-50%] right-2 flex items-center p-1"
           >
             <Icon
               icon={show ? "mdi:eye" : "mdi:eye-off"}
@@ -59,7 +58,8 @@ export default function FormHookInput({
           </button>
         )}
       </div>
+
       {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
-    </>
+    </div>
   );
 }

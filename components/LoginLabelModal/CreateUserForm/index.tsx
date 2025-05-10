@@ -144,7 +144,7 @@ export default function CreateUserForm({ ref,close }: Props) {
         <button
           type="submit"
           className="btn-primary w-full"
-          disabled={isMutating || isValidating}
+          disabled={isMutating || isValidating || Object.keys(errors).length > 0}
         >
           { isMutating ? <span className="loading loading-spinner"></span> : '創建會員' }
         </button>

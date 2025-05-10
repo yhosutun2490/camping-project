@@ -80,7 +80,7 @@ export default function MemberMenu({user}:PropsType) {
           </MenuList>
         )}
         <p className="text-xl text-primary-500 ml-[0.5rem]">{user} 您好</p>
-        <Icon icon='carbon:triangle-down-solid' className="text-primary-500"  width={20} height={20} />
+        <Icon icon='carbon:triangle-down-solid' className="text-primary-500"  width={12} height={12} />
       </div>
     </>
   );
