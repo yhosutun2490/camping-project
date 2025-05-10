@@ -28,7 +28,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
       >
-        <HeaderNavBar username={user?.data?.member?.username??''}/>
+        <HeaderNavBar 
+          username={user?.data?.member?.username ?? ''} 
+          userRole={user?.data?.member?.role}
+        />
         <main className="flex-1 overflow-auto">
           {children}
         </main>
