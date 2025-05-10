@@ -5,6 +5,7 @@ import useClickOutSide from "@/hook/useClickOutSide";
 import { useRouter } from "next/navigation"
 import { useState, useRef } from "react";
 import { useUserLogout } from "@/swr/auth/useAuth"
+import { Icon } from "@iconify/react";
 import toast from 'react-hot-toast';
 
 type OpenState = true | false;
@@ -54,7 +55,11 @@ export default function MemberMenu({user}:PropsType) {
     <>
       <div
         ref={menuRef}
-        className="avatar relative flex items-center"
+        className="avatar relative flex gap-2 items-center
+        bg-white/10 backdrop-blur-lg
+        hover:cursor-pointer
+        hover:bg-primary-100 rounded-full p-[0.5rem]"
+        onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
         <div className="w-[35px] h-[35px] rounded-full">
           <Image
@@ -63,15 +68,19 @@ export default function MemberMenu({user}:PropsType) {
             height={35}
             alt="Picture of the author"
             className="cursor-pointer"
-            onClick={() => setIsOpenMenu(!isOpenMenu)}
+          
           />
         </div>
         {isOpenMenu && (
-          <MenuList className="absolute top-[50px] left-0 w-[120%]" list={list}>
+          <MenuList className="absolute top-[60px] left-0 w-[120%]" 
+          list={list}
+          closeMenu={()=>setIsOpenMenu(false)}
+          >
             <p onClick={handleLogOut}>登出</p>
           </MenuList>
         )}
-        <p className="text-xl text-primary-700 ml-[0.5rem]">{user} 您好</p>
+        <p className="text-xl text-primary-500 ml-[0.5rem]">{user} 您好</p>
+        <Icon icon='carbon:triangle-down-solid' className="text-primary-500"  width={20} height={20} />
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import SearchBarForm from "@/components/SearchBarForm";
+// import SearchBarForm from "@/components/SearchBarForm";
 import TabList from "./TabList";
 import { Icon } from "@iconify/react";
 export default function TabListSection() {
@@ -26,10 +26,10 @@ export default function TabListSection() {
 
   ]
   return (
-    <div className="flex flex-col gap-5 bg-inherit border-2 pt-6 px-8">
+    <div className="flex flex-col gap-5 bg-inherit border-b-1 border-zinc-50 pt-6 px-8">
       <p className="search_condition text-4xl text-neutral-950">以下是與台北地區、5人 相關的露營活動體驗 </p>
       <div className="event_search_bar w-[80%] mx-auto">
-        <SearchBarForm isBgBlur={false} bgColor="bg-primary-300"/>
+        {/* <SearchBarForm isBgBlur={false} bgColor="bg-primary-300"/> */}
       </div>
       <TabList lists={eventTabLists}/>
     </div>
