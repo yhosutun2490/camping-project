@@ -1,11 +1,15 @@
 @import "tailwindcss";
 /* 自訂樣式區塊 */
 @import "../styles/button.css";
-@plugin "daisyui";
-
+@plugin "daisyui" {
+  exclude: rootscrollgutter;
+}
 :root {
   --background: #ffffff;
 }
+
+
+
 @theme {
   --color-primary-700: #354738;
   --color-primary-500: #5C795F;
@@ -36,6 +40,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+html.modal-open {
+  scrollbar-gutter: auto !important;
 }
 
 @layer base {
