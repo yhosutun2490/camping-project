@@ -60,11 +60,11 @@ export default async function MemberLayout({
      grid grid-cols-[300px_3fr] h-screen pt-[60px]"
     >
 
-      <aside className="h-full sticky top-5 pb-8 shadow-md bg-primary-50">
+      <aside className="h-full sticky top-5 shadow-md bg-primary-50">
         <AvatarCard userInfo={{photo_url: memberInfo?.data.member.photo_url, username: memberInfo?.data.member.username}}/>
         <SideBarMenu lists={menuLists}/>
       </aside>
-      <main className="overflow-y-auto h-full pt-6 pb-8 px-[5%] bg-white">{children}</main>
+      <main className="overflow-y-auto h-full pt-6 pb-[60px] px-[5%] bg-white">{children}</main>
     </div>
   );
 }

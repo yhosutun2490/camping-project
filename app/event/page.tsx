@@ -20,7 +20,7 @@ export default function EventPage() {
 
         {/* 右邊卡片區（⚠️ scroll 主體） */}
         <div
-          className="flex-1 p-6 grid
+          className="flex-1 pt-6 pb-[120px] grid
           grid-cols-[repeat(auto-fit,minmax(250px,350px))] grid-rows-max gap-4"
         >
           <EventCard />
