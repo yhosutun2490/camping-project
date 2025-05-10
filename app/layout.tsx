@@ -32,7 +32,7 @@ export default async function RootLayout({
           username={user?.data?.member?.username ?? ''} 
           userRole={user?.data?.member?.role}
         />
-        <main className="flex-1 h-auto">
+        <main className="flex-1 h-full">
           {children}
         </main>
         <Toast />

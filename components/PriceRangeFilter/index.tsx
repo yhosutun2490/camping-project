@@ -111,7 +111,7 @@ export default function DualRangeForm() {
 
         <button
           type="submit"
-          className="px-4 py-2 btn bg-primary-500 text-white rounded"
+          className="px-4 py-2 btn-primary rounded"
         >
           提交
         </button>
