@@ -89,7 +89,7 @@ export default function MemberInfoForm({ initialProfile }: Props) {
       <p className="text-primary-500 text-2xl">管理個人資料</p>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-2"
+        className="grid grid-cols-2 gap-2 grid-rows-auto"
       >
         <div className="avatar_wrapper col-span-2">
           <UserAvatarUpload

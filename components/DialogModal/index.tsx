@@ -17,7 +17,7 @@ export default function DialogModal({
   return (
     <>
       <input type="checkbox" ref={modalRef} id={id} className="modal-toggle" />
-      <div className="modal" role="dialog">
+      <div className="modal overflow-x-hidden" role="dialog">
         <div className={`modal-box bg-gray-50 ${modalWidth}`}>{children}</div>
         <label className="modal-backdrop" htmlFor={id}>
           Close

@@ -48,14 +48,14 @@ export default async function MemberLayout({
   ]
   return (
     <div
-      className="member_page_layout
-    lg:grid lg:grid-cols-[300px_1fr] h-full overflow-hidden pt-[60px]"
+      className="member_page_layout 
+    grid grid-cols-[300px_3fr] pt-[60px] h-[100dvh] overflow-y-hidden"
     >
-      <aside className="border-r-1 h-full pt-4 shadow-md bg-primary-50">
+      <aside className="h-full top-5 pt-4 pb-8 shadow-md bg-primary-50">
         <AvatarCard userInfo={{photo_url: memberInfo?.data.member.photo_url, username: memberInfo?.data.member.username}}/>
         <SideBarMenu lists={menuLists}/>
       </aside>
-      <main className="h-full pt-6 px-[5%]">{children}</main>
+      <main className="h-lca pt-6 pb-10 px-[5%] overflow-y-auto">{children}</main>
     </div>
   );
 }

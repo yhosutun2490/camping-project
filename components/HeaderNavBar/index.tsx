@@ -23,7 +23,7 @@ export default function HeaderNavBar({username, userRole}:PropsType) {
   
   return (
     < div className={[
-      'navbar fixed inset-x-0  w-full px-[16%] z-10',
+      'navbar fixed inset-x-0  w-full px-[10%] z-10',
       isHome ? 'bg-transparent' : 'bg-white shadow-md'
     ].join(' ')} >
       <div className="flex flex-1 items-center">

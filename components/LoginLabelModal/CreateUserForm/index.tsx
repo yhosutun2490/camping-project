@@ -134,5 +134,5 @@ export default function CreateUserForm({ ref,close }: Props) {
           { isMutating ? <span className="loading loading-spinner"></span> : '創建會員' }
         </button>
     </form>
-  );
+  )
 }

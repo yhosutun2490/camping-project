@@ -42,7 +42,7 @@ export default function FormHookInput({
           disabled:text-zinc-500
           disabled:cursor-not-allowed
           disabled:border-none
-          disabled:opacity-50
+          disabled:opacity-80
           ${error ? "input-error border-red-500" : ""}`}
           {...register}
         />
