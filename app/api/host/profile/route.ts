@@ -26,10 +26,9 @@ export async function POST(
       // 調用 API
       const response = await axiosInstance.post<HostProfileResponse>("/host/profile", profileData, {
         headers: {
-          authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
+          Cookie: `access_token=${accessToken}`,
         },
-        withCredentials: true // 確保接收 cookie
+        withCredentials: true,
       });
 
       // 從後端 response 獲取 cookie
