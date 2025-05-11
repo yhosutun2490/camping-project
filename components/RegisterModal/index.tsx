@@ -36,10 +36,10 @@ export default function RegisterModal() {
          註冊
       </label>
       <DialogModal id='modal-register' modalRef={modalRef}>
-        <p className="text-3xl text-base-200 text-center">
+        <p className="text-3xl text-primary-500 text-center">
           成為~森森不息的~會員
         </p>
-         <CreateUserForm ref={createFormRef} close={closeModal}/>: 
+         <CreateUserForm ref={createFormRef} close={closeModal}/>
       </DialogModal>
     </>
   );

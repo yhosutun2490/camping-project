@@ -2,7 +2,6 @@
 
 import React, { useImperativeHandle, useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormHandle } from "@/components/CreateHostModal";
 import { hostProfileSchema, HostProfileFormType } from "@/schema/HostProfileForm";
@@ -36,7 +35,7 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
       shouldUnregister: true,
     });
 
-    const { createHost, isLoading } = useCreateHostProfile();
+    const { trigger: createHost, isMutating: isLoading } = useCreateHostProfile();
 
     // 暴露表單重設函式給父元件
     useImperativeHandle(ref, () => ({
@@ -87,8 +86,8 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
     };
 
     // 圖片上傳功能的 hook
-    const { uploadAvatar } = useHostAvatarUpload();
-    const { uploadCover } = useHostCoverUpload();
+    const { trigger: uploadAvatar } = useHostAvatarUpload();
+    const { trigger: uploadCover } = useHostCoverUpload();
     const [isSubmitting, setIsSubmitting] = useState(false);
     
     // 表單提交處理
@@ -104,7 +103,6 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
           setValue('photo', null, { shouldValidate: true });
           hasError = true;
         } else if (!(data.photo instanceof File) || data.photo.size === 0) {
-          toast.error('頭像檔案無效或為空');
           setValue('photo', null, { shouldValidate: true });
           hasError = true;
         }
@@ -114,7 +112,6 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
           setValue('photo_background', null, { shouldValidate: true });
           hasError = true;
         } else if (!(data.photo_background instanceof File) || data.photo_background.size === 0) {
-          toast.error('背景圖片檔案無效或為空');
           setValue('photo_background', null, { shouldValidate: true });
           hasError = true;
         }
@@ -137,24 +134,17 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
           photo_background_url: defaultBackgroundUrl
         });
         
-        toast.success('主辦方資料建立成功');
         
         // 成功建立主辦方後，再上傳圖片
         try {
           // 上傳主辦方頭像並取得 URL
           if (data.photo instanceof File && data.photo.size > 0) {
-            
-            toast.loading('上傳主辦方頭像中...', { id: 'avatar-upload' });
             await uploadAvatar(data.photo);
-            toast.success('主辦方頭像上傳成功', { id: 'avatar-upload' });
           }
           
           // 上傳背景圖片並取得 URL
           if (data.photo_background instanceof File && data.photo_background.size > 0) {
-            // 顯示檔案資訊以便偵錯
-            toast.loading('上傳背景圖片中...', { id: 'cover-upload' });
             await uploadCover(data.photo_background);
-            toast.success('背景圖片上傳成功', { id: 'cover-upload' });
           }
           
           // 圖片已上傳到主辦方帳戶，不需要額外更新主辦方資料
@@ -164,20 +154,6 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
           onSuccess();
         } catch (error) {
           console.error("圖片上傳失敗:", error);
-          
-          // 提供更具體的錯誤訊息
-          let errorMessage = '主辦方建立成功，但圖片上傳失敗';
-          if (error instanceof Error) {
-            errorMessage = `主辦方建立成功，但圖片上傳失敗: ${error.message}`;
-            
-            // 如果是 "請上傳圖片" 錯誤，提供更明確的指引
-            if (error.message.includes('請上傳圖片')) {
-              errorMessage += '。請確認圖片格式正確且未損壞。';
-            }
-          }
-          
-          toast.error(errorMessage);
-          
           // 儘管圖片上傳失敗，仍然關閉表單並重新整理頁面
           router.refresh();
           onSuccess();
@@ -185,8 +161,6 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, "ref">>(
       } catch (error) {
         // 處理錯誤並顯示給用戶
         console.error(error);
-        const errorMessage = error instanceof Error ? error.message : "建立主辦方資料失敗";
-        toast.error(`錯誤：${errorMessage}`);
       } finally {
         setIsSubmitting(false);
       }

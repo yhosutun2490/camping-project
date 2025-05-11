@@ -10,6 +10,12 @@ export default async function MemberLayout({
   const memberInfo = await memberGetProfile()
   const menuLists = [
     {
+      id: '0',
+      link: '/member',
+      title: '管理個人資料',
+      icon: 'mingcute:ticket-line'
+  },
+    {
         id: '1',
         link: '/member/tickets',
         title: '我的活動票卷',
@@ -46,16 +52,19 @@ export default async function MemberLayout({
         icon: 'mdi:account-multiple-outline'
     },
   ]
+
+
   return (
     <div
-      className="member_pag_layout
-    lg:grid lg:grid-cols-[300px_1fr] h-full overflow-hidden pt-[60px]"
+      className="member_page_layout relative
+     grid grid-cols-[300px_3fr] h-screen pt-[60px]"
     >
-      <aside className="border-r-1 h-full pt-4 shadow-md bg-primary-50">
+
+      <aside className="h-full sticky top-5 shadow-md bg-primary-50">
         <AvatarCard userInfo={{photo_url: memberInfo?.data.member.photo_url, username: memberInfo?.data.member.username}}/>
         <SideBarMenu lists={menuLists}/>
       </aside>
-      <main className="h-full pt-6 px-[5%]">{children}</main>
+      <main className="overflow-y-auto h-full pt-6 pb-[60px] px-[5%] bg-white">{children}</main>
     </div>
   );
 }
