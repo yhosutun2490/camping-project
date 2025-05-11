@@ -12,15 +12,17 @@ type Props = {
 
 export default function SideBarMenu({ lists }: Props) {
   return (
-    <div className="menu_list bg-primary-50 text-neutral-950 h-full px-[15%]">
-      <ul className="menu rounded-box w-full flex flex-col space-y-6">
+    <div className="menu_list bg-primary-50 text-neutral-950 px-[5%]">
+      <ul className="menu rounded-box w-full flex flex-col 2xl:gap-4">
         {lists.map(item=> 
-           <Link href={item.link} key={item.id} className='flex items-center space-x-2'>
+           <button key={item.id} className='w-full hover:bg-primary-100 rounded-lg px-4 py-2'>
+              <Link href={item.link}  className='flex items-center space-x-2'>
              <Icon icon={item.icon} width={28} height={28} />
              <p className='text-2xl'>{item.title}</p>
            </Link>
+           </button>
+         
         )}
-      
       </ul>
     </div>
   );

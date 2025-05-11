@@ -43,7 +43,7 @@ export default function CreateHostModal({ onSuccess }: CreateHostModalProps) {
 
   return (
     <>
-      <label htmlFor="create-host" className="flex items-center">
+      <label htmlFor="create-host" className="flex items-center hover:text-primary-500 cursor-pointer">
         辦活動
       </label>
       <DialogModal modalWidth="max-w-5xl" id="create-host" modalRef={modalRef}>

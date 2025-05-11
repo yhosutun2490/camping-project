@@ -13,13 +13,16 @@
     "axios": "^1.8.4",
     "clsx": "^2.1.1",
     "daisyui": "^5.0.11",
+    "embla-carousel-react": "^8.6.0",
     "next": "15.2.4",
     "react": "^19.0.0",
+    "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
     "react-hot-toast": "^2.5.2",
-    "swr": "^2.3.3",
     "react-image-file-resizer": "^0.4.8",
+    "react-range": "^1.10.0",
+    "swr": "^2.3.3",
     "zod": "^3.24.3"
   },
   "devDependencies": {

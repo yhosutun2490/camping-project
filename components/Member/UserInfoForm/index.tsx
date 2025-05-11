@@ -27,7 +27,7 @@ export default function MemberInfoForm({ initialProfile }: Props) {
     setValue,
     clearErrors,
     control,
-    formState: { errors, isValidating },
+    formState: { errors },
   } = useForm<FormType>({
     resolver: zodResolver(memberInfoSchema),
     shouldUnregister: true,
@@ -89,7 +89,7 @@ export default function MemberInfoForm({ initialProfile }: Props) {
       <p className="text-primary-500 text-2xl">管理個人資料</p>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-2"
+        className="grid grid-cols-2 gap-2 grid-rows-auto"
       >
         <div className="avatar_wrapper col-span-2">
           <UserAvatarUpload
@@ -162,9 +162,9 @@ export default function MemberInfoForm({ initialProfile }: Props) {
         <button
           type="submit"
           className="btn-primary w-[150px] h-[40px] col-span-2 justify-self-end"
-          disabled={isValidating}
+          disabled={isMutating || Object.keys(errors).length > 0}
         >
-          更新個人資料
+            { isMutating ? <span className="loading loading-spinner"></span> : '更新個人資料' }
         </button>
       </form>
     </div>

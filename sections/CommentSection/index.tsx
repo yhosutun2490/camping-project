@@ -1,3 +1,3 @@
 export default function CommentSection() {
-    return <main>評論區</main>
+    return <main className="h-full">評論區</main>
 }
