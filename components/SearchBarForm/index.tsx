@@ -59,21 +59,23 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
   
   const onSubmit: SubmitHandler<FormType> = (data) => {
     try {
-      console.log("搜尋參數：", data); 
+      const personCounts = Object.values(data.person).reduce((acc, count) => acc + count, 0);
       // 1. 把 data 攤平／序列化成 key=value
       const params = new URLSearchParams();
-      params.set("location", data?.location ?? '');
-      params.set("price", String(data.price));
-      params.set("adults", String(data.person.adults));
-      params.set("children", String(data.person.children));
-      params.set("pets", String(data.person.pets));
+      if (data?.location) {
+        params.set("location", data?.location ?? '');
+      }
+      if (personCounts) {
+        params.set("person", String(personCounts));
+      }
+
       if (data.dateRange.from) {
         params.set("from", data.dateRange.from);
       }
       if (data.dateRange.to) {
         params.set("to", data.dateRange.to);
       }
-  
+
       // 2. 用 router.push 帶參數跳頁
       router.push(`/event?${params.toString()}`);
     } catch(err) {
@@ -118,7 +120,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
             </div>
           </div>
           <button type="submit" className="bg-primary-500 rounded-full w-[3rem] h-[3rem] flex 
-          cursor-pointer justify-center items-center hover:shadow-lg">
+          cursor-pointer justify-center items-center hover:bg-primary-300">
             <Icon icon='material-symbols:search' className="text-white" width={30} height={30} />
           </button>
         </form>
