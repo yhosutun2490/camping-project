@@ -1,12 +1,14 @@
-import TabListSection from "@/components/TabListSection";
+
 import EventCard from "@/components/EventCard";
 import PriceRangeFilter from "@/components/PriceRangeFilter";
+import TabListClientWrapper from "@/components/TabListClientWrapper";
+
 export default function EventPage() {
   return (
     <div className="h-screen bg-primary-50 ">
       {/* Header */}
       <div className="flex-shrink-0 border-b-2 border-stone-200">
-        <TabListSection />
+        <TabListClientWrapper />
       </div>
 
       {/* 主體左右區塊 */}
