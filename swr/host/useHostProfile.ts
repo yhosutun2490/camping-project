@@ -1,6 +1,7 @@
 import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
 import axios from 'axios';
-import { CreateHostProfileRequest, HostProfileResponse } from "@/types/api/host";
+import { CreateHostProfileRequest, HostProfileResponse, GetHostProfileResponse } from "@/types/api/host";
 import toast from 'react-hot-toast';
 
 // 建立主辦單位資料 API
@@ -33,5 +34,39 @@ export function useCreateHostProfile() {
     trigger,
     data,
     error,
+  };
+}
+
+// 獲取主辦單位資料 API
+export function useGetHostProfile() {
+  const { data, error, isLoading, mutate } = useSWR<GetHostProfileResponse>(
+    "/api/host/profile",
+    async (url) => {
+      try {
+        const response = await axios.get(url);
+        return response.data;
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response) {
+          // 404 表示尚未建立主辦方資料，不顯示錯誤提示
+          if (error.response.status !== 404) {
+            const errorMessage = error.response.data.message || "無法取得主辦方資料";
+            toast.error(errorMessage);
+          }
+          throw error;
+        }
+        throw new Error("取得主辦方資料發生錯誤");
+      }
+    },
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+    }
+  );
+
+  return {
+    hostProfile: data?.data?.host_info,
+    isLoading,
+    error,
+    mutate,
   };
 }
