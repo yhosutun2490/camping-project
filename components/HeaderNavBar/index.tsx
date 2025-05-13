@@ -4,6 +4,7 @@ import Image from "next/image";
 import LoginLabelModal from "@/components/LoginLabelModal";
 import RegisterModal from "@/components/RegisterModal";
 import MemberMenu from "@/components/HeaderNavBar/MemberMenu";
+import HeaderSearchBarForm from "../HeaderSearchBarForm";
 
 import { usePathname, useRouter } from "next/navigation";
 import CreateHostModal from "../CreateHostModal";
@@ -42,6 +43,9 @@ export default function HeaderNavBar({ username, userRole }: PropsType) {
            森森不息
           </p>
         </Link>
+      </div>
+      <div className="header_search_bar mx-auto max-w-[500px] h-[64px]">
+        <HeaderSearchBarForm />
       </div>
       <div className="flex item-center space-x-4 h-full">
         <Link href="/event" className="flex items-center">
