@@ -73,8 +73,11 @@ function CustomCaption({ calendarMonth, displayIndex }: MonthCaptionProps) {
     </div>
   );
 }
+interface Props {
+  placeholder?: string
+}
 
-export default function DatePickerField() {
+export default function DatePickerField( {placeholder='請選擇日期'}: Props) {
   const today = new Date(); // “now” reference
   // 1. 從 Context 拿到 control
   const { register, setValue } = useFormContext();
@@ -118,7 +121,7 @@ export default function DatePickerField() {
       >
         {formDateRange?.from && formDateRange?.to
           ? `${formDateRange.from} - ${formDateRange.to}`
-          : "選擇日期範圍"}
+          : placeholder }
       </div>
       <div
         tabIndex={0}
