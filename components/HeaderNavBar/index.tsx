@@ -38,10 +38,10 @@ export default function HeaderNavBar({
           "bg-transparent": isHome && !isBarScaleUp,
           "bg-white shadow-md": !isHome,
         },
-        isBarScaleUp ? "bg-zinc-50" : ""
+        isBarScaleUp ? "bg-white" : ""
       )}
     >
-      <div className="flex items-center h-10">
+      <div className="flex items-center h-10 z-1">
         <Link href="/" className="flex items-center">
           <Image
             src="/header/logo_icon.svg"
@@ -57,35 +57,36 @@ export default function HeaderNavBar({
       {/* 搜尋列 */}
       <div
         className={clsx(
-          "header_search_bar mx-auto absolute left-0 right-0 ease-in-out duration-200 ",
+          "header_search_bar mx-auto absolute left-0 right-0 overflow-visible ease-in-out ",
           isBarScaleUp
-            ? "top-[60px] w-full h-[120px] px-[10%] bg-zinc-50 transition-all"
-            : "w-[30%] h-12 px-0 transition-none"
+            ? "top-[25px] w-full h-[120px] px-[10%] bg-white duration-300"
+            : "w-[343px] h-12 px-0 transition-[width] duration-200 transition-[top] duration-600"
         )}
         ref={headerSearchBarRef}
         onClick={() => setIsBarScaleUp(true)}
       >
-        {isBarScaleUp && (
-          <div
-            className="text-xl text-primary-500 text-center mb-4"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsBarScaleUp(false);
-            }}
-          >
-            想去哪/糾團去/隨時出發
-          </div>
-        )}
-        <div className={`h-14
-          ${isBarScaleUp
-            ? "left-0 right-0 h-14 px-[10%] bg-zinc-50"
-            : "w-full h-12"
-          }`}>
+        {isBarScaleUp && (<div
+          className="text-xl text-primary-500 text-center mb-4"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsBarScaleUp(false);
+          }}
+        >
+          想去哪/糾團去/隨時出發
+        </div>)}
+
+        <div
+          className={`h-14
+          ${
+            isBarScaleUp
+              ? "left-0 right-0 h-14 px-[10%] bg-white"
+              : "w-full h-12"
+          }`}
+        >
           <HeaderSearchBarForm isBarOpen={isBarScaleUp} />
         </div>
-
       </div>
-      <div className="flex item-center space-x-4 h-10">
+      <div className="flex item-center space-x-4 h-10 z-1">
         <Link href="/event" className="flex items-center">
           <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
             活動列表
@@ -121,7 +122,7 @@ export default function HeaderNavBar({
       {/* 半透明遮罩層，點擊可關閉搜尋放大 */}
       {isBarScaleUp && (
         <div
-          className="fixed top-[180px] left-0 w-full h-full bg-black/50 opacity-50 z-10"
+          className="fixed top-[145px] left-0 w-full h-full bg-black/50 opacity-50 z-5"
           onClick={() => setIsBarScaleUp(false)}
         />
       )}

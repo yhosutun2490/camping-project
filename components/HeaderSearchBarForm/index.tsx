@@ -121,7 +121,7 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen}:Props) {
             </div>
           </div>
           <button type="submit" className={`m-1 bg-primary-500 rounded-full flex 
-          cursor-pointer justify-center items-center hover:bg-primary-300 ${isBarOpen?'w-11':'w-9'}`}>
+          cursor-pointer justify-center items-center hover:bg-primary-300 w-11`}>
             <Icon icon='material-symbols:search' className="text-white" width={isBarOpen?25:20} height={isBarOpen?25:20} />
           </button>
         </form>
