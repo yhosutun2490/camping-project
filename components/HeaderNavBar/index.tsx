@@ -33,12 +33,12 @@ export default function HeaderNavBar({
   return (
     <div
       className={clsx(
-        "navbar fixed inset-x-0 w-full flex justify-between px-[8%] py-0 z-20 cursor-pointer transition-all",
+        "navbar fixed inset-x-0 w-full flex justify-between px-[8%] py-0 h-20 z-20 cursor-pointer delay-50 ease-in-out transition-all",
         {
           "bg-transparent": isHome && !isBarScaleUp,
           "bg-white shadow-md": !isHome,
         },
-        isBarScaleUp ? "bg-zinc-50 h-[150px] pb-[70px]" : "h-20"
+        isBarScaleUp ? "bg-zinc-50" : ""
       )}
     >
       <div className="flex items-center h-10">
@@ -56,14 +56,12 @@ export default function HeaderNavBar({
       </div>
       {/* 搜尋列 */}
       <div
-        className={`
-            header_search_bar mx-auto 
-            ${
-              isBarScaleUp
-                ? "absolute left-0 right-0 top-[40px] w-full h-14 px-[10%] transition-all"
-                : "relative left-[8%] w-[30%] h-12 transition-all"
-            }
-          `}
+        className={clsx(
+          "header_search_bar mx-auto absolute left-0 right-0 ease-in-out duration-200 ",
+          isBarScaleUp
+            ? "top-[60px] w-full h-[120px] px-[10%] bg-zinc-50 transition-all"
+            : "w-[30%] h-12 px-0 transition-none"
+        )}
         ref={headerSearchBarRef}
         onClick={() => setIsBarScaleUp(true)}
       >
@@ -78,7 +76,14 @@ export default function HeaderNavBar({
             想去哪/糾團去/隨時出發
           </div>
         )}
-        <HeaderSearchBarForm isBarOpen={isBarScaleUp} />
+        <div className={`h-14
+          ${isBarScaleUp
+            ? "left-0 right-0 h-14 px-[10%] bg-zinc-50"
+            : "w-full h-12"
+          }`}>
+          <HeaderSearchBarForm isBarOpen={isBarScaleUp} />
+        </div>
+
       </div>
       <div className="flex item-center space-x-4 h-10">
         <Link href="/event" className="flex items-center">
@@ -116,7 +121,7 @@ export default function HeaderNavBar({
       {/* 半透明遮罩層，點擊可關閉搜尋放大 */}
       {isBarScaleUp && (
         <div
-          className="fixed inset-y-30 bg-white/100 bg-opacity-50 z-10"
+          className="fixed top-[180px] left-0 w-full h-full bg-black/50 opacity-50 z-10"
           onClick={() => setIsBarScaleUp(false)}
         />
       )}
