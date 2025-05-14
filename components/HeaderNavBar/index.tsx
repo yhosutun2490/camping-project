@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import CreateHostModal from "../CreateHostModal";
 import clsx from "clsx";
+import useClickOutside from "@/hook/useClickOutSide";
 
 interface PropsType {
   username: string;
@@ -29,6 +30,8 @@ export default function HeaderNavBar({
   const headerSearchBarRef = useRef<HTMLDivElement | null>(null);
   // 檢查使用者是否為主辦方
   const isHost = userRole === "host";
+  // 點擊外部就收起
+  useClickOutside(headerSearchBarRef, () => setIsBarScaleUp(false));
 
   return (
     <div
@@ -83,7 +86,7 @@ export default function HeaderNavBar({
               : "w-full h-12"
           }`}
         >
-          <HeaderSearchBarForm isBarOpen={isBarScaleUp} />
+          <HeaderSearchBarForm isBarOpen={isBarScaleUp} setIsBarScaleUp={setIsBarScaleUp}/>
         </div>
       </div>
       <div className="flex item-center space-x-4 h-10 z-1">

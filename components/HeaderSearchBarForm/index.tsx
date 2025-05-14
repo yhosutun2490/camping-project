@@ -11,11 +11,12 @@ import { useRouter } from "next/navigation";
 interface Props {
   bgColor?: string,
   isBarOpen?: boolean,
+  setIsBarScaleUp?: (val:boolean)=>void
 }
 type FormType = z.infer<typeof searchBarFormSchema>;
 
 
-export default function HeaderSearchBarForm({bgColor, isBarOpen}:Props) {
+export default function HeaderSearchBarForm({bgColor, isBarOpen, setIsBarScaleUp}:Props) {
   const form = useForm<FormType>({
     resolver: zodResolver(searchBarFormSchema),
     shouldUnregister: true,
@@ -75,8 +76,9 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen}:Props) {
       if (data.dateRange.to) {
         params.set("to", data.dateRange.to);
       }
-
+      form.reset()
       // 2. 用 router.push 帶參數跳頁
+      if (setIsBarScaleUp) setIsBarScaleUp(false)
       router.push(`/event?${params.toString()}`);
     } catch(err) {
       console.warn('導向活動列表頁有誤',err)
@@ -97,27 +99,27 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen}:Props) {
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit,onError)} className="flex h-full">
-          <div className="form_input_wrapper flex flex-grow-1 gap-4 items-center divide-x divide-primary-300">
+          <div className="form_input_wrapper flex flex-grow-1 items-center divide-x divide-primary-300">
             <div className="flex flex-col items-center justify-center bg-grey flex-grow-1 relative">
               <div className="flex items-center gap-1">
                 <Icon icon='mdi:location' className="text-white hidden" width={20} height={20} />
                 <span className="hidden">地點</span>
               </div>
-              <Dropdown options={locationOptions} fieldName="location"/>
+              <Dropdown options={locationOptions} fieldName="location" textCenter={true}/>
             </div>
             <div className="flex flex-col items-center justify-center bg-grey flex-grow-1 relative">
               <div className="flex items-center gap-1">
                 <Icon icon='mdi:account-multiple-outline' className="text-white hidden" width={20} height={20} />
                 <span className="hidden">人數</span>
               </div>
-              <PersonCounter />
+              <PersonCounter textCenter={true}/>
             </div>
             <div className="flex flex-col items-center justify-center bg-grey flex-grow-1 relative">
               <div className="flex items-center gap-1">
                 <Icon icon='mynaui:calendar' className="text-white hidden" width={20} height={20} />
                 <span className="hidden">日期</span>
               </div>
-              <DatePickerField placeholder='日期'/>
+              <DatePickerField placeholder='日期' textCenter={true}/>
             </div>
           </div>
           <button type="submit" className={`m-1 bg-primary-500 rounded-full flex 

@@ -11,6 +11,7 @@ import {
 } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
+import { formatDate } from "@/utils/formateDate"
 
 function CustomFooter({ onSave }: { onSave: () => void }) {
   return (
@@ -74,10 +75,11 @@ function CustomCaption({ calendarMonth, displayIndex }: MonthCaptionProps) {
   );
 }
 interface Props {
-  placeholder?: string
+  placeholder?: string,
+  textCenter?: boolean
 }
 
-export default function DatePickerField( {placeholder='請選擇日期'}: Props) {
+export default function DatePickerField( {placeholder='請選擇日期', textCenter}: Props) {
   const today = new Date(); // “now” reference
   // 1. 從 Context 拿到 control
   const { register, setValue } = useFormContext();
@@ -107,7 +109,6 @@ export default function DatePickerField( {placeholder='請選擇日期'}: Props)
     setLocalRange({ from: fromStr, to: toStr });
   }
   function handleSave() {
-    console.log("儲存的日期", localRange);
     setValue("dateRange", localRange);
   }
 
@@ -116,11 +117,11 @@ export default function DatePickerField( {placeholder='請選擇日期'}: Props)
       <div
         tabIndex={0}
         role="button"
-        className="options w-full min-h-[30px] flex items-center"
+        className={`options w-full min-h-[30px] flex items-center ${textCenter?'justify-center':''}`}
         {...register("dateRange")}
       >
         {formDateRange?.from && formDateRange?.to
-          ? `${formDateRange.from} - ${formDateRange.to}`
+          ? `${formatDate(formDateRange.from)} - ${formatDate(formDateRange.to)}`
           : placeholder }
       </div>
       <div

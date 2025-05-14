@@ -75,7 +75,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       if (data.dateRange.to) {
         params.set("to", data.dateRange.to);
       }
-
+      form.reset()
       // 2. 用 router.push 帶參數跳頁
       router.push(`/event?${params.toString()}`);
     } catch(err) {

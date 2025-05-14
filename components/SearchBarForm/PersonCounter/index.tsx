@@ -18,7 +18,10 @@ const counterOptions: Array<{
     { key: "pets",     label: "寵物" },
   ]
   
-export default function PersonCounter() {
+interface Props {
+  textCenter?: boolean
+}
+export default function PersonCounter({ textCenter }:Props) {
   const { register,setValue } = useFormContext();
   const [localCount, setLocalCount] = useState<LocalCounter> ({
     adults: 0,
@@ -57,7 +60,7 @@ export default function PersonCounter() {
       <div
         tabIndex={0}
         role="button"
-        className="options w-full min-h-[30px] flex items-center"
+        className={`options w-full min-h-[30px] flex items-center ${textCenter?'justify-center':''}`}
       >
         {person?.adults + person?.children + person?.pets} 人
       </div>

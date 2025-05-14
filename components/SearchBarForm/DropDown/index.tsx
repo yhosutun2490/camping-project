@@ -7,11 +7,12 @@ type Props = {
       label: string,
       value: string,
     }[];
-    fieldName: string
+    fieldName: string,
+    textCenter?: boolean
 }
   
   
-export default function Dropdown( {options, fieldName}:Props) {
+export default function Dropdown( {options, fieldName, textCenter}:Props) {
   const { register, setValue } = useFormContext();
   const locationValue = useWatch({ name: fieldName });
 
@@ -30,7 +31,7 @@ export default function Dropdown( {options, fieldName}:Props) {
       <div
         tabIndex={0}
         role="button"
-        className="options w-full min-h-[30px] flex items-center"
+        className={`options w-full min-h-[30px] flex items-center ${textCenter?'justify-center':''}`}
       >
         {options.find(item=>item.value === locationValue)?.label}
       </div>
