@@ -1,5 +1,5 @@
 
-import AboutUsCard from "../../components/AboutUsCard"
+import AboutUsCard from "./AboutUsCard"
 
 export default function AboutUsSection() {
     const aboutCardData = [
@@ -46,5 +46,6 @@ export default function AboutUsSection() {
                     )
                 })}
             </div>
+            <button className="btn-primary w-[144px] mx-auto">立刻發起活動</button>
         </main>)
 }

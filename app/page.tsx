@@ -17,7 +17,7 @@ export default function Home() {
       <section id="about-us-section" className="w-full min-h-screen scroll-mt-24 bg-white">
         <AboutUsSection />
       </section>
-      <section id="event-intro-section" className="w-full h-[100dvh] pt-[80px]scroll-mt-24 bg-white bg-fixed bg-[url('/main/bg_event_intro.png')] 
+      <section id="event-intro-section" className="w-full min-h-screen pt-[80px]scroll-mt-24 bg-white bg-fixed bg-[url('/main/bg_event_intro.png')] 
       bg-bottom bg-no-repeat bg-[length:100%_50%]">
         <ActivityIntroSection />
       </section>
