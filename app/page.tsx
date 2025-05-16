@@ -1,5 +1,6 @@
 import SearchSection from "@/sections/SearchSection";
 import BestActivitySection from "@/sections/BestActivitySection";
+import AboutUsSection from "@/sections/AboutUsSection";
 import ActivityIntroSection from "@/sections/ActivityIntro";
 import TopPlaceSection from "@/sections/TopPlaceSection";
 import CommentSection from "@/sections/CommentSection";
@@ -12,6 +13,9 @@ export default function Home() {
       </section>
       <section id="best-section" className="w-full h-screen scroll-mt-24 bg-primary-50">
         <BestActivitySection />
+      </section>
+      <section id="about-us-section" className="w-full min-h-screen scroll-mt-24 bg-white">
+        <AboutUsSection />
       </section>
       <section id="event-intro-section" className="w-full h-[100dvh] pt-[80px]scroll-mt-24 bg-white bg-fixed bg-[url('/main/bg_event_intro.png')] 
       bg-bottom bg-no-repeat bg-[length:100%_50%]">

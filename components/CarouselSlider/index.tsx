@@ -41,29 +41,29 @@ export default function CarouselSlider<T>({
   }, [emblaApi]);
 
   return (
-    <div className="relative w-full mx-auto lg:min-w-[700px] w-[100%] h-full mx-auto h-full">
+    <div className="relative w-full mx-auto lg:min-w-[700px] w-[100%] h-fit mx-auto">
       <div className="w-full overflow-x-clip overflow-y-visible" ref={emblaRef}>
         {/* 只 map 一次 */}
 
         <div className="flex w-full">
           {sliderData?.map((item, idx) => {
 
-          return (
-            <div key={idx} className="relative flex-none w-1/3 px-4 box-border">
-              {renderSlide && renderSlide(item, idx)}
-            </div>
-          );
+            return (
+              <div key={idx} className="relative flex-none w-1/3 px-4 box-border">
+                {renderSlide && renderSlide(item, idx)}
+              </div>
+            );
           })}
         </div>
       </div>
       <button
-        className="absolute left-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
+        className="absolute cursor-pointer left-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
         onClick={() => emblaApi?.scrollPrev()}
       >
         <Icon icon="ri:arrow-left-line" width={20} height={20} />
       </button>
       <button
-        className="absolute right-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
+        className="absolute cursor-pointer right-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
         onClick={() => emblaApi?.scrollNext()}
       >
         <Icon icon="ri:arrow-right-line" width={20} height={20} />
