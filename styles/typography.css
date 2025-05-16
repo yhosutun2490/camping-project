@@ -1,0 +1,16 @@
+@layer utilities {
+  .heading-3 {
+     @apply font-sans         /* 或你自訂的 font-noto */
+           font-semibold     /* weight 600 */
+           text-[24px]       /* font-size: 24px */
+           leading-[36px]    /* line-height: 36px */
+           tracking-[0px];   /* letter-spacing: 0 */
+  }
+  .heading-5 {
+     @apply font-sans         /* 或你自訂的 font-noto */
+           font-semibold     /* weight 600 */
+           text-[18px]       /* font-size: 24px */
+           leading-[27px]    /* line-height: 36px */
+           tracking-[0px];   /* letter-spacing: 0 */
+  }
+}

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 /* 自訂樣式區塊 */
 @import "../styles/button.css";
+@import "../styles/typography.css";
 @plugin "daisyui" {
   exclude: rootscrollgutter;
 }
@@ -60,5 +61,4 @@ body {
     font-family: 'Noto Sans TC', sans-serif;
     letter-spacing: 0;
   }
- 
 }
