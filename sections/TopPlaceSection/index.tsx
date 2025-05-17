@@ -102,12 +102,14 @@ export default function TopPlaceSection() {
     },
   ];
   return (
-    <main className="flex flex-col h-full relative text-neutral-950 text-4xl px-[8%] py-[5%] lg:py-[12%] lg:px-[16%] flex flex-col gap-[1.25rem] lg:gap-[40px] text-center">
-      <p>露營地點排行</p>
+    <main className="flex flex-col h-full relative text-neutral-950 text-4xl px-[1rem] sm:px-[8%] 
+    py-[40px] md:py-[5%] lg:py-[12%] lg:px-[16%] flex flex-col gap-[1.25rem] lg:gap-[40px] text-center">
+      <p className="heading-3 md:hidden">露營地點排行</p>
+      <p className="heading-1 hidden md:block">露營地點排行</p>
       <div className="h-[100%]">
         <CarouselSlider
           sliderData={topPlaceData}
-          bgClass={"bg-primary-50 rounded-xl p-[2rem]"}
+          bgClass={"place_slider bg-primary-50 rounded-xl p-[1rem] md:p-[2rem]"}
           hasDivider= {true}
           renderSlide={(item, idx) => (
             <div key={idx} className="relative space-y-4 overflow-visible">

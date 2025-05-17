@@ -86,7 +86,8 @@ export default function CommentSection() {
     lg:pt-[120px] lg:px-[10%] 2xl:px-[16%] 
     flex flex-col gap-[1.25rem] lg:gap-[40px] text-center"
     >
-      <p>最新評論</p>
+      <p className="heading-3 md:hidden">最新評論</p>
+      <p className="heading-1 hidden md:block">最新評論</p>
       <div className="comment_lists w-full grid grid-cols-1 lg:grid-cols-3 gap-[2rem]">
         {sampleComment.map((item, idx) => {
           return (

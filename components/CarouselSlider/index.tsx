@@ -55,7 +55,7 @@ export default function CarouselSlider<T>({
             const isActive =  idx > currentSlide && idx <= currentSlide + 2;
             return (
               <div key={idx} className={clsx(
-                  "relative flex-none md:w-1/2 lg:w-1/3 h-full px-4 box-border",
+                  "relative flex-none min-w-[280px] w-[90%] sm:w-1/2 lg:w-1/3 h-full px-2 md:px-4 box-border",
                   // 👉 2. 只有 active 的才加分隔線
                   isActive && hasDivider
                     ? "border-l-2 border-white"
@@ -68,13 +68,13 @@ export default function CarouselSlider<T>({
         </div>
       </div>
       <button
-        className="absolute cursor-pointer left-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
+        className="absolute cursor-pointer hidden sm:block left-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
         onClick={() => emblaApi?.scrollPrev()}
       >
         <Icon icon="ri:arrow-left-line" width={20} height={20} />
       </button>
       <button
-        className="absolute cursor-pointer right-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
+        className="absolute cursor-pointer hidden sm:block right-[-7%] top-1/2 translate-y-[-50%] w-10 h-10 p-2 bg-white rounded-full border-2 border-neutral-900 hover:bg-white/50"
         onClick={() => emblaApi?.scrollNext()}
       >
         <Icon icon="ri:arrow-right-line" width={20} height={20} />

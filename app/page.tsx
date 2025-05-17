@@ -11,7 +11,7 @@ export default function Home() {
       <section id="search-section" className="w-full h-full">
         <SearchSection />
       </section>
-      <section id="best-section" className="w-full h-screen scroll-mt-24 bg-primary-50">
+      <section id="best-section" className="w-full min-h-[70dvh] sm:min-h-screen scroll-mt-24 bg-primary-50">
         <BestActivitySection />
       </section>
       <section id="about-us-section" className="w-full min-h-screen scroll-mt-24 bg-white">
