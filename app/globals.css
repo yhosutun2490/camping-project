@@ -50,15 +50,7 @@ body {
     color: var(--input-text) !important;
   }
 
- 
 }
 
-@layer utilities {
-  .text-base {
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    font-family: 'Noto Sans TC', sans-serif;
-    letter-spacing: 0;
-  }
-}
+
+ 

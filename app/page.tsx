@@ -21,7 +21,7 @@ export default function Home() {
       bg-bottom bg-no-repeat bg-[length:100%_50%]">
         <ActivityIntroSection />
       </section>
-      <section id="top-place" className="w-full h-[100dvh] scroll-mt-24">
+      <section id="top-place" className="w-full min-h-screen scroll-mt-24">
         <TopPlaceSection />
       </section>
       <section id="comment" className="w-full h-[100dvh] px-4 scroll-mt-24">

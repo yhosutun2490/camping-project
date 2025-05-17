@@ -25,14 +25,14 @@ export default function IntroCard({
             <p className="text-xs text-neutral-700 lg:text-base">挑戰難度</p>
             <RatingStar rating={rating} />
         </div>
-        <figure className="mx-auto hidden w-[300px] h-[300px] aspect-[1/1] lg:block">
+        <figure className="mx-auto hidden max-w-[300px] max-h-[300px] aspect-[1/1] lg:block">
           <Image width={300} height={300} src={image} alt={description.title} 
             className="rounded-xl"/>
         </figure>
          <div className="description">
-            <p className="heading-5 lg:hidden">{description.title}</p>
-            <p className="heading-3 hidden lg:block">{description.title}</p>
-            <p className="lg:h-[2.5rem]">{description.subtitle}</p>
+            <p className="heading-5 lg:hidden text-neutral-950">{description.title}</p>
+            <p className="heading-3 hidden lg:block text-neutral-950">{description.title}</p>
+            <p className="text-sm lg:h-[54px] lg:!text-lg text-neutral-700">{description.subtitle}</p>
          </div>
       </div>
     </div>

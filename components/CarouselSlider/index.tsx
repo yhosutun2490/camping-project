@@ -3,18 +3,23 @@
 import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useState } from "react";
+import clsx from "clsx";
 
 interface Props<T> {
   sliderData?: T[];
+  bgClass?: string;
+  hasDivider?: boolean;
   renderSlide?: (item: T, index: number) => React.ReactNode;
 }
 
 export default function CarouselSlider<T>({
   sliderData,
+  bgClass,
+  hasDivider,
   renderSlide,
 }: Props<T>) {
   // 目前觀看的slider
-  const [, setCurrentSlide] = useState<number>(0);
+  const [currentSlide, setCurrentSlide] = useState<number>(0);
   // 設定 loop、自動播放速度等等
   const [emblaRef, emblaApi] = useEmblaCarousel({
     skipSnaps: true,
@@ -41,15 +46,21 @@ export default function CarouselSlider<T>({
   }, [emblaApi]);
 
   return (
-    <div className="relative w-full mx-auto lg:min-w-[700px] w-[100%] h-fit mx-auto">
-      <div className="w-full overflow-x-clip overflow-y-visible" ref={emblaRef}>
+    <div className={clsx("relative w-full mx-auto lg:min-w-[700px] w-[100%] h-full mx-auto",bgClass)}>
+      <div className="w-full h-full overflow-x-clip overflow-y-visible" ref={emblaRef}>
         {/* 只 map 一次 */}
 
-        <div className="flex w-full">
+        <div className="flex w-full h-full">
           {sliderData?.map((item, idx) => {
-
+            const isActive =  idx > currentSlide && idx <= currentSlide + 2;
             return (
-              <div key={idx} className="relative flex-none w-1/3 px-4 box-border">
+              <div key={idx} className={clsx(
+                  "relative flex-none md:w-1/2 lg:w-1/3 h-full px-4 box-border",
+                  // 👉 2. 只有 active 的才加分隔線
+                  isActive && hasDivider
+                    ? "border-l-2 border-white"
+                    : "border-none"
+                )}>
                 {renderSlide && renderSlide(item, idx)}
               </div>
             );
