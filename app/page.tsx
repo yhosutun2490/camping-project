@@ -24,7 +24,9 @@ export default function Home() {
       <section id="top-place" className="w-full min-h-screen scroll-mt-24">
         <TopPlaceSection />
       </section>
-      <section id="comment" className="w-full min-h-[57dvh] scroll-mt-24">
+      <section id="comment" className="w-full min-h-[57dvh] scroll-mt-24 
+      bg-[url('/main/comment/comment_bg_mobile.png')]
+      md:bg-[url('/main/comment/comment_bg.png')] bg-bottom bg-no-repeat bg-[length:100%_20%]">
         <CommentSection />
       </section>
       <Footer />

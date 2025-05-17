@@ -82,8 +82,8 @@ export default function CommentSection() {
 
   return (
     <main
-      className="relative text-neutral-950 text-4xl px-[8%] py-[10%]
-    lg:py-[60px] lg:px-[10%] 2xl:px-[16%] 
+      className="relative text-neutral-950 text-4xl px-[8%] pt-[10%] py-[178px]
+    lg:pt-[120px] lg:px-[10%] 2xl:px-[16%] 
     flex flex-col gap-[1.25rem] lg:gap-[40px] text-center"
     >
       <p>最新評論</p>

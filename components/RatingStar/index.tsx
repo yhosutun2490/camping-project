@@ -26,7 +26,7 @@ export default function RatingStar({
             aria-label={`${value} star`}
             aria-pressed={isFilled}
             className={`
-              mask mask-star
+              mask mask-star-2 mr-1
               ${isFilled ? 'bg-primary-500 opacity-100' : 'bg-gray-400 opacity-60'}
               ${!readOnly ? 'cursor-pointer focus:outline-none' : ''}
             `}
