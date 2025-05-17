@@ -1,4 +1,11 @@
 @layer utilities {
+   .heading-7 {
+     font-size: 12px;
+     line-height: 18px;
+     font-weight: 600;
+     font-family: 'Noto Sans TC', sans-serif;
+     letter-spacing: 0;
+  }
   .heading-5 {
      font-size: 18px;
      line-height: 27px;

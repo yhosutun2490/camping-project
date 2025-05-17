@@ -1,17 +1,20 @@
 "use client"
+import clsx from "clsx";
 type RatingStarProps = {
   rating: number;
   readOnly?: boolean;
+  ratingSizeClass?: string;
   onChange?: (newRating: number) => void;
 };
 
 export default function RatingStar({
   rating,
   readOnly = true,
+  ratingSizeClass,
   onChange,
 }: RatingStarProps) {
   return (
-    <div className="rating">
+    <div className={clsx('rating',ratingSizeClass)}>
       {Array.from({ length: 5 }, (_, idx) => {
         const value = idx + 1;
         const isFilled = value <= rating;
@@ -24,7 +27,7 @@ export default function RatingStar({
             aria-pressed={isFilled}
             className={`
               mask mask-star
-              ${isFilled ? 'bg-primary-500 opacity-100' : 'bg-gray-200 opacity-80'}
+              ${isFilled ? 'bg-primary-500 opacity-100' : 'bg-gray-400 opacity-60'}
               ${!readOnly ? 'cursor-pointer focus:outline-none' : ''}
             `}
             onClick={() => {

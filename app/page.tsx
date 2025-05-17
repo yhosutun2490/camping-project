@@ -24,7 +24,7 @@ export default function Home() {
       <section id="top-place" className="w-full min-h-screen scroll-mt-24">
         <TopPlaceSection />
       </section>
-      <section id="comment" className="w-full h-[100dvh] px-4 scroll-mt-24">
+      <section id="comment" className="w-full min-h-[57dvh] scroll-mt-24">
         <CommentSection />
       </section>
       <Footer />

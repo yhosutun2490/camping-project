@@ -5,7 +5,9 @@
 @plugin "daisyui" {
   exclude: rootscrollgutter;
 }
-
+@utility rating {
+  @apply w-fit bg-none;
+}
 
 
 @theme {
