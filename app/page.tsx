@@ -29,7 +29,10 @@ export default function Home() {
       md:bg-[url('/main/comment/comment_bg.png')] bg-bottom bg-no-repeat bg-[length:100%_20%]">
         <CommentSection />
       </section>
-      <Footer />
+      <section id="footer" className="w-full min-h-[34dvh] scroll-mt-24 bg-white 
+      px-[1rem] py-[1.5rem] lg:px-[15%] lg:py-[40px]" >
+         <Footer />
+      </section>
     </div>
   );
 }
