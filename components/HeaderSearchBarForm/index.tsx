@@ -34,7 +34,7 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen, setIsBarScaleUp
   const router = useRouter()
 
 
-  // 地點選擇
+// 地點選擇
   const locationOptions = [
     {
       id: "1",
@@ -52,8 +52,24 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen, setIsBarScaleUp
       label: "台中",
       value: "Taichung",
     },
+       {
+      id: "4",
+      label: "嘉義",
+      value: "Chayi",
+    },
+    {
+      id: "5",
+      label: "南投",
+      value: "Nantou",
+    },
+
+    {
+      id: "6",
+      label: "屏東",
+      value: "Pintung",
+    },
   ];
-  
+
   const onError: SubmitErrorHandler<FormType> = (errors) => {
     console.log("驗證失敗欄位：", errors);
   };
@@ -107,7 +123,7 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen, setIsBarScaleUp
               </div>
               <Dropdown options={locationOptions} fieldName="location" textCenter={true}/>
             </div>
-            <div className="flex flex-col items-center justify-center bg-grey flex-grow-1 relative">
+            <div className="flex flex-col items-center  justify-center bg-grey flex-grow-1 relative">
               <div className="flex items-center gap-1">
                 <Icon icon='mdi:account-multiple-outline' className="text-white hidden" width={20} height={20} />
                 <span className="hidden">人數</span>

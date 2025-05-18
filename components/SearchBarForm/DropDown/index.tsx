@@ -39,7 +39,7 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
         tabIndex={0}
         role="button"
         className={`sm:hidden options w-full min-h-[30px] flex items-center ${
-          textCenter ? "justify-center" : ""
+          textCenter ? "text-center leading-[2]" : ""
         }`}
         onClick={() => setMobileOpen(true)}
       >
@@ -49,7 +49,7 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
         tabIndex={0}
         role="button"
         className={`hidden sm:block options w-full min-h-[30px] flex items-center ${
-          textCenter ? "justify-center" : ""
+          textCenter ? "text-center leading-[2]" : ""
         }`}
       >
         {options.find((item) => item.value === locationValue)?.label}

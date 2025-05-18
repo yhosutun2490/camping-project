@@ -11,6 +11,7 @@ import { useState, useRef } from "react";
 import CreateHostModal from "../CreateHostModal";
 import clsx from "clsx";
 import useClickOutside from "@/hook/useClickOutSide";
+import { useTopIntersectStore } from "@/stores/topIntersectStore";
 
 interface PropsType {
   username: string;
@@ -32,16 +33,18 @@ export default function HeaderNavBar({
   const isHost = userRole === "host";
   // 點擊外部就收起
   useClickOutside(headerSearchBarRef, () => setIsBarScaleUp(false));
+  // 是否進入首頁置頂區塊
+  const isTopSectionVisible = useTopIntersectStore((s) => s.isTopVisible);
 
   return (
     <div
       className={clsx(
-        "navbar fixed inset-x-0 w-full flex justify-between px-[8%] py-0 h-20 z-20 cursor-pointer delay-50 ease-in-out transition-all",
+        "navbar fixed inset-x-0 w-full flex flex-wrap justify-between px-[1rem] sm:px-[8%] py-0 h-20 z-20 cursor-pointer delay-50 ease-in-out transition-all",
         {
           "bg-transparent": isHome && !isBarScaleUp,
-          "bg-white shadow-md": !isHome,
+          "bg-white shadow-md": !isHome || !isTopSectionVisible,
         },
-        isBarScaleUp ? "bg-white" : ""
+        isBarScaleUp ? "bg-white" : "",
       )}
     >
       <div className="flex items-center h-10 z-1">
@@ -58,37 +61,49 @@ export default function HeaderNavBar({
         </Link>
       </div>
       {/* 搜尋列 */}
-      <div
-        className={clsx(
-          "header_search_bar mx-auto absolute left-0 right-0 overflow-visible ease-in-out ",
-          isBarScaleUp
-            ? "top-[25px] w-full h-[120px] px-[10%] bg-white duration-300"
-            : "w-[343px] h-12 px-0 transition-[width] duration-200 transition-[top] duration-600"
-        )}
-        ref={headerSearchBarRef}
-        onClick={() => setIsBarScaleUp(true)}
-      >
-        {isBarScaleUp && (<div
-          className="text-xl text-primary-500 text-center mb-4"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsBarScaleUp(false);
+      {!isTopSectionVisible && (
+        <div
+          className={clsx(
+            "header_search_bar mx-auto absolute left-0 right-0 overflow-visible ease-in-out ",
+            isBarScaleUp
+              ? "top-[25px] w-full h-[120px] px-[10%] bg-white duration-300"
+              : "w-[343px] h-12 px-0 transition-[width] duration-200 transition-[top] duration-600",
+            "sm:cursor-pointer sm:hover:shadow-lg sm:rounded-xl",
+          )}
+          ref={headerSearchBarRef}
+          onClick={() => {
+            if (window.innerWidth >= 640) {
+              setIsBarScaleUp(true);
+            }
           }}
         >
-          想去哪/糾團去/隨時出發
-        </div>)}
+          {isBarScaleUp && (
+            <div
+              className="text-xl text-primary-500 text-center mb-4"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsBarScaleUp(false);
+              }}
+            >
+              想去哪/糾團去/隨時出發
+            </div>
+          )}
 
-        <div
-          className={`h-14
+          <div
+            className={`h-14
           ${
             isBarScaleUp
               ? "left-0 right-0 h-14 px-[10%] bg-white"
               : "w-full h-12"
           }`}
-        >
-          <HeaderSearchBarForm isBarOpen={isBarScaleUp} setIsBarScaleUp={setIsBarScaleUp}/>
+          >
+            <HeaderSearchBarForm
+              isBarOpen={isBarScaleUp}
+              setIsBarScaleUp={setIsBarScaleUp}
+            />
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex item-center space-x-4 h-10 z-1">
         <Link href="/event" className="flex items-center">
           <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
