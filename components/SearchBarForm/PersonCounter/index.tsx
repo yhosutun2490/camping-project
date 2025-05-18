@@ -118,7 +118,7 @@ export default function PersonCounter({ textCenter }: Props) {
         ))}
         <button
           type="button"
-          className="btn border-none bg-primary-500 mt-2 py-2 rounded-2xl"
+          className="w-full btn-primary mt-2 py-2 rounded-2xl"
           onClick={() => handleClickOnBlur()}
         >
           儲存

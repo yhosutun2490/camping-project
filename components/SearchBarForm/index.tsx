@@ -8,7 +8,7 @@ import Dropdown from "./DropDown";
 import PersonCounter from "./PersonCounter";
 import DatePickerField from "./DatePickerFIeld";
 import { useRouter } from "next/navigation";
-import { createPortal } from "react-dom";
+
 interface Props {
   isBgBlur?: boolean,
   bgColor?: string,
@@ -51,6 +51,22 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       id: "3",
       label: "台中",
       value: "Taichung",
+    },
+       {
+      id: "4",
+      label: "嘉義",
+      value: "Chayi",
+    },
+    {
+      id: "5",
+      label: "南投",
+      value: "Nantou",
+    },
+
+    {
+      id: "6",
+      label: "屏東",
+      value: "Pintung",
     },
   ];
   

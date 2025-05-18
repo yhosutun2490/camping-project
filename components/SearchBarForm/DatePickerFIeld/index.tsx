@@ -21,7 +21,7 @@ function CustomFooter({ onSave }: { onSave: () => void }) {
       </button>
       <button
         onClick={onSave}
-        className="px-6 py-2 w-[200px] bg-primary-500 text-white rounded-lg hover:bg-gray-700"
+        className="px-6 py-2 w-[200px] btn-primary text-white rounded-lg hover:bg-gray-700"
       >
         儲存
       </button>
