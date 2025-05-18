@@ -1,7 +1,7 @@
 import useSWRMutation from 'swr/mutation';
 import useSWR from 'swr';
 import axios from 'axios';
-import { CreateHostProfileRequest, HostProfileResponse, GetHostProfileResponse } from "@/types/api/host";
+import { CreateHostProfileRequest, HostProfileResponse, GetHostProfileResponse, UpdateHostProfileRequest } from "@/types/api/host";
 import toast from 'react-hot-toast';
 
 // 建立主辦單位資料 API
@@ -68,5 +68,44 @@ export function useGetHostProfile() {
     isLoading,
     error,
     mutate,
+  };
+}
+
+// 更新主辦單位資料 API
+export function useUpdateHostProfile() {
+  const { hostProfile, mutate } = useGetHostProfile();
+  
+  const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/host/profile",
+    async (url, { arg: payload }: { arg: UpdateHostProfileRequest }) => {
+      try {
+        const response = await axios.patch<HostProfileResponse>(url, payload, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // 更新成功後重新載入資料
+        mutate();
+        
+        toast.success("主辦方資料更新成功");
+        return response.data;
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response) {
+          const errorMessage = error.response.data.message || "主辦方資料更新失敗";
+          toast.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+        throw new Error("主辦方資料更新發生錯誤");
+      }
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+    hostProfile,
   };
 }

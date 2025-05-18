@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import HostProfile from "./components/HostProfile";
 import HostActivities from "./components/HostActivities";
+import { HostProfile } from "./components/HostProfile";
 
 export default function HostPage() {
   return (
