@@ -117,24 +117,12 @@ export default function HeaderSearchBarForm({bgColor, isBarOpen, setIsBarScaleUp
         <form onSubmit={form.handleSubmit(onSubmit,onError)} className="flex h-full">
           <div className="form_input_wrapper flex flex-grow-1 items-center divide-x divide-primary-300">
             <div className="flex flex-col items-center justify-center bg-grey flex-grow-1 relative">
-              <div className="flex items-center gap-1">
-                <Icon icon='mdi:location' className="text-white hidden" width={20} height={20} />
-                <span className="hidden">地點</span>
-              </div>
               <Dropdown options={locationOptions} fieldName="location" textCenter={true}/>
             </div>
             <div className="flex flex-col items-center  justify-center bg-grey flex-grow-1 relative">
-              <div className="flex items-center gap-1">
-                <Icon icon='mdi:account-multiple-outline' className="text-white hidden" width={20} height={20} />
-                <span className="hidden">人數</span>
-              </div>
               <PersonCounter textCenter={true}/>
             </div>
             <div className="flex flex-col items-center justify-center bg-grey flex-grow-1 relative">
-              <div className="flex items-center gap-1">
-                <Icon icon='mynaui:calendar' className="text-white hidden" width={20} height={20} />
-                <span className="hidden">日期</span>
-              </div>
               <DatePickerField placeholder='日期' textCenter={true}/>
             </div>
           </div>

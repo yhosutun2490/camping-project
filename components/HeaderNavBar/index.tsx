@@ -39,7 +39,8 @@ export default function HeaderNavBar({
   return (
     <div
       className={clsx(
-        "navbar fixed inset-x-0 w-full flex flex-wrap justify-between px-[1rem] sm:px-[8%] py-0 h-20 z-20 cursor-pointer delay-50 ease-in-out transition-all",
+        "navbar fixed inset-x-0 w-full h-[130px] items-start md:h-[80px] md:items-center",
+        "flex flex-wrap justify-between px-[1rem] sm:px-[8%] z-20 cursor-pointer delay-50 ease-in-out transition-all",
         {
           "bg-transparent": isHome && !isBarScaleUp,
           "bg-white shadow-md": !isHome || !isTopSectionVisible,
@@ -61,18 +62,19 @@ export default function HeaderNavBar({
         </Link>
       </div>
       {/* 搜尋列 */}
-      {!isTopSectionVisible && (
+      { (
         <div
           className={clsx(
-            "header_search_bar mx-auto absolute left-0 right-0 overflow-visible ease-in-out ",
+            "header_search_bar absolute top-[60px] mx-auto lg:pl-[10%]",
+            "sm:left-[20%] md:right-[10%] md:top-[17px] md:left-0 overflow-visible ease-in-out",
             isBarScaleUp
               ? "top-[25px] w-full h-[120px] px-[10%] bg-white duration-300"
-              : "w-[343px] h-12 px-0 transition-[width] duration-200 transition-[top] duration-600",
-            "sm:cursor-pointer sm:hover:shadow-lg sm:rounded-xl",
+              : "w-[343px] md:w-[250px] lg:w-[450px] h-12 px-0 transition-[width] duration-200 transition-[top] duration-600",
+            !isTopSectionVisible && isHome || !isHome ?'block':'hidden',
           )}
           ref={headerSearchBarRef}
           onClick={() => {
-            if (window.innerWidth >= 640) {
+            if (window.innerWidth >= 1124) {
               setIsBarScaleUp(true);
             }
           }}
@@ -103,6 +105,13 @@ export default function HeaderNavBar({
             />
           </div>
         </div>
+      )}
+      {/* 半透明遮罩層，點擊可關閉搜尋放大 */}
+      {isBarScaleUp && (
+        <div
+          className="fixed top-[135px] left-0 w-full h-full bg-black/50 opacity-50 z-5"
+          onClick={() => setIsBarScaleUp(false)}
+        />
       )}
       <div className="flex item-center space-x-4 h-10 z-1">
         <Link href="/event" className="flex items-center">
@@ -137,13 +146,7 @@ export default function HeaderNavBar({
           </div>
         )}
       </div>
-      {/* 半透明遮罩層，點擊可關閉搜尋放大 */}
-      {isBarScaleUp && (
-        <div
-          className="fixed top-[145px] left-0 w-full h-full bg-black/50 opacity-50 z-5"
-          onClick={() => setIsBarScaleUp(false)}
-        />
-      )}
+     
     </div>
   );
 }

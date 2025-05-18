@@ -165,7 +165,8 @@ export default function DatePickerField({
       </div>
       <div
         tabIndex={0}
-        className="hidden sm:block dropdown-content menu mt-11 rounded-2xl z-10 w-full relative max-lg:left-[-180%]"
+        className="hidden sm:block dropdown-content menu mt-11 rounded-2xl z-10 w-full relative 
+        md:left-[-180%] lg:left-[-50%]"
       >
         <DayPicker
           required

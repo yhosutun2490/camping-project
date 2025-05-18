@@ -69,7 +69,7 @@ export default function PersonCounter({ textCenter }: Props) {
         tabIndex={0}
         role="button"
         className={`block sm:hidden options w-full min-h-[30px] flex items-center ${
-          textCenter ? "text-center leading-[2]" : ""
+          textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
         onClick={() => setMobileOpen(true)}
       >
@@ -79,7 +79,7 @@ export default function PersonCounter({ textCenter }: Props) {
         tabIndex={0}
         role="button"
         className={`hidden sm:block options w-full min-h-[30px] flex items-center ${
-          textCenter ? "text-center leading-[2]" : ""
+          textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
       >
         {person?.adults + person?.children + person?.pets} 人
