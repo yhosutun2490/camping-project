@@ -8,6 +8,7 @@ import Dropdown from "./DropDown";
 import PersonCounter from "./PersonCounter";
 import DatePickerField from "./DatePickerFIeld";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 interface Props {
   isBgBlur?: boolean,
   bgColor?: string,
@@ -98,21 +99,21 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
         <form onSubmit={form.handleSubmit(onSubmit,onError)} className="flex">
           <div className="form_input_wrapper flex flex-grow-1 gap-4 items-center divide-x divide-white/30">
             <div className="flex flex-col bg-grey grow-1 relative">
-              <div className="flex items-center gap-1">
+              <div className="items-center gap-1 hidden sm:flex">
                 <Icon icon='mdi:location' className="text-white" width={20} height={20} />
                 <span>地點</span>
               </div>
               <Dropdown options={locationOptions} fieldName="location"/>
             </div>
             <div className="flex flex-col bg-grey grow-1 relative">
-              <div className="flex items-center gap-1">
+              <div className="items-center gap-1 hidden sm:sm:flex">
                 <Icon icon='mdi:account-multiple-outline' className="text-white" width={20} height={20} />
                 <span>人數</span>
               </div>
               <PersonCounter />
             </div>
-            <div className="flex flex-col bg-grey grow-1 relative">
-              <div className="flex items-center gap-1">
+            <div className="flex-col bg-grey grow-1 relative">
+              <div className="flex items-center gap-1 hidden sm:sm:flex">
                 <Icon icon='mynaui:calendar' className="text-white" width={20} height={20} />
                 <span>日期</span>
               </div>
