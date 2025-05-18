@@ -1,7 +1,8 @@
 "use client";
 import { Icon } from "@iconify/react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext, useWatch, Controller } from "react-hook-form";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
   DayPicker,
   DateRange,
@@ -11,7 +12,7 @@ import {
 } from "react-day-picker";
 import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
-import { formatDate } from "@/utils/formateDate"
+import { formatDate } from "@/utils/formateDate";
 
 function CustomFooter({ onSave }: { onSave: () => void }) {
   return (
@@ -29,16 +30,24 @@ function CustomFooter({ onSave }: { onSave: () => void }) {
   );
 }
 
-function CustomCaption({ calendarMonth, displayIndex }: MonthCaptionProps) {
+
+interface MyCaptionProps extends MonthCaptionProps {
+  totalMonths: number;
+}
+function CustomCaption({ calendarMonth, displayIndex, totalMonths}: MyCaptionProps,) {
   // 1. 拿到真正的 JS Date
   const monthDate = (calendarMonth as CalendarMonth).date as Date;
 
   // 2. 用官方 hook 拿到 context 裡的 goToMonth / prev / next
-  const { goToMonth, previousMonth, nextMonth } = useDayPicker();
+  const { goToMonth, previousMonth, nextMonth } =
+    useDayPicker();
+
+  // 單月日曆或雙月日曆
+  const isSingle = totalMonths === 1;
 
   const label = format(monthDate, "MMMM yyyy");
   return (
-    <div className="flex items-center justify-between px-4 mb-2">
+    <div className="flex w-full items-center justify-between px-4 mb-2">
       {/* 第一個月顯示上一頁，其他空一格 */}
       {displayIndex === 0 ? (
         <Icon
@@ -58,7 +67,7 @@ function CustomCaption({ calendarMonth, displayIndex }: MonthCaptionProps) {
       <span className="text-lg font-semibold text-gray-700">{label}</span>
 
       {/* 最後一個月顯示下一頁，其他空一格 */}
-      {displayIndex === 1 ? (
+      {displayIndex === 1 || isSingle ? (
         <Icon
           icon="gridicons:arrow-right"
           width={40}
@@ -75,14 +84,20 @@ function CustomCaption({ calendarMonth, displayIndex }: MonthCaptionProps) {
   );
 }
 interface Props {
-  placeholder?: string,
-  textCenter?: boolean
+  placeholder?: string;
+  textCenter?: boolean;
 }
 
-export default function DatePickerField( {placeholder='請選擇日期', textCenter}: Props) {
+export default function DatePickerField({
+  placeholder = "請選擇日期",
+  textCenter,
+}: Props) {
+  // mobile 彈窗狀態
+  const [isMobileOpen, setMobileOpen] = useState(false);
+
   const today = new Date(); // “now” reference
   // 1. 從 Context 拿到 control
-  const { register, setValue } = useFormContext();
+  const { setValue, control } = useFormContext();
   const [localRange, setLocalRange] = useState<{
     to?: string;
     from?: string;
@@ -114,19 +129,43 @@ export default function DatePickerField( {placeholder='請選擇日期', textCen
 
   return (
     <div className="dropdown dropdown-left w-full">
+      {/* form hook 綁定 */}
+      <Controller
+        control={control}
+        name="dateRange"
+        render={() => <input type="hidden" />}
+      />
+      {/* 手機板選單按鈕 */}
       <div
         tabIndex={0}
         role="button"
-        className={`options w-full min-h-[30px] flex items-center ${textCenter?'justify-center':''}`}
-        {...register("dateRange")}
+        className={`sm:hidden options w-full min-h-[30px] flex items-center ${
+          textCenter ? "justify-center" : ""
+        }`}
+        onClick={() => setMobileOpen(true)}
       >
         {formDateRange?.from && formDateRange?.to
-          ? `${formatDate(formDateRange.from)} - ${formatDate(formDateRange.to)}`
-          : placeholder }
+          ? `${formatDate(formDateRange.from)} - ${formatDate(
+              formDateRange.to
+            )}`
+          : placeholder}
       </div>
       <div
         tabIndex={0}
-        className="dropdown-content menu mt-11 rounded-2xl z-10 w-full relative max-lg:left-[-180%]"
+        role="button"
+        className={`hidden sm:flex options w-full min-h-[30px] flex items-center ${
+          textCenter ? "justify-center" : ""
+        }`}
+      >
+        {formDateRange?.from && formDateRange?.to
+          ? `${formatDate(formDateRange.from)} - ${formatDate(
+              formDateRange.to
+            )}`
+          : placeholder}
+      </div>
+      <div
+        tabIndex={0}
+        className="hidden sm:block dropdown-content menu mt-11 rounded-2xl z-10 w-full relative max-lg:left-[-180%]"
       >
         <DayPicker
           required
@@ -136,7 +175,7 @@ export default function DatePickerField( {placeholder='請選擇日期', textCen
           numberOfMonths={2}
           footer
           fixedWeeks
-          className="p-4 bg-white/100 rounded-2xl"
+          className="w-fit p-4 bg-white/100 rounded-2xl"
           disabled={{ before: today }}
           classNames={{
             months: "flex space-x-4", // space-x-4 加一點左右間距
@@ -147,7 +186,9 @@ export default function DatePickerField( {placeholder='請選擇日期', textCen
           }}
           components={{
             Nav: () => <></>,
-            MonthCaption: CustomCaption,
+            MonthCaption: (captionProps) => (
+              <CustomCaption {...captionProps} totalMonths={2} />
+            ),
             Footer: () => <CustomFooter onSave={handleSave} />,
           }}
           modifiers={{
@@ -160,6 +201,61 @@ export default function DatePickerField( {placeholder='請選擇日期', textCen
           }}
         />
       </div>
+      {isMobileOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 bg-black/40 z-50 flex items-end select-none"
+            onClick={() => setMobileOpen(false)}
+          >
+            <div onClick={(e) => e.stopPropagation()} className="w-full">
+              <DayPicker
+                required
+                mode="range"
+                selected={selectedRange}
+                onSelect={(date) => {
+                  handleSelectDate(date);
+                }}
+                numberOfMonths={1}
+                footer
+                fixedWeeks
+                className="w-full p-4 bg-white/100 rounded-2xl"
+                disabled={{ before: today }}
+                classNames={{
+                  months: "w-[350px] mx-auto flex", // space-x-4 加一點左右間距
+                  month: "flex-1",
+                  month_grid:'w-full',
+                  weekday: "flex-1 text-neutral-300",
+                  selected: "mx-auto w-fit border-none bg-primary-100 text-neutral-950", // 套给所有 selected
+                  day: "rounded text-neutral-950",
+                  disabled: "opacity-30 pointer-events-none",
+                }}
+                components={{
+                  Nav: () => <></>,
+                  MonthCaption: (captionProps) => (
+                    <CustomCaption {...captionProps} totalMonths={1} />
+                  ),
+                  Footer: () => (
+                    <CustomFooter
+                      onSave={() => {
+                        handleSave();
+                        setMobileOpen(false);
+                      }}
+                    />
+                  ),
+                }}
+                modifiers={{
+                  past: { before: today },
+                }}
+                modifiersClassNames={{
+                  range_start: "bg-primary-300 rounded-full",
+                  range_end: "bg-primary-300 rounded-full",
+                  past: "text-grey-500",
+                }}
+              />
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
