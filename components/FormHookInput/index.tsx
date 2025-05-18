@@ -12,6 +12,7 @@ type InputFieldProps = {
   error?: FieldError;
   className?: string;
   disabled?: boolean;
+  onFocus?: React.FocusEventHandler<HTMLInputElement>;
 };
 
 export default function FormHookInput({
@@ -22,6 +23,7 @@ export default function FormHookInput({
   error,
   className,
   disabled = false,
+  onFocus  
 }: InputFieldProps) {
   // 只有 password 欄位才需要這個 state
   const [show, setShow] = useState<boolean>(false);
@@ -44,6 +46,7 @@ export default function FormHookInput({
           disabled:opacity-80
           ${error ? "input-error border-red-500" : ""}`}
           {...register}
+          onFocus={onFocus}   // ← 這裡綁定
         />
         {type === "password" && (
           <button
