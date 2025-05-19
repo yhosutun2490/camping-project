@@ -8,6 +8,7 @@ import Dropdown from "./DropDown";
 import PersonCounter from "./PersonCounter";
 import DatePickerField from "./DatePickerFIeld";
 import { useRouter } from "next/navigation";
+
 interface Props {
   isBgBlur?: boolean,
   bgColor?: string,
@@ -51,6 +52,22 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       label: "台中",
       value: "Taichung",
     },
+       {
+      id: "4",
+      label: "嘉義",
+      value: "Chayi",
+    },
+    {
+      id: "5",
+      label: "南投",
+      value: "Nantou",
+    },
+
+    {
+      id: "6",
+      label: "屏東",
+      value: "Pintung",
+    },
   ];
   
   const onError: SubmitErrorHandler<FormType> = (errors) => {
@@ -75,7 +92,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
       if (data.dateRange.to) {
         params.set("to", data.dateRange.to);
       }
-
+      form.reset()
       // 2. 用 router.push 帶參數跳頁
       router.push(`/event?${params.toString()}`);
     } catch(err) {
@@ -98,21 +115,21 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
         <form onSubmit={form.handleSubmit(onSubmit,onError)} className="flex">
           <div className="form_input_wrapper flex flex-grow-1 gap-4 items-center divide-x divide-white/30">
             <div className="flex flex-col bg-grey grow-1 relative">
-              <div className="flex items-center gap-1">
+              <div className="items-center gap-1 hidden sm:flex">
                 <Icon icon='mdi:location' className="text-white" width={20} height={20} />
                 <span>地點</span>
               </div>
               <Dropdown options={locationOptions} fieldName="location"/>
             </div>
             <div className="flex flex-col bg-grey grow-1 relative">
-              <div className="flex items-center gap-1">
+              <div className="items-center gap-1 hidden sm:sm:flex">
                 <Icon icon='mdi:account-multiple-outline' className="text-white" width={20} height={20} />
                 <span>人數</span>
               </div>
               <PersonCounter />
             </div>
-            <div className="flex flex-col bg-grey grow-1 relative">
-              <div className="flex items-center gap-1">
+            <div className="flex-col bg-grey grow-1 relative">
+              <div className="flex items-center gap-1 hidden sm:sm:flex">
                 <Icon icon='mynaui:calendar' className="text-white" width={20} height={20} />
                 <span>日期</span>
               </div>

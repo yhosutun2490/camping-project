@@ -53,3 +53,8 @@ export type UploadImageResponse = SuccessResponse<{
 export type HostProfileResponse = SuccessResponse<{
   host_info: HostProfile;
 }>;
+
+// 獲取主辦單位資料 API 回應
+export type GetHostProfileResponse = SuccessResponse<{
+  host_info: HostProfile;
+}>;
