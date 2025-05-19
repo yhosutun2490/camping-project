@@ -5,7 +5,6 @@ import { FormData } from '../schema/formDataSchema';
 import FormField from '../../../components/form/FormField';
 import FormInput from '../../../components/form/FormInput';
 import FormNumberInput from '../../../components/form/FormNumberInput';
-import FormRadioGroup from '../../../components/form/FormRadioGroup';
 import FormSwitch from '../../../components/form/FormSwitch';
 import FormDynamicInputs from '../../../components/form/FormDynamicInputs';
 
@@ -90,28 +89,67 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
               {/* 活動地點 */}
               <FormField
                 label="活動地點"
-                name="eventInfo.location"
+                name="eventInfo.address"
                 required
-                error={errors.eventInfo?.location?.message}
+                error={errors.eventInfo?.address?.message}
               >
                 <FormInput
-                  name="eventInfo.location"
+                  name="eventInfo.address"
                   placeholder="請輸入活動地點（最多200字）"
+                />
+              </FormField>
+
+              {/* 經度座標 */}
+              <FormField
+                label="經度"
+                name="eventInfo.longitude"
+                required
+                error={errors.eventInfo?.longitude?.message}
+              >
+                <FormNumberInput
+                  name="eventInfo.longitude"
+                  step={0.000001}
+                />
+              </FormField>
+
+              {/* 緯度座標 */}
+              <FormField
+                label="緯度"
+                name="eventInfo.latitude"
+                required
+                error={errors.eventInfo?.latitude?.message}
+              >
+                <FormNumberInput
+                  name="eventInfo.latitude"
+                  step={0.000001}
                 />
               </FormField>
 
               {/* 上限人數 */}
               <FormField
                 label="上限人數"
-                name="eventInfo.maxParticipants"
+                name="eventInfo.max_participants"
                 required
-                error={errors.eventInfo?.maxParticipants?.message}
+                error={errors.eventInfo?.max_participants?.message}
               >
                 <FormNumberInput
-                  name="eventInfo.maxParticipants"
+                  name="eventInfo.max_participants"
                   min={1}
                   max={10000}
                   step={1}
+                />
+              </FormField>
+              
+              {/* 活動價格 */}
+              <FormField
+                label="活動價格"
+                name="eventInfo.price"
+                required
+                error={errors.eventInfo?.price?.message}
+              >
+                <FormNumberInput
+                  name="eventInfo.price"
+                  min={0}
                 />
               </FormField>
             </div>
@@ -251,6 +289,32 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
                   </select>
                 </div>
               </FormField>
+              
+              <FormField
+                label="報名開始時間"
+                name="eventInfo.registration_open_time"
+                required
+                error={errors.eventInfo?.registration_open_time?.message}
+              >
+                <input
+                  type="datetime-local"
+                  className="input input-bordered w-full"
+                  {...register('eventInfo.registration_open_time')}
+                />
+              </FormField>
+              
+              <FormField
+                label="報名截止時間"
+                name="eventInfo.registration_close_time"
+                required
+                error={errors.eventInfo?.registration_close_time?.message}
+              >
+                <input
+                  type="datetime-local"
+                  className="input input-bordered w-full"
+                  {...register('eventInfo.registration_close_time')}
+                />
+              </FormField>
             </div>
           </div>
         </div>
@@ -283,17 +347,43 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
               error={errors.eventInfo?.tags?.message}
             >
               <div className="bg-base-100 p-3 rounded-lg">
-                <FormRadioGroup
-                  name="eventInfo.tags"
-                  options={[
-                    { value: '寵物友善', label: '寵物友善' },
-                    { value: '閤家同樂', label: '閤家同樂' },
-                    { value: '新手友善', label: '新手友善' },
-                    { value: '進階挑戰', label: '進階挑戰' },
-                    { value: '秘境探索', label: '秘境探索' },
-                    { value: '奢豪露營', label: '奢豪露營' },
-                  ]}
-                />
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: 1, label: '寵物友善' },
+                    { id: 2, label: '閤家同樂' },
+                    { id: 3, label: '新手友善' },
+                    { id: 4, label: '進階挑戰' },
+                    { id: 5, label: '秘境探索' },
+                    { id: 6, label: '奢豪露營' },
+                  ].map((tag) => (
+                    <label key={tag.id} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="checkbox checkbox-primary"
+                        value={tag.id}
+                        checked={(getValues('eventInfo.tags') || []).includes(tag.id)}
+                        onChange={(e) => {
+                          const currentTags = getValues('eventInfo.tags') || [];
+                          const tagId = Number(e.target.value);
+                          
+                          if (e.target.checked) {
+                            // 新增標籤ID到陣列
+                            setValue('eventInfo.tags', [...currentTags, tagId]);
+                          } else {
+                            // 從陣列中移除標籤ID
+                            setValue(
+                              'eventInfo.tags',
+                              currentTags.filter((id) => id !== tagId)
+                            );
+                          }
+                          
+                          trigger('eventInfo.tags');
+                        }}
+                      />
+                      <span>{tag.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </FormField>
           </div>
@@ -307,12 +397,12 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
             {/* 取消政策 */}
             <FormField
               label="取消政策"
-              name="eventInfo.cancelPolicy"
-              error={errors.eventInfo?.cancelPolicy?.message}
+              name="eventInfo.cancel_policy"
+              error={errors.eventInfo?.cancel_policy?.message}
             >
               <div className="bg-base-100 p-3 rounded-lg">
                 <FormSwitch
-                  name="eventInfo.cancelPolicy"
+                  name="eventInfo.cancel_policy"
                   label="15 天前可免費取消"
                 />
               </div>
@@ -321,8 +411,8 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
             {/* 行前通知 */}
             <FormField
               label="行前通知（選填）"
-              name="eventInfo.notifications"
-              error={errors.eventInfo?.notifications?.message}
+              name="eventInfo.event_notifications"
+              error={errors.eventInfo?.event_notifications?.message}
             >
               <div className="bg-base-100 p-3 rounded-lg">
                 <FormDynamicInputs

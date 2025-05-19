@@ -15,12 +15,23 @@ const CreateActivityForm: React.FC = () => {
     mode: 'onChange',
     defaultValues: {
       eventInfo: {
-        title: '', organizer: '', location: '',
+        title: '', 
+        organizer: '', 
+        address: '', // 改名從 location 到 address
+        longitude: 121.5633, // 預設台北101經度
+        latitude: 25.0338, // 預設台北101緯度
         startDate: new Date().toISOString().slice(0, 10),
-        startTime: '00:00', endDate: new Date().toISOString().slice(0, 10),
-        endTime: '00:00', maxParticipants: 1,
-        description: '', tags: '寵物友善', cancelPolicy: false,
-        notifications: [],
+        startTime: '00:00', 
+        endDate: new Date().toISOString().slice(0, 10),
+        endTime: '00:00', 
+        registration_open_time: new Date().toISOString().slice(0, 16), // 報名開始時間
+        registration_close_time: new Date().toISOString().slice(0, 16), // 報名結束時間
+        max_participants: 1, // 改名從 maxParticipants 到 max_participants
+        price: 0, // 新增價格欄位
+        description: '', 
+        tags: [1], // 改為數字陣列，預設選第一個標籤 (寵物友善)
+        cancel_policy: false, // 改名從 cancelPolicy 到 cancel_policy
+        event_notifications: [], // 改名從 notifications 到 event_notifications
       },
       coverImages: [],
       eventImages: [],
