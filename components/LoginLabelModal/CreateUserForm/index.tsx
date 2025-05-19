@@ -73,7 +73,15 @@ export default function CreateUserForm({ ref,close }: Props) {
               type: "manual",
               message: "手機號碼已經註冊過",
             });
-        } else {
+        }
+        else if (message === "密碼不符合規則，需要包含英文數字大小寫，最短8個字，最長16個字") {
+            toast.error("密碼不符合規定")
+            setError("password", {
+              type: "manual",
+              message: "密碼不符合規定",
+            });
+        } 
+        else {
           toast.error("註冊失敗，請稍後再試")
         }   
       }

@@ -36,17 +36,16 @@ export default function EventCard({
   };
   return (
     <div className="card bg-white w-full max-w-full h-full p-8 shadow-sm flex flex-col gap-4">
-    <div className="date_info flex justify-between items-center">
-      <p className="text-base text-neutral-700">{formatDate(date?.start)} - {formatDate(date?.end)}</p>
+    <div className="date_info flex text-base justify-between items-center">
+      <p className="text-neutral-700">{formatDate(date?.start)} - {formatDate(date?.end)}</p>
       <p className="text-primary-500 font-semibold">報名人數: {person?.subscribed} / {person?.max}</p>
     </div>
 
-    <figure className="w-full relative">
+    <figure className="w-full relative aspect-[3/2]">
       <Image
         src={image || "/event/event_1.png"}
         alt="event"
-        width={300}
-        height={200}
+        fill
         className="rounded-xl w-full h-auto object-cover"
       />
       <div className="absolute badge border-none bg-primary-100 text-primary-500 

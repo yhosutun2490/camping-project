@@ -1,10 +1,13 @@
 @import "tailwindcss";
 /* 自訂樣式區塊 */
 @import "../styles/button.css";
+@import "../styles/typography.css";
 @plugin "daisyui" {
   exclude: rootscrollgutter;
 }
-
+@utility rating {
+  @apply w-fit bg-none;
+}
 
 
 @theme {
@@ -14,6 +17,7 @@
   --color-primary-100: #E3E9E2;
   --color-primary-50: #F3F6F3;
   --color-neutral-300: #B0B0B0;
+  --color-neutral-900: #3D3D3D;
   --color-neutral-950: #121212;
   --color-neutral-white: #FFFFFF;
   ;
@@ -48,16 +52,7 @@ body {
     color: var(--input-text) !important;
   }
 
- 
 }
 
-@layer utilities {
-  .text-base {
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    font-family: 'Noto Sans TC', sans-serif;
-    letter-spacing: 0;
-  }
+
  
-}
