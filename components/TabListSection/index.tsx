@@ -63,23 +63,6 @@ export default function TabListSection() {
   ];
   return (
     <div className="flex flex-col gap-2 bg-inherit pt-4 px-8">
-      <p className="search_condition text-2xl text-neutral-950">
-        {isAllEmpty ? (
-          <span>以下是所有露營活動</span>
-        ) : (
-          <span>
-            以下是與
-            {location && <>「{location}」地區</>}
-            {person && <>、{person} 人</>}
-            {from && to && (
-              <>
-                、{from} ~ {to}
-              </>
-            )}
-            有關的露營活動體驗
-          </span>
-        )}
-      </p>
       <div className="event_search_bar w-[80%] mx-auto">
         {/* <SearchBarForm isBgBlur={false} bgColor="bg-primary-300"/> */}
       </div>

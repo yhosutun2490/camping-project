@@ -1,36 +1,50 @@
 
-import EventCard from "@/components/EventCard";
-import PriceRangeFilter from "@/components/PriceRangeFilter";
-import TabListClientWrapper from "@/components/TabListClientWrapper";
 
-export default function EventPage() {
+import type { GetEventsParams } from '@/types/api/event/allEvents'
+import EventFilterShell from '@/components/EventFilterShell'
+
+export default async function EventPage({
+  searchParams,
+}:{
+  searchParams: Record<string,string|undefined>
+}) {
+  const params = await searchParams
+
+ 
+  const filter:GetEventsParams = {
+    location: params?.location || undefined,
+    people: Number(params?.person) || 0,
+    startTime: params?.from || undefined,
+    endTime: params?.to || undefined,
+    minPrice: Number(params?.minPrice) || 0, 
+    maxPrice: Number(params?.maxPrice) || 10000, 
+    page: 1,
+    per: 10,
+    sort: 'asc'
+  }
+  const isAllEmpty = JSON.stringify(params) === '{}'
+  console.log('目前篩選條件', filter,'params',params)
+
   return (
-    <div className="h-screen bg-primary-50 ">
-      {/* Header */}
-      <div className="flex-shrink-0 border-b-2 border-stone-200">
-        <TabListClientWrapper />
-      </div>
-
-      {/* 主體左右區塊 */}
-      <div className="flex flex-grow">
-        {/* 左邊 Filter（不會滾） */}
-        <aside className="w-[300px] p-6">
-          <div className="sticky top-6 h-fit">
-            <PriceRangeFilter />
-          </div>
-        </aside>
-
-        {/* 右邊卡片區（⚠️ scroll 主體） */}
-        <div
-          className="flex-1 pt-6 pb-[120px] grid
-          grid-cols-[repeat(auto-fit,minmax(250px,350px))] grid-rows-max gap-4"
-        >
-          <EventCard />
-          <EventCard image="/event/event_2.png" />
-          <EventCard image="/event/event_3.png" />
-          <EventCard image="/event/event_1.png" />
-        </div>
-      </div>
+    <div className="h-screen bg-primary-50">
+         <p className="search_condition text-2xl text-neutral-950">
+        {isAllEmpty ? (
+          <span>以下是所有露營活動</span>
+        ) : (
+          <span>
+            以下是與
+            {filter?.location && <>「{filter?.location}」地區</>}
+            {filter?.people && <>、{filter?.people } 人</>}
+            {filter?.startTime && filter?.endTime && (
+              <>
+                時間:{filter?.startTime } ~ {filter?.endTime}
+              </>
+            )}
+            有關的露營活動體驗
+          </span>
+        )}
+      </p>
+      <EventFilterShell />
     </div>
   );
 }
