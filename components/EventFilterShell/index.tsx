@@ -29,7 +29,7 @@ export default function EventFilterShell({initialFilter, initialTags}:Props) {
       start_Time: initialFilter.startTime,
       end_Time:   initialFilter.endTime,
     })
-    setTags(['all'])
+    setTags([])
   }, [
     initialFilter.location,
     initialFilter.people,

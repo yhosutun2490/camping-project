@@ -7,7 +7,7 @@ type Filter = {
     maxPrice?: number; 
     start_Time?: string;
     end_Time?: string;
-    tags?: string[]
+    tags: string[]
 };
 type FilterActions = {
   setFilter: (f: Partial<Omit<Filter, "tags">>) => void;  // Omit Filter物件但不能包含tag

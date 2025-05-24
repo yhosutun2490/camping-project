@@ -1,40 +1,65 @@
 "use client";
-import { useState } from "react";
 import clsx from "clsx";
-import type { GetApiV1MetaEventTags200Data, GetApiV1MetaEventTags200DataEventTagsItem } from "@/types/services/EventTags";
+import { Icon } from "@iconify/react";
+import type {
+  GetApiV1MetaEventTags200Data,
+  GetApiV1MetaEventTags200DataEventTagsItem,
+} from "@/types/services/EventTags";
+import { useFilterStore } from "@/stores/useFilterStore";
 
 interface Props {
-  initialTagsList: GetApiV1MetaEventTags200Data ;
+  initialTagsList: GetApiV1MetaEventTags200Data;
 }
 const defaultTabs: GetApiV1MetaEventTags200DataEventTagsItem[] = [
-  { id: "1", name: "全部",      level: "easy",   description: "", created_at: "" },
-  { id: "2", name: "新手友善",  level: "easy",   description: "", created_at: "" },
-  { id: "3", name: "闔家同樂",  level: "easy",   description: "", created_at: "" },
-  { id: "4", name: "進階挑戰",  level: "advance",description: "", created_at: "" },
-  { id: "5", name: "秘境探索",  level: "medium", description: "", created_at: "" },
-  { id: "6", name: "奢華露營",  level: "easy",   description: "", created_at: "" },
+  { id: "2", name: "新手友善", level: "easy", description: "", created_at: "" },
+  { id: "3", name: "闔家同樂", level: "easy", description: "", created_at: "" },
+  {
+    id: "4",
+    name: "進階挑戰",
+    level: "advance",
+    description: "",
+    created_at: "",
+  },
+  {
+    id: "5",
+    name: "秘境探索",
+    level: "medium",
+    description: "",
+    created_at: "",
+  },
+  { id: "6", name: "奢華露營", level: "easy", description: "", created_at: "" },
 ];
 export default function TabList({ initialTagsList }: Props) {
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const tags = useFilterStore((s) => s.tags);
+  const setTags = useFilterStore((s) => s.setTags);
 
-  const eventTabLists = 
+  const eventTabLists =
     Array.isArray(initialTagsList) && initialTagsList.length > 0
       ? initialTagsList
       : defaultTabs;
 
-
   function handleClickTab(value: string) {
-    setActiveTab(value);
+    const nextTags = tags.includes(value)
+    // 如果已經包含，就移除它
+    ? tags.filter((t) => t !== value)
+    // 否則就加進去
+    : [...tags, value]
+
+    setTags(nextTags)
   }
 
   return (
-    <div className="flex flex-wrap gap-5 px-[10%] py-4 md:p-0">
-      { eventTabLists?.map((item) => (
+    <div className="tag-list space-y-2">
+      {tags.length > 0 && (
+        <p className="text-primary-300"> 已選擇 {tags.length} 項標籤 </p>
+      )}
+      <div className="flex flex-wrap gap-5 px-[10%] py-4 md:p-0">
+        {eventTabLists?.map((item) => (
           <div
             className={clsx(
               `p-4 badge badge-outline flex items-center gap-2 cursor-pointer 
           text-xl text-neutral-950 hover:scale-110`,
-              activeTab === item.name
+              tags.includes(item.name)
                 ? "text-white bg-primary-500"
                 : "bg-transparent"
             )}
@@ -42,8 +67,17 @@ export default function TabList({ initialTagsList }: Props) {
             onClick={() => handleClickTab(item.name as string)}
           >
             {item?.name}
+            {tags.includes(item.name) && (
+              <Icon
+                icon="maki:cross"
+                className="text-neutral-950"
+                width={20}
+                height={20}
+              />
+            )}
           </div>
         ))}
+      </div>
     </div>
   );
 }
