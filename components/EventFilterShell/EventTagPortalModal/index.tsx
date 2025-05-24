@@ -3,8 +3,12 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "@iconify/react";
 import TabList from "@/components/TabListSection/TabList";
+import type { GetApiV1MetaEventTags200Data} from "@/types/services/EventTags";
 
-export default function EventTagPortalModal() {
+interface Props {
+  initialTagsList: GetApiV1MetaEventTags200Data ;
+}
+export default function EventTagPortalModal({initialTagsList}:Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <>
@@ -25,7 +29,7 @@ export default function EventTagPortalModal() {
             onClick={() => setIsOpen(false)}
           >
           <div className="bg-white max-h-[200px] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <TabList />
+            <TabList initialTagsList={initialTagsList}/>
           </div> 
           </div>,
           document.body

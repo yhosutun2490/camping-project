@@ -1,7 +1,9 @@
 
 
 import type { GetEventsParams } from '@/types/api/event/allEvents'
+import type { GetApiV1MetaEventTags200Data} from '@/types/services/EventTags'
 import EventFilterShell from '@/components/EventFilterShell'
+import { getEventTags } from '@/api/server-components/event/tags'
 export const dynamic = 'force-dynamic'
 export default async function EventPage({
   searchParams,
@@ -10,7 +12,7 @@ export default async function EventPage({
 }) {
   const params = await searchParams
 
- 
+  // filter 條件
   const filter:GetEventsParams = {
     location: params?.location || undefined,
     people: Number(params?.person) || 0,
@@ -23,7 +25,10 @@ export default async function EventPage({
     sort: 'asc'
   }
   const isAllEmpty = JSON.stringify(params) === '{}'
-  console.log('目前篩選條件', filter,'params',params)
+
+  // event tags
+  const eventTagsData: GetApiV1MetaEventTags200Data | []  = await getEventTags();
+  console.log('eventTags',eventTagsData)
 
   return (
     <div className="h-screen bg-primary-50">
@@ -50,7 +55,7 @@ export default async function EventPage({
           </span>
         )}
       </p>
-      <EventFilterShell />
+      <EventFilterShell initialFilter={filter} initialTags={eventTagsData}/>
     </div>
   );
 }

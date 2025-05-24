@@ -4,17 +4,51 @@ import PriceRangeFilter from "@/components/PriceRangeFilter";
 import EventCard from "@/components/EventCard";
 import EventTagPortalModal from "./EventTagPortalModal";
 import PriceRangePortalModal from "./PriceRangePortalModal";
+import { useFilterStore } from '@/stores/useFilterStore'
+import type { GetEventsParams } from '@/types/api/event/allEvents'
+import type { GetApiV1MetaEventTags200Data} from '@/types/services/EventTags'
+import { useEffect } from "react";
+
+type Props = {
+  initialFilter: GetEventsParams,
+  initialTags: GetApiV1MetaEventTags200Data 
+}
 
 
-export default function EventFilterShell() {
+export default function EventFilterShell({initialFilter, initialTags}:Props) {
+  const setFilter = useFilterStore((s) => s.setFilter)
+  const setTags   = useFilterStore((s) => s.setTags)
+
+  useEffect(() => {
+    // 1. 初始化除了 tags 以外的欄位
+    setFilter({
+      location:  initialFilter.location,
+      people:    initialFilter.people,
+      minPrice:  initialFilter.minPrice,
+      maxPrice:  initialFilter.maxPrice,
+      start_Time: initialFilter.startTime,
+      end_Time:   initialFilter.endTime,
+    })
+    setTags(['all'])
+  }, [
+    initialFilter.location,
+    initialFilter.people,
+    initialFilter.minPrice,
+    initialFilter.maxPrice,
+    initialFilter.startTime,
+    initialFilter.endTime,
+    setFilter,
+    setTags,
+  ])
+
   return (
     <div className="event_filter_section">
       <div className="border-b-1 border-zinc-300 py-2 px-4">
         <div className="hidden md:block">
-          <TabList />
+          <TabList initialTagsList={initialTags}/>
         </div>
         <div className="flex justify-between space-x-4 md:hidden">
-          <EventTagPortalModal />
+          <EventTagPortalModal initialTagsList={initialTags} />
           <PriceRangePortalModal />
         </div>
       </div>

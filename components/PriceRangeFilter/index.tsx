@@ -19,7 +19,7 @@ export default function PriceRangeFilter( {setIsOpen}:Props) {
   });
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   const onSubmit = (data: FormValues) => {
     console.log("送出的範圍：", data.priceRange);
@@ -31,8 +31,8 @@ export default function PriceRangeFilter( {setIsOpen}:Props) {
       const [minPrice, maxPrice] = data.priceRange;
       params.set("minPrice", String(minPrice));
       params.set("maxPrice", String(maxPrice));
-
-      // 3. push 回去
+      
+      // 4. push 回去
       router.push(`${pathname}?${params.toString()}`);
       if (setIsOpen) setIsOpen(false)
     } catch (err) {

@@ -1,100 +1,27 @@
 "use client";
-import { useState, ReactNode } from "react";
+import { useState } from "react";
 import clsx from "clsx";
-import { Icon } from "@iconify/react";
+import type { GetApiV1MetaEventTags200Data, GetApiV1MetaEventTags200DataEventTagsItem } from "@/types/services/EventTags";
 
-type Tab = {
-  title: string;
-  value: string;
-  icon?: ReactNode;
-};
-
-export default function TabList() {
+interface Props {
+  initialTagsList: GetApiV1MetaEventTags200Data ;
+}
+const defaultTabs: GetApiV1MetaEventTags200DataEventTagsItem[] = [
+  { id: "1", name: "全部",      level: "easy",   description: "", created_at: "" },
+  { id: "2", name: "新手友善",  level: "easy",   description: "", created_at: "" },
+  { id: "3", name: "闔家同樂",  level: "easy",   description: "", created_at: "" },
+  { id: "4", name: "進階挑戰",  level: "advance",description: "", created_at: "" },
+  { id: "5", name: "秘境探索",  level: "medium", description: "", created_at: "" },
+  { id: "6", name: "奢華露營",  level: "easy",   description: "", created_at: "" },
+];
+export default function TabList({ initialTagsList }: Props) {
   const [activeTab, setActiveTab] = useState<string>("all");
-  const iconColor = 'text-primary-300'
-  const iconMap = {
-    default: 'arcticons:another-notes',
-    all: 'material-symbols:border-all',
-    beginner: 'fe:beginner',
-    family: 'material-symbols:family-restroom-rounded',
-    advance:'carbon:skill-level-advanced',
-    secret: 'la:user-secret',
-    luxury: 'token:flux',
-  }
-  const eventTabLists:Tab[] = [
-    {
-      title: "全部",
-      value: "all",
-      icon: (
-        <Icon
-          icon={iconMap['all']}
-          className= {iconColor}
-          width={20}
-          height={20}
-        />
-      ),
-    },
-    {
-      title: "新手友善",
-      value: "beginner",
-      icon: (
-        <Icon
-          icon={iconMap['beginner']}
-          className= {iconColor}
-          width={20}
-          height={20}
-        />
-      ),
-    },
-    {
-      title: "闔家同樂",
-      value: "family",
-      icon: (
-        <Icon
-          icon={iconMap['family']}
-          className= {iconColor}
-          width={20}
-          height={20}
-        />
-      ),
-    },
-    {
-      title: "進階挑戰",
-      value: "advance",
-      icon: (
-        <Icon
-          icon={iconMap['advance']}
-          className= {iconColor}
-          width={20}
-          height={20}
-        />
-      ),
-    },
-    {
-      title: "秘境探索",
-      value: "secret",
-      icon: (
-        <Icon
-          icon={iconMap['secret']}
-          className= {iconColor}
-          width={20}
-          height={20}
-        />
-      ),
-    },
-     {
-      title: "豪奢露營",
-      value: "luxury",
-      icon: (
-        <Icon
-          icon={iconMap['luxury']}
-          className= {iconColor}
-          width={20}
-          height={20}
-        />
-      ),
-    },
-  ];
+
+  const eventTabLists = 
+    Array.isArray(initialTagsList) && initialTagsList.length > 0
+      ? initialTagsList
+      : defaultTabs;
+
 
   function handleClickTab(value: string) {
     setActiveTab(value);
@@ -102,18 +29,21 @@ export default function TabList() {
 
   return (
     <div className="flex flex-wrap gap-5 px-[10%] py-4 md:p-0">
-      {eventTabLists?.map((item) => (
-        <div  className={clsx(`p-4 badge badge-outline flex items-center gap-2 cursor-pointer 
+      { eventTabLists?.map((item) => (
+          <div
+            className={clsx(
+              `p-4 badge badge-outline flex items-center gap-2 cursor-pointer 
           text-xl text-neutral-950 hover:scale-110`,
-          activeTab === item.value?"text-white bg-primary-500":"bg-transparent"
-        )}
-        key={item.value}
-        onClick={() => handleClickTab(item?.value)}
-        >
-          {item?.icon}
-          {item?.title}   
-        </div>
-      ))}
+              activeTab === item.name
+                ? "text-white bg-primary-500"
+                : "bg-transparent"
+            )}
+            key={item.name}
+            onClick={() => handleClickTab(item.name as string)}
+          >
+            {item?.name}
+          </div>
+        ))}
     </div>
   );
 }
