@@ -5,7 +5,7 @@ export default function EventLayout({
   }) {
     return (
     <div className="h-screen bg-primary-50 pt-[140px] md:pt-[80px]">
-      <main className="min-h-0 overflow-auto">{children}</main>
+      <main className="min-h-0 overflow-y-auto">{children}</main>
     </div>
     );
   }

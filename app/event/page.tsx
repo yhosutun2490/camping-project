@@ -30,7 +30,7 @@ export default async function EventPage({
   console.log('eventTags',eventTagsData)
 
   return (
-    <div className="h-screen bg-primary-50">
+    <div className="min-h-screen bg-primary-50">
       <p className="search_condition heading-3 text-center text-neutral-950 px-4 py-2">
         {isAllEmpty ? (
           <span>以下是所有露營活動</span>
