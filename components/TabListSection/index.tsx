@@ -1,16 +1,9 @@
 "use client"
 import TabList from "./TabList";
 import { Icon } from "@iconify/react";
-import { useSearchParams } from 'next/navigation'
+
 export default function TabListSection() {
-  const searchParams = useSearchParams();
-  const location = searchParams.get("location");
-  const person = searchParams.get("person");
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-
-  const isAllEmpty = !location && !person && !from && !to;
-
+  const iconColor = 'text-primary-300'
   const eventTabLists = [
     {
       title: "全部",
@@ -18,7 +11,7 @@ export default function TabListSection() {
       icon: (
         <Icon
           icon="material-symbols:border-all"
-          className="text-inherit"
+          className= {iconColor}
           width={20}
           height={20}
         />
@@ -30,7 +23,7 @@ export default function TabListSection() {
       icon: (
         <Icon
           icon="fe:beginner"
-          className="text-inherit"
+          className= {iconColor}
           width={20}
           height={20}
         />
@@ -42,7 +35,7 @@ export default function TabListSection() {
       icon: (
         <Icon
           icon="material-symbols:family-restroom-rounded"
-          className="text-inherit"
+          className= {iconColor}
           width={20}
           height={20}
         />
@@ -54,7 +47,7 @@ export default function TabListSection() {
       icon: (
         <Icon
           icon="carbon:skill-level-advanced"
-          className="text-inherit"
+          className= {iconColor}
           width={20}
           height={20}
         />
@@ -62,10 +55,7 @@ export default function TabListSection() {
     },
   ];
   return (
-    <div className="flex flex-col gap-2 bg-inherit pt-4 px-8">
-      <div className="event_search_bar w-[80%] mx-auto">
-        {/* <SearchBarForm isBgBlur={false} bgColor="bg-primary-300"/> */}
-      </div>
+    <div className="flex flex-col gap-2 bg-inherit p-4 px-8">
       <TabList lists={eventTabLists} />
     </div>
   );

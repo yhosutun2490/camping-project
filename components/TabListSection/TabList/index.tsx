@@ -18,7 +18,7 @@ export default function TabList({ lists }: Props) {
   return (
     <div className="flex gap-5 text-neutral-950 text-xl">
       {lists?.map((item) => (
-        <div  className="tab_list flex items-center gap-2 cursor-pointer hover:text-primary-300" key={item.value}>
+        <div  className="badge badge-outline bg-primary-500 flex items-center gap-2 cursor-pointer hover:text-primary-300" key={item.value}>
           {item?.icon}
           <div
             className={`${

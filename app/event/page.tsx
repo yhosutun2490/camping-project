@@ -27,7 +27,7 @@ export default async function EventPage({
 
   return (
     <div className="h-screen bg-primary-50">
-         <p className="search_condition text-2xl text-neutral-950">
+      <p className="search_condition heading-3 text-center text-neutral-950 px-4 py-2">
         {isAllEmpty ? (
           <span>以下是所有露營活動</span>
         ) : (
