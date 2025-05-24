@@ -12,6 +12,7 @@ interface Props {
     subscribed: number;
     max: number;
   };
+  tags?: string[]
 }
 
 export default function EventCard({
@@ -26,7 +27,8 @@ export default function EventCard({
   person = {
     subscribed: 18,
     max: 30
-  }
+  },
+  tags = [],
 }: Props) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -56,6 +58,11 @@ export default function EventCard({
 
     <div className="card-body p-0 flex flex-col gap-2">
       <h2 className="card-title text-2xl text-neutral-950">{title}</h2>
+       <div className="tags space-x-2">
+        {tags.map((tag) => (
+          <div className="badge bg-primary-300 border-0" key={tag}>{tag}</div>
+        ))}
+      </div>
       <div className="price flex items-baseline">
         <span className="text-xl text-primary-500 font-bold">NT$ {price}</span>
         <span className="text-base text-neutral-700 pl-2">/ 每人</span>

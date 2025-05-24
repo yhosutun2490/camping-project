@@ -1,7 +1,6 @@
 
 
 import type { GetEventsParams } from '@/types/api/event/allEvents'
-import type { GetApiV1MetaEventTags200Data} from '@/types/services/EventTags'
 import EventFilterShell from '@/components/EventFilterShell'
 import { getEventTags } from '@/api/server-components/event/tags'
 export const dynamic = 'force-dynamic'
@@ -27,7 +26,7 @@ export default async function EventPage({
   const isAllEmpty = JSON.stringify(params) === '{}'
 
   // event tags
-  const eventTagsData: GetApiV1MetaEventTags200Data | []  = await getEventTags();
+  const eventTagsData = await getEventTags();
   console.log('eventTags',eventTagsData)
 
   return (

@@ -10,7 +10,7 @@ const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
 /**
  * 取得活動列表 利用query string 查詢 和 loadMore 取得更多分頁
- * @param filters 搜尋活動的query string 參數 
+ * @param filters 搜尋活動的query string 參數
  */
 export function useEventList(filters: GetEventsParams) {
   const perPage = filters.per ?? 10;
@@ -44,12 +44,19 @@ export function useEventList(filters: GetEventsParams) {
       revalidateFirstPage: false,
     });
 
-  const events = data ? data.flatMap((d) => d.data.events) : [];
-  const isReachingEnd = (() => {
-    if (!data || data.length === 0) return false; // 還沒拿到或第一頁沒資料 → 還沒到底
-    return data[data.length - 1].data.events.length < perPage;
-  })();
+  const events = data ? data.flatMap((d) => d?.data?.events ?? []) : [];
 
+  // isReachingEnd
+  const isReachingEnd = (() => {
+    if (!data || data.length === 0) return false;
+
+    const last = data[data.length - 1];
+    const list = last?.data?.events;
+    // 如果最後一頁沒有 data 或 events 就當成「到底了」
+    if (!Array.isArray(list)) return true;
+    return list.length < perPage;
+  })();
+  
   return {
     events,
     isLoading: !data && isValidating,

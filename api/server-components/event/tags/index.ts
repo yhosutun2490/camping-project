@@ -7,7 +7,7 @@ const endpoint = "/meta/event-tags";
 /**
  * 取得所有活動分類標籤
  */
-export const getEventTags = async (): Promise<GetApiV1MetaEventTags200Data | []> => {
+export const getEventTags = async (): Promise<GetApiV1MetaEventTags200Data> => {
   try {
     const {data}= await axiosInstance.get<GetApiV1MetaEventTags200Data>(
       endpoint,
@@ -16,6 +16,6 @@ export const getEventTags = async (): Promise<GetApiV1MetaEventTags200Data | []>
     return data ;
   } catch (err) {
     formatAxiosError(err) as ErrorResponse
-    return []
+    return [] as unknown as GetApiV1MetaEventTags200Data;
   }
 };
