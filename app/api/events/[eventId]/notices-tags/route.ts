@@ -12,7 +12,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { eventId: string } }
 ): Promise<NextResponse<UpdateEventNoticesTagsResponse | ErrorResponse>> {
-  const { eventId } = params;
+  const { eventId } = await params;
 
   // 檢查活動 ID 是否存在
   if (!eventId) {

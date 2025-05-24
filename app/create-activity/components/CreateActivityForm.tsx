@@ -29,7 +29,7 @@ const CreateActivityForm: React.FC = () => {
         max_participants: 1, // 改名從 maxParticipants 到 max_participants
         price: 0, // 新增價格欄位
         description: '', 
-        tags: [1], // 改為數字陣列，預設選第一個標籤 (寵物友善)
+        tags: [], 
         cancel_policy: false, // 改名從 cancelPolicy 到 cancel_policy
         event_notifications: [], // 改名從 notifications 到 event_notifications
       },

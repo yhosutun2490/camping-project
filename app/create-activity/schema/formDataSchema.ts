@@ -23,15 +23,15 @@ export const EventInfoSchema = z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
     // 新增報名時間
-    registration_open_time: z.string().refine(val => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(val), '格式需為 ISO 日期時間格式'),
-    registration_close_time: z.string().refine(val => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(val), '格式需為 ISO 日期時間格式'),
+    registration_open_time: z.string(),
+    registration_close_time: z.string(),
     // 改為 max_participants
     max_participants: z.number().min(1, '至少1人').max(10000, '最多10000人'),
     // 新增價格
     price: z.number().min(0, '價格不可為負'),
     description: z.string().min(1, '請輸入活動描述').max(5000, '最多5000字'),
-    // 改為多選陣列
-    tags: z.array(z.number()).min(1, '請至少選擇一個標籤'),
+    // 改為多選字串陣列
+    tags: z.array(z.string()).min(1, '請至少選擇一個標籤'),
     // 改為 cancel_policy
     cancel_policy: z.boolean(),
     // 改為 event_notifications
