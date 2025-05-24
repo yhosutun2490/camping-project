@@ -44,8 +44,9 @@ export function useEventList(filters: GetEventsParams) {
       revalidateFirstPage: false,
     });
 
-  const events = data ? data.flatMap((d) => d?.data?.events ?? []) : [];
-
+  const events = data ? data.flatMap((d) => d?.data?.events ?? []) : []; // event資料扁平化
+  const totalCount = data?.[0]?.data?.pagination?.total ?? 0;
+ 
   // isReachingEnd
   const isReachingEnd = (() => {
     if (!data || data.length === 0) return false;
@@ -60,6 +61,7 @@ export function useEventList(filters: GetEventsParams) {
   return {
     events,
     isLoading: !data && isValidating,
+    totalCount,
     isLoadingMore: isValidating,
     hasMore: !isReachingEnd,
     loadMore: () => setSize(size + 1),

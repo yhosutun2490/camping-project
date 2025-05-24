@@ -8,8 +8,14 @@ import { useFilterStore } from "@/stores/useFilterStore";
 import type { GetEventsParams } from "@/types/api/event/allEvents";
 import type { GetApiV1MetaEventTags200Data } from "@/types/services/EventTags";
 import type { Event } from "@/types/api/event/allEvents";
-import { useEffect } from "react";
+import React,{ useEffect,useCallback, useState } from "react";
 import { useEventList } from "@/swr/event/useEventList";
+import InfiniteLoader from "react-window-infinite-loader";
+import {
+  FixedSizeList,
+  ListChildComponentProps,
+  ListOnItemsRenderedProps,
+} from "react-window";
 
 type Props = {
   initialFilter: GetEventsParams;
@@ -223,12 +229,12 @@ export default function EventFilterShell({
   initialFilter,
   initialTags,
 }: Props) {
-  // swr get event list
-  const { events } = useEventList(initialFilter);
 
   // 篩選store
   const setFilter = useFilterStore((s) => s.setFilter);
   const setTags = useFilterStore((s) => s.setTags);
+  // 整體高度
+  const [listHeight, setListHeight] = useState(0);
 
   useEffect(() => {
     // 1. 初始化除了 tags 以外的欄位
@@ -251,10 +257,67 @@ export default function EventFilterShell({
     setFilter,
     setTags,
   ]);
+  
+  // 無限載入實作
+  // 1. 從 hook 拿資料、總筆數、分頁控制方法
+  const {
+    events,
+    totalCount,
+    hasMore,
+    isLoadingMore,
+    loadMore,
+  } = useEventList(initialFilter);
+
+
+  // only runs on client
+  useEffect(() => {
+    const h = window.innerHeight - 200;
+    setListHeight(h > 0 ? h : 0);
+  }, []);
+
+  // 3. 判斷某筆 index 資料是否已經載入
+  const isItemLoaded = useCallback(
+    (index: number) => index < events.length,
+    [events.length]
+  );
+
+   // 4. 當要加載更多時呼叫 loadMore (SWR)
+  const loadMoreItems = useCallback(
+    async () => {
+      if (hasMore && !isLoadingMore) {
+        await loadMore();
+      }
+    },
+    [hasMore, isLoadingMore, loadMore]
+  );
+
+    // 5. 定義 list 中每一列該如何 render
+  const Row = ({ index, style }: ListChildComponentProps) => {
+    if (!isItemLoaded(index)) {
+      // 尚未載入的項目顯示 skeleton 或 loading
+      return (
+        <div style={style} className="p-4 text-center">
+          載入中…
+        </div>
+      );
+    }
+    const ev = events[index];
+    return (
+      <div style={style}>
+        <EventCard
+          key={ev.id}
+          title={ev.title}
+          price={Number(ev.price)}
+          tags={ev.tags}
+        />
+      </div>
+    );
+  };
+
 
   return (
-    <div className="h-screen bg-primary-50 flex flex-col">
-      {/* 頁面頂部：篩選條件顯示 */}
+    <div className="h-screen flex flex-col bg-primary-50">
+      {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
       <div className="border-b border-zinc-300 py-2 px-4">
         <div className="hidden md:block">
           <TabList initialTagsList={initialTags} />
@@ -265,38 +328,43 @@ export default function EventFilterShell({
         </div>
       </div>
 
-      {/* 下面整塊 Filter + Cards 區塊，撐滿剩餘高度，並垂直切兩區 */}
+      {/* ——— 主體區：左側 Filter + 右側 List ——— */}
       <div className="flex flex-1 min-h-0">
-        {/* 左邊 Filter（固定寬、不捲） */}
+        {/* 左側 Filter（不滚动） */}
         <aside className="hidden md:block w-[300px] py-6 px-4">
           <div className="sticky top-6">
             <PriceRangeFilter />
           </div>
         </aside>
 
-        {/* 右邊 Cards（拿剩餘空間，才捲） */}
-        <div
-          className="flex-1 min-h-0 overflow-y-auto pt-6 pb-[120px] 
-                 grid justify-center
-                 grid-cols-[repeat(auto-fit,minmax(250px,350px))] gap-4"
-        >
-          {events.length
-            ? events.map((data) => (
-                <EventCard
-                  key={data.id}
-                  title={data.title}
-                  price={Number(data.price)}
-                  tags={data.tags}
-                />
-              ))
-            : mockEvents.map((data) => (
-                <EventCard
-                  key={data.id}
-                  title={data.title}
-                  price={Number(data.price)}
-                  tags={data.tags}
-                />
-              ))}
+        {/* 右側 列表（虚拟 + 无限滚） */}
+        <div className="flex-1 min-h-0">
+          <InfiniteLoader
+            isItemLoaded={isItemLoaded}
+            itemCount={totalCount}
+            loadMoreItems={loadMoreItems}
+            threshold={5}
+            minimumBatchSize={10}
+          >
+            {({
+              onItemsRendered,
+              ref,
+            }: {
+              onItemsRendered: ListOnItemsRenderedProps;
+              ref: React.Ref<FixedSizeList>;
+            }) => (
+              <FixedSizeList
+                height={listHeight - 200}   // 扣掉 header、footer 的高度
+                width="100%"
+                itemCount={totalCount}
+                itemSize={380}                     // EventCard 的「行高」
+                onItemsRendered={onItemsRendered}
+                ref={ref}
+              >
+                {Row}
+              </FixedSizeList>
+            )}
+          </InfiniteLoader>
         </div>
       </div>
     </div>
