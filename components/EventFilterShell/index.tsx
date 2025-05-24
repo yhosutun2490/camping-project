@@ -8,14 +8,12 @@ import { useFilterStore } from "@/stores/useFilterStore";
 import type { GetEventsParams } from "@/types/api/event/allEvents";
 import type { GetApiV1MetaEventTags200Data } from "@/types/services/EventTags";
 import type { Event } from "@/types/api/event/allEvents";
-import React,{ useEffect,useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useEventList } from "@/swr/event/useEventList";
-import InfiniteLoader from "react-window-infinite-loader";
-import {
-  FixedSizeList,
-  ListChildComponentProps,
-  ListOnItemsRenderedProps,
-} from "react-window";
+import InfiniteLoader, {
+  InfiniteLoaderChildProps,
+} from "react-window-infinite-loader";
+import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 type Props = {
   initialFilter: GetEventsParams;
@@ -229,7 +227,6 @@ export default function EventFilterShell({
   initialFilter,
   initialTags,
 }: Props) {
-
   // 篩選store
   const setFilter = useFilterStore((s) => s.setFilter);
   const setTags = useFilterStore((s) => s.setTags);
@@ -257,17 +254,11 @@ export default function EventFilterShell({
     setFilter,
     setTags,
   ]);
-  
+
   // 無限載入實作
   // 1. 從 hook 拿資料、總筆數、分頁控制方法
-  const {
-    events,
-    totalCount,
-    hasMore,
-    isLoadingMore,
-    loadMore,
-  } = useEventList(initialFilter);
-
+  const { events, totalCount, hasMore, isLoadingMore, loadMore } =
+    useEventList(initialFilter);
 
   // only runs on client
   useEffect(() => {
@@ -281,17 +272,14 @@ export default function EventFilterShell({
     [events.length]
   );
 
-   // 4. 當要加載更多時呼叫 loadMore (SWR)
-  const loadMoreItems = useCallback(
-    async () => {
-      if (hasMore && !isLoadingMore) {
-        await loadMore();
-      }
-    },
-    [hasMore, isLoadingMore, loadMore]
-  );
+  // 4. 當要加載更多時呼叫 loadMore (SWR)
+  const loadMoreItems = useCallback(async () => {
+    if (hasMore && !isLoadingMore) {
+      await loadMore();
+    }
+  }, [hasMore, isLoadingMore, loadMore]);
 
-    // 5. 定義 list 中每一列該如何 render
+  // 5. 定義 list 中每一列該如何 render
   const Row = ({ index, style }: ListChildComponentProps) => {
     if (!isItemLoaded(index)) {
       // 尚未載入的項目顯示 skeleton 或 loading
@@ -313,7 +301,6 @@ export default function EventFilterShell({
       </div>
     );
   };
-
 
   return (
     <div className="h-screen flex flex-col bg-primary-50">
@@ -346,18 +333,12 @@ export default function EventFilterShell({
             threshold={5}
             minimumBatchSize={10}
           >
-            {({
-              onItemsRendered,
-              ref,
-            }: {
-              onItemsRendered: ListOnItemsRenderedProps;
-              ref: React.Ref<FixedSizeList>;
-            }) => (
+            {({ onItemsRendered, ref }: InfiniteLoaderChildProps) => (
               <FixedSizeList
-                height={listHeight - 200}   // 扣掉 header、footer 的高度
+                height={listHeight} // 预先用 useEffect 拿到的高度
                 width="100%"
                 itemCount={totalCount}
-                itemSize={380}                     // EventCard 的「行高」
+                itemSize={380}
                 onItemsRendered={onItemsRendered}
                 ref={ref}
               >
