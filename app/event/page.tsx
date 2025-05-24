@@ -2,7 +2,7 @@
 
 import type { GetEventsParams } from '@/types/api/event/allEvents'
 import EventFilterShell from '@/components/EventFilterShell'
-
+export const dynamic = 'force-dynamic'
 export default async function EventPage({
   searchParams,
 }:{
@@ -40,6 +40,12 @@ export default async function EventPage({
                 時間:{filter?.startTime } ~ {filter?.endTime}
               </>
             )}
+             {filter?.minPrice && filter?.maxPrice && (
+              <>
+                價格:{filter?.minPrice } ~ {filter?.maxPrice}
+              </>
+            )}
+
             有關的露營活動體驗
           </span>
         )}

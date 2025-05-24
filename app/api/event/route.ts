@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import axiosInstance from "@/api/axiosIntance";
 import type {
-  GetEventsParams,
-  EventListResponse,
-} from "@/types/api/event/allEvents";
+  GetApiV1EventsParams,
+  GetApiV1Events200Data
+} from "@/types/services/Event";
 import type { ErrorResponse } from "@/types/api/response";
 import { formatAxiosError } from "@/utils/errors";
 
@@ -13,7 +13,7 @@ import { formatAxiosError } from "@/utils/errors";
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const apiParams: GetEventsParams = {
+    const apiParams: GetApiV1EventsParams = {
       location: searchParams.get("location") ?? undefined,
       people: searchParams.get("person")
         ? parseInt(searchParams.get("person")!, 10)
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       sort: searchParams.get("sort") as "asc" | "desc"
       // 其他 page/per/sort 也可以同理加上
     };
-    const data = await axiosInstance.get<EventListResponse>("/event", {
+    const data = await axiosInstance.get<GetApiV1Events200Data>("/event", {
       params: apiParams,
     });
 
