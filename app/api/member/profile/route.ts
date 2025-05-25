@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { formatAxiosError } from "@/utils/errors";
-import { MemberProfile,MemberUpdateProfileResponse} from "@/types/api/member/profile";
+import {
+  MemberProfile,
+  MemberUpdateProfileResponse,
+} from "@/types/api/member/profile";
 import { ErrorResponse } from "@/types/api/response";
 import axiosInstance from "@/api/axiosIntance";
 
@@ -8,26 +11,33 @@ import axiosInstance from "@/api/axiosIntance";
 export async function PATCH(
   req: NextRequest
 ): Promise<NextResponse<MemberUpdateProfileResponse | ErrorResponse>> {
-  const {firstname, lastname,gender,username, birth, photo_url} = await req.json() as MemberProfile
-  const accessToken = req.headers.get('access_token')
-   if (!accessToken) {
-     return NextResponse.json(
-       { status: "error", message: "取不到 token,請重新登入" },
-       { status: 401 }
-     );
-   }
-  
-   const payload: Record<string, unknown> = {
+  const { firstname, lastname, gender, username, birth, photo_url } =
+    (await req.json()) as MemberProfile;
+  const accessToken = req.headers.get("access_token");
+  if (!accessToken) {
+    return NextResponse.json(
+      { status: "error", message: "取不到 token,請重新登入" },
+      { status: 401 }
+    );
+  }
+
+  const payload: Record<string, unknown> = {
     firstname,
     lastname,
     gender,
     username,
     birth,
-    photo_url
-  }
+    photo_url,
+  };
+  console.log('payload',payload)
   const cleanPayload = Object.fromEntries(
-    Object.entries(payload).filter(([, v]) => v !== "")
-  )
+    Object.entries(payload).filter(([, v]) => {
+      if (v === "" || v === null || typeof v === "undefined") return false;
+      if (typeof v === "string" && v.toLowerCase().includes("nan"))
+        return false;
+      return true;
+    })
+  );
   try {
     const backEndRes = await axiosInstance.patch<MemberUpdateProfileResponse>(
       "/member/profile",
@@ -49,6 +59,7 @@ export async function PATCH(
     return res;
   } catch (err: unknown) {
     const apiErr = formatAxiosError(err);
+    console.error("PATCH /member/profile error:", err); // 👈 加這行
     return NextResponse.json<ErrorResponse>(
       {
         status: apiErr.status, // failed / error

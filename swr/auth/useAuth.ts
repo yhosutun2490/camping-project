@@ -1,4 +1,5 @@
 import { UserRegister, UserRegisterResponse, UserLogoutResponse } from '@/types/api/auth'
+import { PutAuthResetPassword200, PutAuthResetPasswordBody } from '@/types/services/Auth'
 import axios from "axios";
 import useSWRMutation from 'swr/mutation'
 
@@ -34,6 +35,33 @@ export function useUserLogout() {
       { arg }: { arg: null}
     ):Promise<UserLogoutResponse> => {
       const res = await axios.post<UserLogoutResponse>("/api/auth/logout",arg, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return res.data
+    }
+  );
+
+  return {
+    trigger,
+    isMutating,
+    data,
+    error,
+  };
+}
+
+// reset password 
+
+export function useResetPassword() {
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    "/api/auth/reset-password",
+    async (
+      _key: string,
+      { arg }: { arg: PutAuthResetPasswordBody}
+    ):Promise<PutAuthResetPassword200> => {
+      const res = await axios.put<PutAuthResetPassword200>("/api/auth/reset-password",arg, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",

@@ -325,8 +325,9 @@ export default function EventFilterShell({
         </aside>
 
         {/* 右側 列表（虚拟 + 无限滚） */}
-        <div className="flex-1 min-h-0">
-          <InfiniteLoader
+        <div className="flex-1 min-h-0 p-6">
+          {events.length === 0 && <p className="text-xl text-primary-500 text-center">暫無匹配活動資料</p>}
+          {events.length && <InfiniteLoader
             isItemLoaded={isItemLoaded}
             itemCount={totalCount}
             loadMoreItems={loadMoreItems}
@@ -345,7 +346,7 @@ export default function EventFilterShell({
                 {Row}
               </FixedSizeList>
             )}
-          </InfiniteLoader>
+          </InfiniteLoader>}
         </div>
       </div>
     </div>

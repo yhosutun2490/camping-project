@@ -1,5 +1,5 @@
 import UserInfoForm from "@/components/Member/UserInfoForm"
-import ChangePasswordForm from "@/components/Member/ChangePasswordForm"
+import ChangePasswordForm from "@/components/Member/ResetPasswordForm"
 import { memberGetProfile } from "@/api/server-components/member/profile"
 
 export default async function MemberPage() {
