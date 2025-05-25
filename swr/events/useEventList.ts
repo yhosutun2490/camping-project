@@ -6,7 +6,8 @@ import type {
   EventListResponse,
 } from "@/types/api/event/allEvents";
 
-const fetcher = (url: string) => axios.get(url).then((res) => res.data);
+export const fetcher = (url: string) =>
+  axios.get(url).then(res => res.data.data);
 
 /**
  * 取得活動列表 利用query string 查詢 和 loadMore 取得更多分頁
@@ -25,7 +26,7 @@ export function useEventList(filters: GetEventsParams) {
       ...filters,
       page: pageIndex + 1,
       per: perPage,
-      sort: 'asc'
+      sort: "asc",
     };
 
     // 只留有值的 key，轉 query string
@@ -43,10 +44,10 @@ export function useEventList(filters: GetEventsParams) {
     useSWRInfinite<EventListResponse>(getKey, fetcher, {
       revalidateFirstPage: false,
     });
+  const events = data?.flatMap(d => d.data?.events ?? []) ?? [];
+  const totalCount = data?.[0]?.data.pagination.total ?? 0;
 
-  const events = data ? data.flatMap((d) => d?.data?.events ?? []) : []; // event資料扁平化
-  const totalCount = data?.[0]?.data?.pagination?.total ?? 0;
- 
+
   // isReachingEnd
   const isReachingEnd = (() => {
     if (!data || data.length === 0) return false;
@@ -57,7 +58,7 @@ export function useEventList(filters: GetEventsParams) {
     if (!Array.isArray(list)) return true;
     return list.length < perPage;
   })();
-  
+
   return {
     events,
     isLoading: !data && isValidating,

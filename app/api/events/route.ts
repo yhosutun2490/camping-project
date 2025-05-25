@@ -26,8 +26,8 @@ export async function GET(req: NextRequest) {
         : undefined,
       startTime: searchParams.get("from") ?? undefined,
       endTime: searchParams.get("to") ?? undefined,
-      minPrice: getOptionalNumber(searchParams.get("min")),
-      maxPrice: getOptionalNumber(searchParams.get("max")),
+      minPrice: getOptionalNumber(searchParams.get("minPrice")),
+      maxPrice: getOptionalNumber(searchParams.get("maxPrice")),
       page: Number(searchParams.get("page")) ?? 1,
       per: Number(searchParams.get("per")) ?? 10,
       sort: searchParams.get("sort") as "asc" | "desc",
@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
     const cleanedParams = Object.fromEntries(
       Object.entries(apiParams).filter(([, value]) => value !== undefined)
     );
+    console.log('cleanedParams',cleanedParams)
     const data = await axiosInstance.get<GetApiV1Events200Data>("/events", {
       params: cleanedParams,
     });

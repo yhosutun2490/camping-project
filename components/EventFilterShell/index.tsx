@@ -20,6 +20,30 @@ type Props = {
 };
 
 
+function useItemsPerRow() {
+  const [itemsPerRow, setItemsPerRow] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 768) {
+        setItemsPerRow(1);
+      } else if (width < 1248) {
+        setItemsPerRow(2);
+      } else {
+        setItemsPerRow(3);
+      }
+    };
+
+    handleResize(); // 初次執行
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return itemsPerRow;
+}
+
+
 export default function EventFilterShell({
   initialFilter,
   initialTags,
@@ -29,6 +53,9 @@ export default function EventFilterShell({
   const setTags = useFilterStore((s) => s.setTags);
   // 整體高度
   const [listHeight, setListHeight] = useState(0);
+  
+  // 活動列表grid rows行數
+  const itemsPerRow =  useItemsPerRow()
 
   useEffect(() => {
     // 1. 初始化除了 tags 以外的欄位
@@ -59,14 +86,14 @@ export default function EventFilterShell({
 
   // only runs on client
   useEffect(() => {
-    const h = window.innerHeight - 200;
+    const h = window.innerHeight;
     setListHeight(h > 0 ? h : 0);
   }, []);
 
   // 3. 判斷某筆 index 資料是否已經載入
   const isItemLoaded = useCallback(
-    (index: number) => index < events.length,
-    [events.length]
+    (index: number) => index < Math.ceil(events.length / itemsPerRow),
+    [events.length, itemsPerRow]
   );
 
   // 4. 當要加載更多時呼叫 loadMore (SWR)
@@ -77,28 +104,38 @@ export default function EventFilterShell({
   }, [hasMore, isLoadingMore, loadMore]);
 
   // 5. 定義 list 中每一列該如何 render
-  const Row = ({ index, style }: ListChildComponentProps) => {
-    if (!isItemLoaded(index)) {
-      // 尚未載入的項目顯示 skeleton 或 loading
+    const Row = ({ index, style }: ListChildComponentProps) => {
+    const startIndex = index * itemsPerRow;
+    const rowItems = events.slice(startIndex, startIndex + itemsPerRow);
+
+    if (rowItems.length === 0) {
       return (
         <div style={style} className="p-4 text-center">
           載入中…
         </div>
       );
     }
-    const ev = events[index];
+
     return (
-      <div style={style}>
-        <EventCard
-          key={ev.id}
-          title={ev.title}
-          price={Number(ev.price)}
-          tags={ev.tags}
-        />
+      <div style={style} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+        {rowItems.map((item) => (
+          <div className="min-w-[300px] md:min-w-[350px]" key={item.id} >
+             <EventCard 
+             title={item.title} 
+             date={{ start: item.start_time, end: item.end_time }}
+             image={item.photos}
+             price={item.price}
+             tags={item.tags}
+             />
+          </div>
+         
+        ))}
       </div>
     );
   };
 
+  const rowCount = Math.ceil(totalCount / itemsPerRow);
+  
   return (
     <div className="h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
@@ -114,36 +151,42 @@ export default function EventFilterShell({
 
       {/* ——— 主體區：左側 Filter + 右側 List ——— */}
       <div className="flex flex-1 min-h-0">
-        {/* 左側 Filter（不滚动） */}
+        {/* 左側 Filter */}
         <aside className="hidden md:block w-[300px] py-6 px-4">
           <div className="sticky top-6">
             <PriceRangeFilter />
           </div>
         </aside>
 
-        {/* 右側 列表（虚拟 + 无限滚） */}
+        {/* 右側列表 */}
         <div className="flex-1 min-h-0 p-6">
-          {events.length === 0 && <p className="text-xl text-primary-500 text-center">暫無匹配活動資料</p>}
-          {events.length && <InfiniteLoader
-            isItemLoaded={isItemLoaded}
-            itemCount={totalCount}
-            loadMoreItems={loadMoreItems}
-            threshold={5}
-            minimumBatchSize={10}
-          >
-            {({ onItemsRendered, ref }: InfiniteLoaderChildProps) => (
-              <FixedSizeList
-                height={listHeight} // 预先用 useEffect 拿到的高度
-                width="100%"
-                itemCount={totalCount}
-                itemSize={380}
-                onItemsRendered={onItemsRendered}
-                ref={ref}
-              >
-                {Row}
-              </FixedSizeList>
-            )}
-          </InfiniteLoader>}
+          {events.length === 0 && (
+            <p className="text-xl text-primary-500 text-center">
+              暫無匹配活動資料
+            </p>
+          )}
+          {events.length && (
+            <InfiniteLoader
+              isItemLoaded={isItemLoaded}
+               itemCount={rowCount}
+              loadMoreItems={loadMoreItems}
+              threshold={5}
+              minimumBatchSize={10}
+            >
+              {({ onItemsRendered, ref }: InfiniteLoaderChildProps) => (
+                <FixedSizeList
+                  height={listHeight} // 预先用 useEffect 拿到的高度
+                  width="100%"
+                  itemCount={totalCount}
+                  itemSize={400}
+                  onItemsRendered={onItemsRendered}
+                  ref={ref}
+                >
+                  {Row}
+                </FixedSizeList>
+              )}
+            </InfiniteLoader>
+          )}
         </div>
       </div>
     </div>

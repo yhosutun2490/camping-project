@@ -4,10 +4,10 @@ interface Props {
     start: string;
     end: string;
   };
-  image?: string;
+  image?: string[];
   category?: string;
   title?: string;
-  price?: number;
+  price?: string;
   person?: {
     subscribed: number;
     max: number;
@@ -23,7 +23,7 @@ export default function EventCard({
   image,
   category = '新手友善',
   title = '杜鵑賞花露營',
-  price = 2000,
+  price = '2000',
   person = {
     subscribed: 18,
     max: 30
@@ -45,7 +45,7 @@ export default function EventCard({
 
     <figure className="w-full relative aspect-[3/2]">
       <Image
-        src={image || "/event/event_1.png"}
+        src={image?.[0] || "/event/event_1.png"}
         alt="event"
         fill
         className="rounded-xl w-full h-auto object-cover"
@@ -58,7 +58,7 @@ export default function EventCard({
 
     <div className="card-body p-0 flex flex-col gap-2">
       <h2 className="card-title text-2xl text-neutral-950">{title}</h2>
-       <div className="tags space-x-2">
+       <div className="tags space-x-2 space-y-2">
         {tags.map((tag) => (
           <div className="badge bg-primary-300 border-0" key={tag}>{tag}</div>
         ))}

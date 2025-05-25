@@ -31,7 +31,7 @@ export default async function EventPage({
 
   return (
     <div className="min-h-screen bg-primary-50">
-      <p className="search_condition heading-3 text-center text-neutral-950 px-4 py-2">
+      <div className="search_condition flex items-center heading-3 text-center text-neutral-950 py-6 px-4 lg:py-2">
         {isAllEmpty ? (
           <span>以下是所有露營活動</span>
         ) : (
@@ -52,7 +52,10 @@ export default async function EventPage({
             有關的露營活動體驗
           </span>
         )}
-      </p>
+        <div className="text-base px-4 py-1 h-full 
+          ml-5 border-1 border-primary-300 rounded-full hover:bg-gray-300 hover:cursor-pointer"
+        >清除所有條件</div>
+      </div>
       <EventFilterShell
         initialFilter={filter}
         initialTags={tagData?.eventTags ?? []}
