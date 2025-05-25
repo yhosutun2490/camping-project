@@ -13,12 +13,12 @@ import InfiniteLoader, {
   InfiniteLoaderChildProps,
 } from "react-window-infinite-loader";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 type Props = {
   initialFilter: GetEventsParams;
   initialTags: GetApiV1MetaEventTags200DataEventTagsItem[];
 };
-
 
 function useItemsPerRow() {
   const [itemsPerRow, setItemsPerRow] = useState(1);
@@ -43,7 +43,6 @@ function useItemsPerRow() {
   return itemsPerRow;
 }
 
-
 export default function EventFilterShell({
   initialFilter,
   initialTags,
@@ -51,11 +50,9 @@ export default function EventFilterShell({
   // 篩選store
   const setFilter = useFilterStore((s) => s.setFilter);
   const setTags = useFilterStore((s) => s.setTags);
-  // 整體高度
-  const [listHeight, setListHeight] = useState(0);
-  
+
   // 活動列表grid rows行數
-  const itemsPerRow =  useItemsPerRow()
+  const itemsPerRow = useItemsPerRow();
 
   useEffect(() => {
     // 1. 初始化除了 tags 以外的欄位
@@ -84,12 +81,6 @@ export default function EventFilterShell({
   const { events, totalCount, hasMore, isLoadingMore, loadMore } =
     useEventList(initialFilter);
 
-  // only runs on client
-  useEffect(() => {
-    const h = window.innerHeight;
-    setListHeight(h > 0 ? h : 0);
-  }, []);
-
   // 3. 判斷某筆 index 資料是否已經載入
   const isItemLoaded = useCallback(
     (index: number) => index < Math.ceil(events.length / itemsPerRow),
@@ -104,7 +95,7 @@ export default function EventFilterShell({
   }, [hasMore, isLoadingMore, loadMore]);
 
   // 5. 定義 list 中每一列該如何 render
-    const Row = ({ index, style }: ListChildComponentProps) => {
+  const Row = ({ index, style }: ListChildComponentProps) => {
     const startIndex = index * itemsPerRow;
     const rowItems = events.slice(startIndex, startIndex + itemsPerRow);
 
@@ -117,25 +108,27 @@ export default function EventFilterShell({
     }
 
     return (
-      <div style={style} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+      <div
+        style={style}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4"
+      >
         {rowItems.map((item) => (
-          <div className="min-w-[300px] md:min-w-[350px]" key={item.id} >
-             <EventCard 
-             title={item.title} 
-             date={{ start: item.start_time, end: item.end_time }}
-             image={item.photos}
-             price={item.price}
-             tags={item.tags}
-             />
+          <div className="min-w-[300px] md:min-w-[350px]" key={item.id}>
+            <EventCard
+              title={item.title}
+              date={{ start: item.start_time, end: item.end_time }}
+              image={item.photos}
+              price={item.price}
+              tags={item.tags}
+            />
           </div>
-         
         ))}
       </div>
     );
   };
 
   const rowCount = Math.ceil(totalCount / itemsPerRow);
-  
+
   return (
     <div className="h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
@@ -168,22 +161,28 @@ export default function EventFilterShell({
           {events.length && (
             <InfiniteLoader
               isItemLoaded={isItemLoaded}
-               itemCount={rowCount}
+              itemCount={rowCount}
               loadMoreItems={loadMoreItems}
               threshold={5}
               minimumBatchSize={10}
             >
               {({ onItemsRendered, ref }: InfiniteLoaderChildProps) => (
-                <FixedSizeList
-                  height={listHeight} // 预先用 useEffect 拿到的高度
-                  width="100%"
-                  itemCount={totalCount}
-                  itemSize={400}
-                  onItemsRendered={onItemsRendered}
-                  ref={ref}
-                >
-                  {Row}
-                </FixedSizeList>
+                <div className="h-full min-h-[800px] overflow-auto">
+                  <AutoSizer>
+                    {({ height, width }) => (
+                      <FixedSizeList
+                        height={height}
+                        width={width}
+                        itemCount={totalCount}
+                        itemSize={400}
+                        onItemsRendered={onItemsRendered}
+                        ref={ref}
+                      >
+                        {Row}
+                      </FixedSizeList>
+                    )}
+                  </AutoSizer>
+                </div>
               )}
             </InfiniteLoader>
           )}
