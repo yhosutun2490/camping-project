@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 森森不息
+森森不息為一款專門為露營活動設計的票務平台，使用者可以註冊帳號在此平台上發布或參與活動，也能管理活動相關票務和金流。  
+詳細功能請參閱「[主要功能](#主要功能)」。
 
-## Getting Started
+網站入口 https://camping-project-one.vercel.app/
+  
+## 主要頁面
+**👉首頁頁面（網站入口）**
+**👉註冊頁面（可註冊成為森森不息會員）**
+**👉活動搜尋頁面 (依據條件快速搜尋)**
+**👉單一活動頁面 (查詢活動細項資訊)**
+**👉個人頁面 （可瀏覽使用者的個人資料與活動參與票卷）**
+**👉活動主辦方頁面（可管理和編輯上架活動等）**
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 主要功能
+【前台使用者】
+- 可以註冊新帳號或是登入已註冊帳號成員會員
+- 可以成為活動主辦人
+- 透過Email重新設定密碼
+- 可以條件搜尋活動和觀看活動詳息頁面
+- 可以報名參與活動並使用線上金流付款
+- 成為活動主辦人後可透過表單快速創建活動
+
+【會員後台】
+- 個人頁面瀏覽以及編輯自己的頭像、背景圖、名稱、與自我介紹，也可以在設定頁面更改帳號密碼等資料
+- 管理自己的活動票務
+- 管理未付款的活動訂單
+
+【主辦方後台】
+- 管理活動方自己的自己的頭像、背景圖、名稱、與自我介紹
+- 編輯活動草稿和提交上架審核
+
+【管理者】
+- 審核待上架的活動
+
+
+## 測試帳號
+
+【一般使用者帳號】
+- 帳號: user@gmail.com
+- 密碼: AAbbcc12345678
+
+【活動主辦方帳號】
+- 帳號: host@gmail.com
+- 密碼: AAbbcc12345678
+
+## 安裝流程
+
+1. 開啟終端機(Terminal)，並確認已安裝 node.js(建議v18以上) 與 npm 
+2. 在終端機輸入以下指令，將本專案 clone 到本機電腦
+
+```
+git clone https://github.com/yhosutun2490/camping-project.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. 透過終端機進入存放此專案的資料夾後，輸入以下指令安裝 npm 套件
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. 安裝完畢後請輸入以下指令執行專案
 
-## Learn More
+```
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. 打開瀏覽器輸入以下網址即可開始使用本專案
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+7. 如欲退出專案可使用以下快捷鍵
 
-## Deploy on Vercel
+```
+ctrl + C
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 開發工具
+- Node.js 18 
+- Next.js 15.2.4
+- react: 19.0.0
+- TypeScript: 5
+- zustand: 5.0.4
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### UI CSS libaray
+- daisyui: 5.0.11
+- tailwindcss: 4
+
+### API 管理
+- axios: 1.8.4
+- swr: 2.3.3,
+- zod : 3.24.3
+
+
+## 開發人員
+
+- [Rafael]
+- [Shiba]
