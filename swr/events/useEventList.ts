@@ -25,6 +25,7 @@ export function useEventList(filters: GetEventsParams) {
       ...filters,
       page: pageIndex + 1,
       per: perPage,
+      sort: 'asc'
     };
 
     // 只留有值的 key，轉 query string
@@ -34,8 +35,7 @@ export function useEventList(filters: GetEventsParams) {
         return acc;
       }, {})
     );
-
-    return `/api/event?${queryString.toString()}`;
+    return `/api/events?${queryString.toString()}`;
   };
 
   // SWR infinite 主體

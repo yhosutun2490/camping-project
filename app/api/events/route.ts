@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import axiosInstance from "@/api/axiosIntance";
 import type {
   GetApiV1EventsParams,
-  GetApiV1Events200Data
+  GetApiV1Events200Data,
 } from "@/types/services/Event";
 import type { ErrorResponse } from "@/types/api/response";
 import { formatAxiosError } from "@/utils/errors";
+
+function getOptionalNumber(val: string | null): number | undefined {
+  if (!val) return undefined;
+  const parsed = Number(val);
+  return isNaN(parsed) ? undefined : parsed;
+}
 
 /**
  * 公開取得所有活動列表資訊
@@ -20,26 +26,31 @@ export async function GET(req: NextRequest) {
         : undefined,
       startTime: searchParams.get("from") ?? undefined,
       endTime: searchParams.get("to") ?? undefined,
-      minPrice:  Number(searchParams.get("min")) ?? undefined,
-      maxPrice:  Number(searchParams.get("max")) ?? undefined,
-      page:  Number(searchParams.get("page")) ?? 1,
-      per:  Number(searchParams.get("per"))?? 10,
-      sort: searchParams.get("sort") as "asc" | "desc"
+      minPrice: getOptionalNumber(searchParams.get("min")),
+      maxPrice: getOptionalNumber(searchParams.get("max")),
+      page: Number(searchParams.get("page")) ?? 1,
+      per: Number(searchParams.get("per")) ?? 10,
+      sort: searchParams.get("sort") as "asc" | "desc",
       // 其他 page/per/sort 也可以同理加上
     };
-    const data = await axiosInstance.get<GetApiV1Events200Data>("/event", {
-      params: apiParams,
+    // 清除undefine條件
+    const cleanedParams = Object.fromEntries(
+      Object.entries(apiParams).filter(([, value]) => value !== undefined)
+    );
+    const data = await axiosInstance.get<GetApiV1Events200Data>("/events", {
+      params: cleanedParams,
     });
 
-    return NextResponse.json({ code: 200, data });
+    return NextResponse.json({ code: 200, data: data.data });
   } catch (err: unknown) {
     const apiErr = formatAxiosError(err);
+    console.warn("err", err);
     return NextResponse.json<ErrorResponse>(
       {
-        status: apiErr.status, // failed / error
-        message: apiErr.message, // 錯誤訊息
+        status: apiErr.status,
+        message: apiErr.message,
       },
-      { status: apiErr.httpCode } // HTTP 回傳碼
+      { status: apiErr.httpCode }
     );
   }
 }
