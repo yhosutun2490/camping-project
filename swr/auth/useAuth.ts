@@ -1,5 +1,5 @@
 import { UserRegister, UserRegisterResponse, UserLogoutResponse } from '@/types/api/auth'
-import { PutAuthResetPassword200, PutAuthResetPasswordBody } from '@/types/services/Auth'
+import { PutAuthResetPassword200, PutAuthResetPasswordBody, PostAuthForgotPassword200, PostAuthForgotPasswordBody } from '@/types/services/Auth'
 import axios from "axios";
 import useSWRMutation from 'swr/mutation'
 
@@ -63,6 +63,31 @@ export function useResetPassword() {
     ):Promise<PutAuthResetPassword200> => {
       const res = await axios.put<PutAuthResetPassword200>("/api/auth/reset-password",arg, {
         withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return res.data
+    }
+  );
+
+  return {
+    trigger,
+    isMutating,
+    data,
+    error,
+  };
+}
+
+// forget password send email
+export function useForgetPasswordSendEmail() {
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    "/api/auth/forgot-password",
+    async (
+      _key: string,
+      { arg }: { arg: PostAuthForgotPasswordBody}
+    ):Promise<PostAuthForgotPassword200> => {
+      const res = await axios.post<PostAuthForgotPassword200>("/api/auth/forgot-password",arg, {
         headers: {
           "Content-Type": "application/json",
         },

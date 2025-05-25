@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useImperativeHandle, useState } from "react";
 import React from "react";
 import FormHookInput from "@/components/FormHookInput";
+import ForgetPassWordForm from "@/components/LoginLabelModal/ForgetPasswordForm";
 import { useMemberLogin } from "@/swr/auth/useLoginAndRefreshToken";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -24,9 +25,13 @@ export type FormHandle = {
   resetForm: () => void;
 };
 
+type Step = "login" | "forgetPassword";
+
 export default function LoginForm({ ref, close }: Props) {
   const router = useRouter();
   const [loginError, setLoginError] = useState<string>("");
+  const [step, setStep] = useState<Step>("login"); // 忘記密碼表單切換步驟
+
   const {
     register,
     handleSubmit,
@@ -66,21 +71,20 @@ export default function LoginForm({ ref, close }: Props) {
       resetForm: () => {
         reset();
         clearErrors();
+        setStep("login");
       },
     }),
     [reset, clearErrors]
   );
 
-  return (
+  return step === "login" ? (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <p className="text-3xl text-primary-500 text-center">登入</p>
       <FormHookInput
         label="Email"
         type="email"
         placeholder="請填入Email"
         register={register("email")}
-        onFocus={() => {
-          setLoginError("");
-        }}
         error={errors.email}
       />
 
@@ -89,19 +93,20 @@ export default function LoginForm({ ref, close }: Props) {
         type="password"
         placeholder="請填入密碼"
         register={register("password")}
-        onFocus={() => {
-          setLoginError("");
-        }}
         error={errors.password}
       />
-      {loginError && <p className="text-base text-error">{loginError}</p>}
-      <p className="text-base text-end mb-1.5 text-gray-500 underline decoration-1 cursor-pointer">
-        忘記密碼?
+      <p
+        className="text-end text-primary-300 mb-2 font-semibold underline hover:text-gray-300"
+        onClick={() => setStep("forgetPassword")}
+      >
+        忘記密碼
       </p>
+      {loginError && <p className="text-base text-error">{loginError}</p>}
+
       <button
         type="submit"
         className="btn-primary w-full"
-        disabled={isMutating || Object.keys(errors).length > 0}
+        disabled={isMutating}
       >
         {isMutating ? (
           <span className="loading loading-spinner"></span>
@@ -110,5 +115,7 @@ export default function LoginForm({ ref, close }: Props) {
         )}
       </button>
     </form>
+  ) : (
+    <ForgetPassWordForm setStep={setStep}/>
   );
 }

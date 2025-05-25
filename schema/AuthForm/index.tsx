@@ -40,3 +40,8 @@ export const registerSchema = z.object({
       "密碼需至少8位，且包含英文大小寫與數字"
     ),
 });
+
+
+export const forgetPasswordSendEmailSchema = z.object({
+  email: z.string({ required_error: "Email為必填" }).email("Email格式錯誤"),
+});

@@ -8,6 +8,7 @@ const excludeApiList = [
   "/api/auth/login",
   "/api/auth/register",
   "/api/auth/check",
+  "/api/auth/forgot-password",
 ];
 
 export async function middleware(request: NextRequest) {
