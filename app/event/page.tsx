@@ -26,8 +26,7 @@ export default async function EventPage({
   const isAllEmpty = JSON.stringify(params) === '{}'
 
   // event tags
-  const eventTagsData = await getEventTags();
-  console.log('eventTags',eventTagsData)
+  const tagData = await getEventTags();
 
   return (
     <div className="min-h-screen bg-primary-50">
@@ -54,7 +53,7 @@ export default async function EventPage({
           </span>
         )}
       </p>
-      <EventFilterShell initialFilter={filter} initialTags={eventTagsData}/>
+      <EventFilterShell initialFilter={filter} initialTags={tagData?.eventTags ?? []}/>
     </div>
   );
 }

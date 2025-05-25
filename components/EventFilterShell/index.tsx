@@ -6,7 +6,7 @@ import EventTagPortalModal from "./EventTagPortalModal";
 import PriceRangePortalModal from "./PriceRangePortalModal";
 import { useFilterStore } from "@/stores/useFilterStore";
 import type { GetEventsParams } from "@/types/api/event/allEvents";
-import type { GetApiV1MetaEventTags200Data } from "@/types/services/EventTags";
+import type { GetApiV1MetaEventTags200DataEventTagsItem } from "@/types/services/EventTags";
 import type { Event } from "@/types/api/event/allEvents";
 import React, { useEffect, useCallback, useState } from "react";
 import { useEventList } from "@/swr/event/useEventList";
@@ -17,7 +17,7 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 type Props = {
   initialFilter: GetEventsParams;
-  initialTags: GetApiV1MetaEventTags200Data;
+  initialTags: GetApiV1MetaEventTags200DataEventTagsItem[];
 };
 
 export const mockEvents: Event[] = [

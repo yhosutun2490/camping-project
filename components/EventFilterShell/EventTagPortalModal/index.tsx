@@ -3,10 +3,10 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon } from "@iconify/react";
 import TabList from "@/components/TabListSection/TabList";
-import type { GetApiV1MetaEventTags200Data} from "@/types/services/EventTags";
+import type { GetApiV1MetaEventTags200DataEventTagsItem } from "@/types/services/EventTags";
 
 interface Props {
-  initialTagsList: GetApiV1MetaEventTags200Data ;
+  initialTagsList: GetApiV1MetaEventTags200DataEventTagsItem[] ;
 }
 export default function EventTagPortalModal({initialTagsList}:Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);

@@ -2,13 +2,12 @@
 import clsx from "clsx";
 import { Icon } from "@iconify/react";
 import type {
-  GetApiV1MetaEventTags200Data,
   GetApiV1MetaEventTags200DataEventTagsItem,
 } from "@/types/services/EventTags";
 import { useFilterStore } from "@/stores/useFilterStore";
 
 interface Props {
-  initialTagsList: GetApiV1MetaEventTags200Data;
+  initialTagsList: GetApiV1MetaEventTags200DataEventTagsItem[];
 }
 const defaultTabs: GetApiV1MetaEventTags200DataEventTagsItem[] = [
   { id: "2", name: "新手友善", level: "easy", description: "", created_at: "" },
@@ -32,9 +31,8 @@ const defaultTabs: GetApiV1MetaEventTags200DataEventTagsItem[] = [
 export default function TabList({ initialTagsList }: Props) {
   const tags = useFilterStore((s) => s.tags);
   const setTags = useFilterStore((s) => s.setTags);
-
   const eventTabLists =
-    Array.isArray(initialTagsList) && initialTagsList.length > 0
+    Array.isArray(initialTagsList) && initialTagsList?.length > 0
       ? initialTagsList
       : defaultTabs;
 
@@ -58,16 +56,16 @@ export default function TabList({ initialTagsList }: Props) {
           <div
             className={clsx(
               `p-4 badge badge-outline flex items-center gap-2 cursor-pointer 
-          text-xl text-neutral-950 hover:scale-110`,
-              tags.includes(item.name)
+          text-sm text-neutral-950 hover:scale-110`,
+              tags.includes(item.name ?? "")
                 ? "text-white bg-primary-500"
-                : "bg-transparent"
+                : "bg-transparent border-primary-300"
             )}
             key={item.name}
             onClick={() => handleClickTab(item.name as string)}
           >
             {item?.name}
-            {tags.includes(item.name) && (
+            {(tags.includes(item.name ?? "")) && (
               <Icon
                 icon="maki:cross"
                 className="text-neutral-950"

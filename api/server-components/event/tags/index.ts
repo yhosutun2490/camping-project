@@ -7,15 +7,19 @@ const endpoint = "/meta/event-tags";
 /**
  * 取得所有活動分類標籤
  */
+
+type GetEventTagsResponse = {
+  status: string;
+  message: string;
+  data: GetApiV1MetaEventTags200Data;
+};
+
 export const getEventTags = async (): Promise<GetApiV1MetaEventTags200Data> => {
   try {
-    const {data}= await axiosInstance.get<GetApiV1MetaEventTags200Data>(
-      endpoint,
-    );
-    console.log('api活動標籤', data)
-    return data ;
+    const response = await axiosInstance.get<GetEventTagsResponse>(endpoint);
+    return response.data.data;
   } catch (err) {
-    formatAxiosError(err) as ErrorResponse
+    formatAxiosError(err) as ErrorResponse;
     return [] as unknown as GetApiV1MetaEventTags200Data;
   }
 };
