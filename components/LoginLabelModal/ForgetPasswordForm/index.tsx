@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import React from "react";
+import React, { useState } from "react";
 import FormHookInput from "@/components/FormHookInput";
 import { useForgetPasswordSendEmail } from "@/swr/auth/useAuth"
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { z } from "zod";
 import { forgetPasswordSendEmailSchema } from "@/schema/AuthForm";
 import toast from "react-hot-toast";
 import axios from "axios";
+
 
 // zod schema 轉換為typescript
 type FormType = z.infer<typeof forgetPasswordSendEmailSchema>;
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function ForgetPassWordForm({ setStep }: Props) {
+
   const {
     register,
     handleSubmit,
@@ -26,6 +28,8 @@ export default function ForgetPassWordForm({ setStep }: Props) {
     resolver: zodResolver(forgetPasswordSendEmailSchema),
     shouldUnregister: true,
   });
+  
+  const [isSendEmailSuccess,setIsSendEmailSuccess] = useState<boolean>(false)
 
   const {trigger, isMutating} = useForgetPasswordSendEmail()
 
@@ -33,6 +37,7 @@ export default function ForgetPassWordForm({ setStep }: Props) {
     try {
       trigger({email: data?.email})
       toast.success('已寄送更新密碼連結')
+      setIsSendEmailSuccess(true)
     } catch(err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
@@ -52,7 +57,8 @@ export default function ForgetPassWordForm({ setStep }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <p className="text-3xl text-primary-500 text-center">忘記密碼?</p>
-      <FormHookInput
+      {!isSendEmailSuccess? <>
+         <FormHookInput
         label="Email"
         type="email"
         placeholder="請填入Email"
@@ -71,6 +77,9 @@ export default function ForgetPassWordForm({ setStep }: Props) {
           "寄送新密碼設定連結"
         )}
       </button>
+      </>: <p className="text-2xl text-neutral-950 mt-5 text-center">已經寄送重新設定連結，請稍後至信箱確認!</p>}
+ 
+   
       <div
         className="text-base text-end mt-1.5 
         text-gray-500 underline decoration-1 cursor-pointer hover:text-gray-300"

@@ -4,7 +4,7 @@ export default function EventLayout({
     children: React.ReactNode;
   }) {
     return (
-    <div className="h-screen bg-primary-50 pt-[140px] md:pt-[80px]">
+    <div className="h-screen bg-primary-50">
       <main className="min-h-0 overflow-y-auto">{children}</main>
     </div>
     );

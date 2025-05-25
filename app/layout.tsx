@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderNavBar from "@/components/HeaderNavBar";
 import Toast from "@/components/Toast";
+import LayoutContentWrapper from "@/components/LayoutContentWrapper";
 import { getUserInfo } from "@/api/server-components/checkUser"
 
 const geistSans = Geist({
@@ -32,9 +33,9 @@ export default async function RootLayout({
           username={user?.data?.member?.username ?? ''} 
           userRole={user?.data?.member?.role}
         />
-        <main className="flex-1 h-full">
-          {children}
-        </main>
+        <LayoutContentWrapper>
+           {children}
+        </LayoutContentWrapper>
         <Toast />
       </body>
     </html>
