@@ -8,15 +8,17 @@ const excludeApiList = [
   "/api/auth/login",
   "/api/auth/register",
   "/api/auth/check",
+  "/api/auth/forgot-password",
+  "/api/event",
+  "/api/auth/oauth/google"
 ];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (excludeApiList.includes(pathname)) {
-    return NextResponse.next();
-  }
-
+ if (excludeApiList.some((prefix) => pathname.startsWith(prefix))) {
+  return NextResponse.next(); // 動態路由也放行
+}
   // 取得目前token資訊
   const accessToken = request.cookies.get("access_token")?.value; // 過期token瀏覽器不會讓你夾帶
   const refreshToken = request.cookies.get("refresh_token")?.value;

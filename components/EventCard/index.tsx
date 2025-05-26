@@ -4,14 +4,16 @@ interface Props {
     start: string;
     end: string;
   };
-  image?: string;
+  image?: string[];
   category?: string;
   title?: string;
-  price?: number;
+  price?: string;
   person?: {
     subscribed: number;
     max: number;
   };
+  address?:string;
+  tags?: string[]
 }
 
 export default function EventCard({
@@ -22,11 +24,13 @@ export default function EventCard({
   image,
   category = '新手友善',
   title = '杜鵑賞花露營',
-  price = 2000,
+  price = '2000',
   person = {
     subscribed: 18,
     max: 30
-  }
+  },
+  address = '新竹',
+  tags = [],
 }: Props) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -43,7 +47,7 @@ export default function EventCard({
 
     <figure className="w-full relative aspect-[3/2]">
       <Image
-        src={image || "/event/event_1.png"}
+        src={image?.[0] || "/event/event_1.png"}
         alt="event"
         fill
         className="rounded-xl w-full h-auto object-cover"
@@ -55,7 +59,13 @@ export default function EventCard({
     </figure>
 
     <div className="card-body p-0 flex flex-col gap-2">
+      <p className="address text-base text-primary-300"> { address.slice(0,3)}</p>
       <h2 className="card-title text-2xl text-neutral-950">{title}</h2>
+       <div className="tags space-x-2 space-y-2">
+        {tags.map((tag) => (
+          <div className="badge bg-primary-300 border-0" key={tag}>{tag}</div>
+        ))}
+      </div>
       <div className="price flex items-baseline">
         <span className="text-xl text-primary-500 font-bold">NT$ {price}</span>
         <span className="text-base text-neutral-700 pl-2">/ 每人</span>

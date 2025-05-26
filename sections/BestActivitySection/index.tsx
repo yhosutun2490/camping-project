@@ -4,12 +4,12 @@ import CarouselSlider from "@/components/CarouselSlider";
 import EventCard from "@/components/EventCard";
 export default function BestActivitySection() {
   const sampleData = [
-    { id: 1, title: "森中漫步", image: "/event/event_2.png" },
-    { id: 2, title: "夜間探險", image: "/event/event_3.png" },
-    { id: 3, title: "家庭旅遊", image: "/event/event_1.png" },
-    { id: 1, title: "森中漫步", image: "/event/event_3.png" },
-    { id: 2, title: "夜間探險", image: "/event/event_2.png" },
-    { id: 3, title: "家庭旅遊", image: "/event/event_1.png" },
+    { id: 1, title: "森中漫步", image: ["/event/event_2.png"] },
+    { id: 2, title: "夜間探險", image: ["/event/event_3.png"] },
+    { id: 3, title: "家庭旅遊", image: ["/event/event_1.png"] },
+    { id: 1, title: "森中漫步", image: ["/event/event_3.png"] },
+    { id: 2, title: "夜間探險", image: ["/event/event_2.png"] },
+    { id: 3, title: "家庭旅遊", image: ["/event/event_1.png"] },
     // … 你的活動資料
   ];
 
