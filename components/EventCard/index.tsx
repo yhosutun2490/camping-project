@@ -22,7 +22,6 @@ export default function EventCard({
     end: '2025-06-30'
   },
   image,
-  category = '新手友善',
   title = '杜鵑賞花露營',
   price = '2000',
   person = {
@@ -39,31 +38,30 @@ export default function EventCard({
     return `${month}/${day}`;
   };
   return (
-    <div className="card bg-white w-full max-w-full h-full p-8 shadow-sm flex flex-col gap-4">
+    <div className="card bg-white w-full max-w-full h-full p-8 shadow-sm flex flex-col gap-2">
     <div className="date_info flex text-base justify-between items-center">
       <p className="text-neutral-700">{formatDate(date?.start)} - {formatDate(date?.end)}</p>
       <p className="text-primary-500 font-semibold">報名人數: {person?.subscribed} / {person?.max}</p>
     </div>
 
-    <figure className="w-full relative aspect-[3/2]">
+    <figure className="w-full max-h-[180px] relative aspect-[3/2]">
       <Image
         src={image?.[0] || "/event/event_1.png"}
         alt="event"
         fill
-        className="rounded-xl w-full h-auto object-cover"
+        className="rounded-xl w-full object-cover"
       />
       <div className="absolute badge border-none bg-primary-100 text-primary-500 
         top-6 right-0 rounded-r-none">
-        {category}
+        {address.slice(0,3)}
       </div>
     </figure>
 
     <div className="card-body p-0 flex flex-col gap-2">
-      <p className="address text-base text-primary-300"> { address.slice(0,3)}</p>
-      <h2 className="card-title text-2xl text-neutral-950">{title}</h2>
-       <div className="tags space-x-2 space-y-2">
+      <h2 className="card-title text-2xl text-neutral-950 line-clamp-1">{title}</h2>
+       <div className="tags flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <div className="badge bg-primary-300 border-0" key={tag}>{tag}</div>
+          <div className="badge bg-primary-300 border-0 text-sm" key={tag}>{tag}</div>
         ))}
       </div>
       <div className="price flex items-baseline">

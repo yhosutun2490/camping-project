@@ -76,17 +76,16 @@ export default function EventFilterShell({
 
   // 無限載入實作
   // 1. 從 hook 拿資料、總筆數、分頁控制方法
-  const { events, totalCount, hasMore, isLoadingMore, loadMore } =
+  const { events, hasMore, isLoadingMore, loadMore } =
     useEventList(initialFilter);
 
   const filteredEvents = useMemo(() => {
     if (!tags || tags.length === 0) return events;
 
     return events.filter((event) =>
-       event.tags?.some(tag => tags.includes(tag))
+      event.tags?.some((tag) => tags.includes(tag))
     );
   }, [events, tags]);
-   
 
   // 3. 判斷某筆 index 資料是否已經載入
   const isItemLoaded = useCallback(
@@ -120,11 +119,10 @@ export default function EventFilterShell({
         className="grid grid-cols-1 justify-center md:grid-cols-2 lg:grid-cols-3 gap-4 px-4"
       >
         {rowItems.map((item) => (
-          <div className="min-w-[300px] max-w-[450px] mx-auto" key={item.id}>
+          <div className="min-w-[300px] max-w-[500px] mx-auto" key={item.id}>
             <EventCard
               title={item.title}
               date={{ start: item.start_time, end: item.end_time }}
-              image={item.photos}
               price={item.price}
               tags={item.tags}
             />
@@ -134,7 +132,7 @@ export default function EventFilterShell({
     );
   };
 
-  const rowCount = Math.ceil(filteredEvents.length/ itemsPerRow);
+  const rowCount = Math.ceil(filteredEvents.length / itemsPerRow);
 
   return (
     <div className="h-screen flex flex-col bg-primary-50">
@@ -159,39 +157,39 @@ export default function EventFilterShell({
         </aside>
 
         {/* 右側列表 */}
-        <div className="flex-1 min-h-0 p-6">
+        <div className="flex-1 min-h-screen p-6">
           {filteredEvents.length === 0 && (
             <p className="text-xl text-primary-500 text-center">
               暫無匹配活動資料
             </p>
           )}
           {filteredEvents.length && (
-            <InfiniteLoader
-              isItemLoaded={isItemLoaded}
-              itemCount={rowCount}
-              loadMoreItems={loadMoreItems}
-              threshold={5}
-              minimumBatchSize={10}
-            >
-              {({ onItemsRendered, ref }) => (
-                <div className="h-full min-h-[800px] overflow-auto">
-                  <AutoSizer>
-                    {({ height, width }) => (
+            <div className="flex-1 min-h-0 h-full">
+              <AutoSizer>
+                {({ height, width }) => (
+                  <InfiniteLoader
+                    isItemLoaded={isItemLoaded}
+                    itemCount={rowCount}
+                    loadMoreItems={loadMoreItems}
+                    threshold={5}
+                    minimumBatchSize={10}
+                  >
+                    {({ onItemsRendered, ref }) => (
                       <FixedSizeList
                         height={height}
                         width={width}
-                        itemCount={totalCount}
+                        itemCount={rowCount}
                         itemSize={400}
                         onItemsRendered={onItemsRendered}
-                        ref={ref}
+                        outerRef={ref}
                       >
                         {Row}
                       </FixedSizeList>
                     )}
-                  </AutoSizer>
-                </div>
-              )}
-            </InfiniteLoader>
+                  </InfiniteLoader>
+                )}
+              </AutoSizer>
+            </div>
           )}
         </div>
       </div>
