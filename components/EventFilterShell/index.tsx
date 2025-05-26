@@ -7,7 +7,7 @@ import PriceRangePortalModal from "./PriceRangePortalModal";
 import { useFilterStore } from "@/stores/useFilterStore";
 import type { GetEventsParams } from "@/types/api/event/allEvents";
 import type { GetApiV1MetaEventTags200DataEventTagsItem } from "@/types/services/EventTags";
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useEventList } from "@/swr/events/useEventList";
 import InfiniteLoader, {
   InfiniteLoaderChildProps,
@@ -17,7 +17,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 type Props = {
   initialFilter: GetEventsParams;
-  initialTags: GetApiV1MetaEventTags200DataEventTagsItem[];
+  initialEventTags: GetApiV1MetaEventTags200DataEventTagsItem[];
 };
 
 function useItemsPerRow() {
@@ -45,11 +45,12 @@ function useItemsPerRow() {
 
 export default function EventFilterShell({
   initialFilter,
-  initialTags,
+  initialEventTags,
 }: Props) {
   // 篩選store
   const setFilter = useFilterStore((s) => s.setFilter);
   const setTags = useFilterStore((s) => s.setTags);
+  const tags = useFilterStore((s) => s.tags); // 這裡是 store 的 tags 陣列
 
   // 活動列表grid rows行數
   const itemsPerRow = useItemsPerRow();
@@ -64,7 +65,6 @@ export default function EventFilterShell({
       start_Time: initialFilter.startTime,
       end_Time: initialFilter.endTime,
     });
-    setTags([]);
   }, [
     initialFilter.location,
     initialFilter.people,
@@ -81,10 +81,19 @@ export default function EventFilterShell({
   const { events, totalCount, hasMore, isLoadingMore, loadMore } =
     useEventList(initialFilter);
 
+  const filteredEvents = useMemo(() => {
+    if (!tags || tags.length === 0) return events;
+
+    return events.filter((event) =>
+       event.tags?.some(tag => tags.includes(tag))
+    );
+  }, [events, tags]);
+   
+
   // 3. 判斷某筆 index 資料是否已經載入
   const isItemLoaded = useCallback(
-    (index: number) => index < Math.ceil(events.length / itemsPerRow),
-    [events.length, itemsPerRow]
+    (index: number) => index < Math.ceil(filteredEvents.length / itemsPerRow),
+    [filteredEvents.length, itemsPerRow]
   );
 
   // 4. 當要加載更多時呼叫 loadMore (SWR)
@@ -97,7 +106,7 @@ export default function EventFilterShell({
   // 5. 定義 list 中每一列該如何 render
   const Row = ({ index, style }: ListChildComponentProps) => {
     const startIndex = index * itemsPerRow;
-    const rowItems = events.slice(startIndex, startIndex + itemsPerRow);
+    const rowItems = filteredEvents.slice(startIndex, startIndex + itemsPerRow);
 
     if (rowItems.length === 0) {
       return (
@@ -134,10 +143,10 @@ export default function EventFilterShell({
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
       <div className="border-b border-zinc-300 py-2 px-4">
         <div className="hidden md:block">
-          <TabList initialTagsList={initialTags} />
+          <TabList initialTagsList={initialEventTags} />
         </div>
         <div className="flex justify-between space-x-4 md:hidden">
-          <EventTagPortalModal initialTagsList={initialTags} />
+          <EventTagPortalModal initialTagsList={initialEventTags} />
           <PriceRangePortalModal />
         </div>
       </div>

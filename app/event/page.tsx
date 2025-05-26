@@ -25,6 +25,8 @@ export default async function EventPage({
         ? Number(params.maxPrice)
         : undefined,
   };
+
+
   const isAllEmpty = JSON.stringify(params) === "{}";
 
   const { location, people, minPrice, maxPrice } = filter;
@@ -60,7 +62,7 @@ export default async function EventPage({
       </div>
       <EventFilterShell
         initialFilter={filter}
-        initialTags={tagData?.eventTags ?? []}
+        initialEventTags={tagData?.eventTags ?? []}
       />
     </div>
   );
