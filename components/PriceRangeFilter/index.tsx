@@ -20,7 +20,7 @@ export default function PriceRangeFilter( {setIsOpen}:Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname()
-
+  
   const onSubmit = (data: FormValues) => {
     console.log("送出的範圍：", data.priceRange);
     try {
@@ -88,9 +88,9 @@ export default function PriceRangeFilter( {setIsOpen}:Props) {
               />
 
               {/* 數字輸入框 */}
-              <div className="flex items-center space-x-2">
-                <div className="text-primary-300">
-                  NT$
+              <div className="flex justify-between items-center mt-6 space-x-2">
+                <div className="text-primary-300 space-x-2">
+                  <span>NT$</span>
                   <input
                     type="number"
                     className="w-24 border p-1"
@@ -107,8 +107,8 @@ export default function PriceRangeFilter( {setIsOpen}:Props) {
                   />
                 </div>
                 <span>─</span>
-                <div className="text-primary-300">
-                  NT$
+                <div className="text-primary-300 space-x-2">
+                  <span>NT$</span>
                   <input
                     type="number"
                     className="w-24 border p-1"

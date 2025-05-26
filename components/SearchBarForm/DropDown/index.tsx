@@ -1,6 +1,6 @@
 "use client";
 import { useFormContext, useWatch, Controller } from "react-hook-form";
-import { useState} from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 
 type Props = {
@@ -23,7 +23,6 @@ export default function Dropdown({
   const [isMobileOpen, setMobileOpen] = useState(false);
   const { register, setValue, control } = useFormContext();
   const locationValue = useWatch({ name: fieldName });
-
 
   function handleClickOnBlur(value: string) {
     // 先更新值
@@ -99,15 +98,13 @@ export default function Dropdown({
                 <li
                   key={opt.id}
                   className="text-neutral-950 p-2 hover:bg-primary-50 hover:rounded-sm active:rounded-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMobileOpen(false);
+                    handleClickOnBlur(opt.value);
+                  }}
                 >
-                  <a
-                    onClick={() => {
-                      setMobileOpen(false);
-                      handleClickOnBlur(opt.value);
-                    }}
-                  >
-                    {opt.label}
-                  </a>
+                  {opt.label}
                 </li>
               ))}
             </ul>

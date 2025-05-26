@@ -36,16 +36,18 @@ export default function PersonCounter({ textCenter }: Props) {
     pets: number;
   };
 
-  function handleClickOnBlur() {
+  function handleClickOnBlur(skipBlur=false) {
     // 先更新值
     setValue("person", {
       ...localCount,
     });
 
+    if (!skipBlur) {
     const active = document.activeElement;
     if (active instanceof HTMLElement) {
       active.blur();
     }
+  }
   }
 
   function updateCounter(key: keyof LocalCounter, delta: number) {
@@ -119,7 +121,7 @@ export default function PersonCounter({ textCenter }: Props) {
         <button
           type="button"
           className="w-full btn-primary mt-2 py-2 rounded-2xl"
-          onClick={() => handleClickOnBlur()}
+          onClick={() => handleClickOnBlur(true)}
         >
           儲存
         </button>
@@ -157,7 +159,8 @@ export default function PersonCounter({ textCenter }: Props) {
               ))}
               <button
                 className="btn-primary w-full mt-4"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   handleClickOnBlur();
                   setMobileOpen(false);
                 }}

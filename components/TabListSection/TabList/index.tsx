@@ -47,7 +47,7 @@ export default function TabList({ initialTagsList }: Props) {
   }
 
   return (
-    <div className="tag-list space-y-2">
+    <div className="tag-list p-4 md:p-0 space-y-2">
       {tags.length > 0 && (
         <p className="text-primary-300"> 已選擇 {tags.length} 項標籤 </p>
       )}
