@@ -1,5 +1,6 @@
 import type { GetEventsParams } from "@/types/api/event/allEvents";
 import EventFilterShell from "@/components/EventFilterShell";
+import RestButton from "@/components/EventFilterShell/ResetButton";
 import { getEventTags } from "@/api/server-components/event/tags";
 export const dynamic = "force-dynamic";
 export default async function EventPage({
@@ -31,30 +32,20 @@ export default async function EventPage({
 
   return (
     <div className="min-h-screen bg-primary-50">
-      <div className="search_condition flex items-center heading-3 text-center text-neutral-950 py-6 px-4 lg:py-2">
+      <div className="search_condition flex flex-col gap-2 md:flex-row items-center heading-3 text-center text-neutral-950 py-6 px-4 lg:py-2">
         {isAllEmpty ? (
           <span>以下是所有露營活動</span>
         ) : (
           <span>
             以下是與
             {filter?.location && <>「{filter?.location}」地區</>}
-            {filter?.people && <>、{filter?.people} 人</>}
-            {filter?.startTime && filter?.endTime && (
-              <>
-                時間:{filter?.startTime} ~ {filter?.endTime}
-              </>
-            )}
-            {filter?.minPrice && filter?.maxPrice && (
-              <>
-                價格:{filter?.minPrice} ~ {filter?.maxPrice}
-              </>
-            )}
-            有關的露營活動體驗
+            {filter?.people && <>、「{filter?.people } 人」</>}
+            {filter?.startTime && <>、「日期: {filter?.startTime} - {filter?.startTime}」</>}
+            {filter?.maxPrice && <> 、「價格: {filter?.minPrice} - {filter?.maxPrice}」</>}
+            有關的露營活動
           </span>
         )}
-        <div className="text-base px-4 py-1 h-full 
-          ml-5 border-1 border-primary-300 rounded-full hover:bg-gray-300 hover:cursor-pointer"
-        >清除所有條件</div>
+        <RestButton />
       </div>
       <EventFilterShell
         initialFilter={filter}

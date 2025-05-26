@@ -17,9 +17,9 @@ type FilterActions = {
 
 const initialFilter: Filter = {
   location: undefined,
-  people: 0,
-  minPrice: 0,
-  maxPrice: 10000,
+  people: undefined,
+  minPrice: undefined,
+  maxPrice: undefined,
   start_Time: "",
   end_Time: "",
   tags: [],
@@ -27,13 +27,6 @@ const initialFilter: Filter = {
 
 export const useFilterStore = create<Filter & FilterActions>((set) => ({
   ...initialFilter,
-  location: undefined,
-  people: 0,
-  minPrice: 0,
-  maxPrice: 10000,
-  tags: [],
-  start_Time: '',
-  end_Time: '',
   setFilter: (f) => set((s) => ({ ...s, ...f })),
   setTags: (tags) => set({ tags }),
   reset: () => set({ ...initialFilter }),

@@ -21,7 +21,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
     resolver: zodResolver(searchBarFormSchema),
     shouldUnregister: true,
     defaultValues: {
-      location: 'Taipei',
+      location: '',
       price: 0,
       person: {
         adults: 0,
@@ -38,35 +38,40 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
   const locationOptions = [
     {
       id: "1",
-      label: "台北",
-      value: "Taipei",
+      label: "新竹",
+      value: "新竹",
     },
     {
       id: "2",
-      label: "台南",
-      value: "Tainan",
+      label: "台北",
+      value: "台北",
     },
-
     {
       id: "3",
-      label: "台中",
-      value: "Taichung",
-    },
-       {
-      id: "4",
-      label: "嘉義",
-      value: "Chayi",
-    },
-    {
-      id: "5",
-      label: "南投",
-      value: "Nantou",
+      label: "台南",
+      value: "台南",
     },
 
     {
+      id: "4",
+      label: "台中",
+      value: "台中",
+    },
+       {
+      id: "5",
+      label: "嘉義",
+      value: "嘉義",
+    },
+    {
       id: "6",
+      label: "南投",
+      value: "南投",
+    },
+
+    {
+      id: "7",
       label: "屏東",
-      value: "Pintung",
+      value: "屏東",
     },
   ];
   
@@ -119,7 +124,7 @@ export default function SearchBarForm({isBgBlur = true, bgColor}:Props) {
                 <Icon icon='mdi:location' className="text-white" width={20} height={20} />
                 <span>地點</span>
               </div>
-              <Dropdown options={locationOptions} fieldName="location"/>
+              <Dropdown options={locationOptions} fieldName="location" placeholder='請選擇地點'/>
             </div>
             <div className="flex flex-col bg-grey grow-1 relative">
               <div className="items-center gap-1 hidden sm:sm:flex">

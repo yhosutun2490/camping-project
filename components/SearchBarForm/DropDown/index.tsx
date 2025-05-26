@@ -1,6 +1,6 @@
 "use client";
 import { useFormContext, useWatch, Controller } from "react-hook-form";
-import { useState } from "react";
+import { useState} from "react";
 import { createPortal } from "react-dom";
 
 type Props = {
@@ -11,12 +11,19 @@ type Props = {
   }[];
   fieldName: string;
   textCenter?: boolean;
+  placeholder?: string;
 };
 
-export default function Dropdown({ options, fieldName, textCenter }: Props) {
+export default function Dropdown({
+  options,
+  fieldName,
+  textCenter,
+  placeholder,
+}: Props) {
   const [isMobileOpen, setMobileOpen] = useState(false);
   const { register, setValue, control } = useFormContext();
   const locationValue = useWatch({ name: fieldName });
+
 
   function handleClickOnBlur(value: string) {
     // 先更新值
@@ -43,7 +50,8 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
         }`}
         onClick={() => setMobileOpen(true)}
       >
-        {options.find((item) => item.value === locationValue)?.label}
+        {options.find((item) => item.value === locationValue)?.label ||
+          placeholder}
       </div>
       <div
         tabIndex={0}
@@ -52,7 +60,8 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
       >
-        {options.find((item) => item.value === locationValue)?.label}
+        {options.find((item) => item.value === locationValue)?.label ||
+          placeholder}
       </div>
       {/**desktop tablet 選單 */}
       <ul
@@ -93,7 +102,7 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
                 >
                   <a
                     onClick={() => {
-                      setMobileOpen(false)
+                      setMobileOpen(false);
                       handleClickOnBlur(opt.value);
                     }}
                   >

@@ -12,6 +12,7 @@ interface Props {
     subscribed: number;
     max: number;
   };
+  address?:string;
   tags?: string[]
 }
 
@@ -28,6 +29,7 @@ export default function EventCard({
     subscribed: 18,
     max: 30
   },
+  address = '新竹',
   tags = [],
 }: Props) {
   const formatDate = (dateStr: string) => {
@@ -57,6 +59,7 @@ export default function EventCard({
     </figure>
 
     <div className="card-body p-0 flex flex-col gap-2">
+      <p className="address text-base text-primary-300"> { address.slice(0,3)}</p>
       <h2 className="card-title text-2xl text-neutral-950">{title}</h2>
        <div className="tags space-x-2 space-y-2">
         {tags.map((tag) => (

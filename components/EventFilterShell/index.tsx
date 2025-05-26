@@ -113,7 +113,7 @@ export default function EventFilterShell({
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4"
       >
         {rowItems.map((item) => (
-          <div className="min-w-[300px] md:min-w-[350px]" key={item.id}>
+          <div className="min-w-[300px]" key={item.id}>
             <EventCard
               title={item.title}
               date={{ start: item.start_time, end: item.end_time }}
