@@ -61,25 +61,25 @@ export default function MemberMenu({user}:PropsType) {
         hover:bg-primary-100 rounded-full p-[0.5rem]"
         onClick={() => setIsOpenMenu(!isOpenMenu)}
       >
-        <div className="w-[35px] h-[35px] rounded-full">
+        <div className="rounded-full">
           <Image
             src="/header/user_image.jpg"
-            width={35}
-            height={35}
+            width={32}
+            height={32}
             alt="Picture of the author"
             className="cursor-pointer"
           
           />
         </div>
         {isOpenMenu && (
-          <MenuList className="absolute top-[60px] left-0 w-[120%]" 
+          <MenuList className="absolute top-[50px] text-sm w-[200px] left-[-140px] md:left-0 md:w-[120%]" 
           list={list}
           closeMenu={()=>setIsOpenMenu(false)}
           >
             <p onClick={handleLogOut}>登出</p>
           </MenuList>
         )}
-        <p className="text-xl text-primary-500 ml-[0.5rem]">{user} 您好</p>
+        <p className="hidden md:block text-xl text-primary-500 ml-[0.5rem]">{user} 您好</p>
         <Icon icon='carbon:triangle-down-solid' className="text-primary-500"  width={12} height={12} />
       </div>
     </>
