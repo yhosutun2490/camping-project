@@ -70,7 +70,7 @@ export default function PersonCounter({ textCenter }: Props) {
       <div
         tabIndex={0}
         role="button"
-        className={`block sm:hidden options w-full min-h-[30px] flex items-center ${
+        className={`block md:hidden options w-full min-h-[30px] flex items-center ${
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
         onClick={() => setMobileOpen(true)}
@@ -80,7 +80,7 @@ export default function PersonCounter({ textCenter }: Props) {
       <div
         tabIndex={0}
         role="button"
-        className={`hidden sm:block options w-full min-h-[30px] flex items-center ${
+        className={`hidden md:block options w-full min-h-[30px] flex items-center ${
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
       >
@@ -90,7 +90,7 @@ export default function PersonCounter({ textCenter }: Props) {
       <ul
         tabIndex={0}
         className={`
-          dropdown-content menu mt-5 rounded-box p-4 w-full hidden sm:block
+          dropdown-content menu mt-5 rounded-box p-4 w-full hidden md:block
           min-w-[250px] max-w-xs 
           bg-white shadow-sm
           [--menu-active-bg:transparent] [--menu-active-fg:inherit]

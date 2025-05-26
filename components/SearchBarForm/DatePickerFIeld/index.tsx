@@ -139,7 +139,7 @@ export default function DatePickerField({
       <div
         tabIndex={0}
         role="button"
-        className={`sm:hidden options w-full min-h-[30px] flex items-center ${
+        className={`md:hidden options w-full min-h-[30px] flex items-center ${
           textCenter ? "justify-center" : ""
         }`}
         onClick={() => setMobileOpen(true)}
@@ -153,7 +153,7 @@ export default function DatePickerField({
       <div
         tabIndex={0}
         role="button"
-        className={`hidden sm:flex options w-full min-h-[30px] flex items-center ${
+        className={`hidden md:flex options w-full min-h-[30px] flex items-center ${
           textCenter ? "justify-center" : ""
         }`}
       >
@@ -165,8 +165,8 @@ export default function DatePickerField({
       </div>
       <div
         tabIndex={0}
-        className="hidden sm:block dropdown-content menu mt-11 rounded-2xl z-10 w-full relative 
-        md:left-[-180%] lg:left-[-50%]"
+        className="hidden md:block dropdown-content menu mt-11 rounded-2xl z-10 w-full relative 
+         max-[900px]:left-[-350%] max-[1150px]:left-[-250%]  max-[1250px]:left-[-150%]  xl:left-[-50%]"
       >
         <DayPicker
           required
