@@ -136,7 +136,7 @@ export default function EventFilterShell({
     );
   };
 
-  const rowCount = Math.ceil(totalCount / itemsPerRow);
+  const rowCount = Math.ceil(filteredEvents.length/ itemsPerRow);
 
   return (
     <div className="h-screen flex flex-col bg-primary-50">
@@ -162,12 +162,12 @@ export default function EventFilterShell({
 
         {/* 右側列表 */}
         <div className="flex-1 min-h-0 p-6">
-          {events.length === 0 && (
+          {filteredEvents.length === 0 && (
             <p className="text-xl text-primary-500 text-center">
               暫無匹配活動資料
             </p>
           )}
-          {events.length && (
+          {filteredEvents.length && (
             <InfiniteLoader
               isItemLoaded={isItemLoaded}
               itemCount={rowCount}
