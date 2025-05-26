@@ -9,7 +9,8 @@ import {
   PostAuthForgotPassword200,
   PostAuthForgotPasswordBody,
   PostAuthResetPasswordByTokenBody,
-  PostAuthResetPasswordByToken200
+  PostAuthResetPasswordByToken200,
+  GetApiV1AuthOauthGoogleResult
 } from "@/types/services/Auth";
 import axios from "axios";
 import axiosInstance from "@/api/axiosIntance";
@@ -152,6 +153,29 @@ export function useRestPasswordByToken() {
             "Content-Type": "application/json",
           },
         }
+      );
+      return res.data;
+    }
+  );
+
+  return {
+    trigger,
+    isMutating,
+    data,
+    error,
+  };
+}
+
+export function useOAuthGoogle() {
+  const { trigger, isMutating, data, error } = useSWRMutation(
+    "/api/auth/oauth/google",
+    async (
+      _key: string,
+      { arg }: { arg: undefined }
+    ): Promise<GetApiV1AuthOauthGoogleResult> => {
+      const res = await axios.get<GetApiV1AuthOauthGoogleResult>(
+        "/api/auth/oauth/google",
+        arg,
       );
       return res.data;
     }
