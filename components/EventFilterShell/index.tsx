@@ -9,9 +9,7 @@ import type { GetEventsParams } from "@/types/api/event/allEvents";
 import type { GetApiV1MetaEventTags200DataEventTagsItem } from "@/types/services/EventTags";
 import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useEventList } from "@/swr/events/useEventList";
-import InfiniteLoader, {
-  InfiniteLoaderChildProps,
-} from "react-window-infinite-loader";
+import InfiniteLoader from "react-window-infinite-loader";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -175,7 +173,7 @@ export default function EventFilterShell({
               threshold={5}
               minimumBatchSize={10}
             >
-              {({ onItemsRendered, ref }: InfiniteLoaderChildProps) => (
+              {({ onItemsRendered, ref }) => (
                 <div className="h-full min-h-[800px] overflow-auto">
                   <AutoSizer>
                     {({ height, width }) => (
