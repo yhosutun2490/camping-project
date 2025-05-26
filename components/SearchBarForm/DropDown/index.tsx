@@ -11,9 +11,15 @@ type Props = {
   }[];
   fieldName: string;
   textCenter?: boolean;
+  placeholder?: string;
 };
 
-export default function Dropdown({ options, fieldName, textCenter }: Props) {
+export default function Dropdown({
+  options,
+  fieldName,
+  textCenter,
+  placeholder,
+}: Props) {
   const [isMobileOpen, setMobileOpen] = useState(false);
   const { register, setValue, control } = useFormContext();
   const locationValue = useWatch({ name: fieldName });
@@ -38,26 +44,28 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
       <div
         tabIndex={0}
         role="button"
-        className={`sm:hidden options w-full min-h-[30px] flex items-center ${
+        className={`md:hidden options w-full min-h-[30px] flex items-center ${
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
         onClick={() => setMobileOpen(true)}
       >
-        {options.find((item) => item.value === locationValue)?.label}
+        {options.find((item) => item.value === locationValue)?.label ||
+          placeholder}
       </div>
       <div
         tabIndex={0}
         role="button"
-        className={`hidden sm:block options w-full min-h-[30px] flex items-center ${
+        className={`hidden md:block options w-full min-h-[30px] flex items-center ${
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
       >
-        {options.find((item) => item.value === locationValue)?.label}
+        {options.find((item) => item.value === locationValue)?.label ||
+          placeholder}
       </div>
       {/**desktop tablet 選單 */}
       <ul
         tabIndex={0}
-        className="hidden sm:block dropdown-content min-w-[150px] max-h-[150px] overflow-y-auto menu mt-5 rounded-box z-10 w-full max-w-xs bg-white shadow-sm"
+        className="hidden md:block dropdown-content min-w-[200px] max-h-[150px] overflow-y-auto menu mt-5 rounded-box z-10 w-full max-w-xs bg-white shadow-sm"
       >
         {options.map((opt) => (
           <li
@@ -90,15 +98,13 @@ export default function Dropdown({ options, fieldName, textCenter }: Props) {
                 <li
                   key={opt.id}
                   className="text-neutral-950 p-2 hover:bg-primary-50 hover:rounded-sm active:rounded-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMobileOpen(false);
+                    handleClickOnBlur(opt.value);
+                  }}
                 >
-                  <a
-                    onClick={() => {
-                      setMobileOpen(false)
-                      handleClickOnBlur(opt.value);
-                    }}
-                  >
-                    {opt.label}
-                  </a>
+                  {opt.label}
                 </li>
               ))}
             </ul>

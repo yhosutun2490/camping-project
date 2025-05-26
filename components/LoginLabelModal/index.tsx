@@ -34,9 +34,6 @@ export default function LoginLabelModal() {
          登入
       </label>
       <DialogModal id='login' modalRef={modalRef}>
-        <p className="text-3xl text-primary-500 text-center">
-           登入
-        </p>
          <LoginForm ref={loginFromRef} close={closeModal}/>
       </DialogModal>
     </>

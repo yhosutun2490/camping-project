@@ -36,16 +36,18 @@ export default function PersonCounter({ textCenter }: Props) {
     pets: number;
   };
 
-  function handleClickOnBlur() {
+  function handleClickOnBlur(skipBlur=false) {
     // 先更新值
     setValue("person", {
       ...localCount,
     });
 
+    if (!skipBlur) {
     const active = document.activeElement;
     if (active instanceof HTMLElement) {
       active.blur();
     }
+  }
   }
 
   function updateCounter(key: keyof LocalCounter, delta: number) {
@@ -68,7 +70,7 @@ export default function PersonCounter({ textCenter }: Props) {
       <div
         tabIndex={0}
         role="button"
-        className={`block sm:hidden options w-full min-h-[30px] flex items-center ${
+        className={`block md:hidden options w-full min-h-[30px] flex items-center ${
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
         onClick={() => setMobileOpen(true)}
@@ -78,7 +80,7 @@ export default function PersonCounter({ textCenter }: Props) {
       <div
         tabIndex={0}
         role="button"
-        className={`hidden sm:block options w-full min-h-[30px] flex items-center ${
+        className={`hidden md:block options w-full min-h-[30px] flex items-center ${
           textCenter ? "text-center justify-center leading-[2]" : ""
         }`}
       >
@@ -88,7 +90,7 @@ export default function PersonCounter({ textCenter }: Props) {
       <ul
         tabIndex={0}
         className={`
-          dropdown-content menu mt-5 rounded-box p-4 w-full hidden sm:block
+          dropdown-content menu mt-5 rounded-box p-4 w-full hidden md:block
           min-w-[250px] max-w-xs 
           bg-white shadow-sm
           [--menu-active-bg:transparent] [--menu-active-fg:inherit]
@@ -119,7 +121,7 @@ export default function PersonCounter({ textCenter }: Props) {
         <button
           type="button"
           className="w-full btn-primary mt-2 py-2 rounded-2xl"
-          onClick={() => handleClickOnBlur()}
+          onClick={() => handleClickOnBlur(true)}
         >
           儲存
         </button>
@@ -157,7 +159,8 @@ export default function PersonCounter({ textCenter }: Props) {
               ))}
               <button
                 className="btn-primary w-full mt-4"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   handleClickOnBlur();
                   setMobileOpen(false);
                 }}

@@ -57,7 +57,7 @@ export default async function MemberLayout({
   return (
     <div
       className="member_page_layout relative
-     grid grid-cols-[300px_3fr] h-screen pt-[60px]"
+     grid grid-cols-[300px_3fr] h-screen"
     >
 
       <aside className="h-full sticky top-5 shadow-md bg-primary-50">

@@ -40,7 +40,7 @@ export default function HeaderNavBar({
     <div
       className={clsx(
         "navbar fixed inset-x-0 w-full h-[130px] items-start md:h-[80px] md:items-center",
-        "flex flex-wrap justify-between px-[1rem] sm:px-[8%] z-20 cursor-pointer delay-50 ease-in-out transition-all",
+        "flex flex-wrap justify-between px-[1rem] sm:px-[6%] lg:px-[8%] z-20 cursor-pointer delay-50 ease-in-out transition-all",
         {
           "bg-transparent": isHome && !isBarScaleUp,
           "bg-white shadow-md": !isHome || !isTopSectionVisible,
