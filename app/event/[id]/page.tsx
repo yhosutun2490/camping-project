@@ -1,52 +1,28 @@
-"use client"
+import TabListAnchor from "@/components/EventById/TabListAnchor";
+export default async function EventByIdPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // 1. 取得活動id
+  const { id } = await params;
 
-import { useState, useEffect } from "react"
-import { useParams } from "next/navigation";
+  // 2. api 取得單一活動資料
+  // const event = await getEventById(id);
 
-type Activity = {
-  id: string;
-  title: string;
-  description: string;
-};
-
-async function getActivityById(id: string): Promise<Activity> {
-  // 模擬 API 呼叫
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id,
-        title: `活動標題 #${id}`,
-        description: "這是一個活動的說明內容。",
-      });
-    }, 500); // 模擬延遲
-  });
-}
-export default function ActivityPage() {
-  const [activity, setActivity] = useState<Activity | null>(null);
-  const params = useParams<{ id: string }>();
-  const id = params.id;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getActivityById(id);
-        setActivity(res);
-      } catch (err) {
-        console.error("載入活動資料失敗", err);
-      }
-    };
-    fetchData();
-  }, [id]);
-
-  if (!activity) {
-    return <p>載入中...</p>;
-  }
-
+  // 3. 渲染活動資料 若無資料導回活動搜尋頁
   return (
-    <div>
-      <h1>{activity.title}</h1>
-      <p>{activity.description}</p>
-      <p>活動 ID：{activity.id}</p>
+    <div className="bg-primary-50 text-black">
+      <div className="sticky top-0 h-[50px] md:h-[40px]">
+        <TabListAnchor />
+      </div>
+      <main className="event_info min-h-screen">
+        <p>活動 ID: {id} </p>
+        <section id="activity-intro">
+          <h2>活動介紹</h2>
+          <p className="h-[1500px]">內容內容內容</p>
+        </section>
+      </main>
     </div>
   );
 }
