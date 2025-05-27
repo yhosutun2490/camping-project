@@ -33,7 +33,7 @@ export default function EventPlansSection() {
     },
   ];
   return (
-    <div className="event_plan_section px-6 py-4 space-y-4 bg-gray-200 rounded-lg shadow-md">
+    <div id="plan" className="event_plan_section px-6 py-4 space-y-4 bg-gray-200 rounded-lg shadow-md">
       <p className="heading-3">選擇方案</p>
       <EventPlanCard
         id='1'

@@ -21,14 +21,17 @@ export default async function EventByIdPage({
       <div className="sticky top-0 z-10 bg-white w-full h-[50px] flex items-center justify-between px-4 shadow">
         <TabListAnchor />
       </div>
-      <main className="h-[calc(100dvh-120px)] overflow-y-auto px-6 py-4">
-        {/* 1. 活動封面照 */}
-        <div className="w-full h-[400px]">
-          <EventCoverGrid />
-        </div>
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4">
-          {/* 活動主要資訊區塊 */}
-          <main>
+      <main
+        id="main-scroll-container"
+        className="h-[100dvh] relative overflow-y-auto"
+      >
+        <div className="event_main_section min-h-0 px-4 py-6 space-y-6">
+          {/* 1. 活動封面照 */}
+          <div className="w-full h-[400px]">
+            <EventCoverGrid />
+          </div>
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4">
+            {/* 活動主要資訊區塊 */}
             <section id="activity-intro">
               {/* 2. 活動價格卡片(手機) */}
               <div className="lg:hidden mb-4">
@@ -42,19 +45,19 @@ export default async function EventByIdPage({
               <EventBasicInfo />
               <EventPlansSection />
             </section>
-          </main>
-          <aside className="relative h-screen">
-            <div className="hidden lg:block md:sticky md:top-0">
-              {/* 2. 活動價格卡片 */}
-              <EventPriceCard
-                price={1000}
-                unit="每人"
-                discounts={["早鳥優惠", "團體優惠"]}
-              />
-            </div>
-          </aside>
+            <aside className="relative h-screen">
+              <div className="hidden lg:block md:sticky md:top-5">
+                {/* 2. 活動價格卡片 */}
+                <EventPriceCard
+                  price={1000}
+                  unit="每人"
+                  discounts={["早鳥優惠", "團體優惠"]}
+                />
+              </div>
+            </aside>
 
-          <p className="h-[1500px]">內容內容內容</p>
+            <p className="h-[1500px]">內容內容內容</p>
+          </div>
         </div>
       </main>
     </div>

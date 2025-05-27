@@ -47,12 +47,18 @@ export default function TabListAnchor() {
   }
   function scrollIntoElement({
     targetId,
+    containerId = "main-scroll-container", 
+    offset = 80,
   }: {
     targetId: string;
+    containerId?: string;
+    offset?: number;
   }) {
     const el = document.getElementById(targetId);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+    const container = document.getElementById(containerId);
+    if (el && container) {
+      const y = el.offsetTop - offset;
+      container.scrollTo({ top: y, behavior: "smooth" });
     }
   }
   return (
