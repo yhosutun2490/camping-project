@@ -44,12 +44,12 @@ export default function EventCard({
       <p className="text-primary-500 font-semibold">報名人數: {person?.subscribed} / {person?.max}</p>
     </div>
 
-    <figure className="w-full max-h-[180px] relative aspect-[3/2]">
+    <figure className="w-full max-h-[180px] relative aspect-[3/2] overflow-hidden rounded-xl">
       <Image
         src={image?.[0] || "/event/event_1.png"}
         alt="event"
         fill
-        className="rounded-xl w-full object-cover"
+        className="rounded-xl w-full object-cover hover:scale-115 transition-transform duration-300"
       />
       <div className="absolute badge border-none bg-primary-100 text-primary-500 
         top-6 right-0 rounded-r-none">

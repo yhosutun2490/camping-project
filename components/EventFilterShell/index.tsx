@@ -179,7 +179,7 @@ export default function EventFilterShell({
                         height={height}
                         width={width}
                         itemCount={rowCount}
-                        itemSize={400}
+                        itemSize={450}
                         onItemsRendered={onItemsRendered}
                         outerRef={ref}
                       >
