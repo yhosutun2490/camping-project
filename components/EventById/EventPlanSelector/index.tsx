@@ -24,7 +24,7 @@ export default function EventPlanSelector({ name, plans }: Props) {
               data={plan}
               isSelected={field.value?.event_plan_id === plan.id}
               onSelect={() => {
-                setValue("plan_addon", []);
+                setValue("plan_addons", []);
                 field.onChange({
                   event_plan_id: plan.id,
                   quantity: 1,

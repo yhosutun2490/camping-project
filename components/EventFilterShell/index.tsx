@@ -121,6 +121,7 @@ export default function EventFilterShell({
         {rowItems.map((item) => (
           <div className="min-w-[300px] max-w-[500px] mx-auto" key={item.id}>
             <EventCard
+              id={item.id}
               title={item.title}
               date={{ start: item.start_time, end: item.end_time }}
               price={item.price}
