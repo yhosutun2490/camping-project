@@ -25,21 +25,26 @@ export default function EventAddonCheckbox({ name, options }: Props) {
         name={name}
         control={control}
         render={({ field }) => {
-          console.log('目前加購選項',field.value)
-          const selected: string[] = field.value || []; // 選中的加購選項
+          const selected: AddonItem[] = field.value || [];
+
+          const checkItemSelected = (
+            selected: AddonItem[],
+            option: AddonItem
+          ): boolean => {
+            return selected.some((item) => item.id === option.id);
+          };
 
           // 處理選中或取消選中的事件
-          const handleSelectCheckbox = (
-            e: React.ChangeEvent<HTMLInputElement>
-          ) => {
-            const value = e.target.value; // 取得 checkbox 的值
-            // checkbox狀態
-            if (e.target.checked) {
-              // 如果選中，添加到選中列表
-              field.onChange([...selected, value]);
+          const handleSelectCheckbox = (option: AddonItem) => {
+            const alreadyHasAddon = checkItemSelected(selected, option);
+            if (alreadyHasAddon) {
+              // 如果已選中，則取消選中（移除）
+              field.onChange(
+                selected.filter((value) => value.id !== option.id)
+              );
             } else {
-              // 如果取消選中，從選中列表中移除
-              field.onChange(selected.filter((item) => item !== value));
+              // 如果未選中，則加入
+              field.onChange([...selected, option]);
             }
           };
           return (
@@ -51,15 +56,15 @@ export default function EventAddonCheckbox({ name, options }: Props) {
                       <input
                         type="checkbox"
                         value={option.value}
-                        checked={selected.includes(option.value)}
-                        onChange={handleSelectCheckbox}
+                        checked={checkItemSelected(selected,option)}
+                        onChange={() => handleSelectCheckbox(option)}
                         className="peer hidden"
                       />
                       <div
                         className="w-5 h-5 rounded-sm border border-gray-400 flex items-center justify-center text-sm
                         peer-checked:bg-primary-500 peer-checked:text-white"
                       >
-                        {selected.includes(option.value) && "✓"}
+                        {checkItemSelected(selected,option) && "✓"}
                       </div>
                       <span>
                         {option.label} - {option.price}元

@@ -244,8 +244,9 @@ export default function EventPlansSection({
       plan: {
         event_plan_id: data[0]?.id,
         quantity: 1,
-        event_plan_price: data[0]?.price,
+        event_plan_price: data[0]?.discounted_price,
       },
+      plan_addons: [], 
     },
   });
 
@@ -255,7 +256,20 @@ export default function EventPlansSection({
     control,
     name: "plan.event_plan_id",
   });
-
+  
+  // 監聽方案價格和所有加購選項
+  const [planPrice, addon ] = useWatch({
+    control,
+    name: ["plan.event_plan_price",'plan_addons'],
+  });
+  
+  console.log('方案價格',planPrice, addon )
+  const totalPrice =
+    (typeof planPrice === "number" ? planPrice : 0) +
+    (Array.isArray(addon)
+      ? addon.reduce((sum, item) => sum + (item?.price ?? 0), 0)
+      : 0);
+  
 
   // 將方案資料分割成 1.方案選項 2.加購選項 兩部份傳入元件
   const planData: PlanData[] = data?.map((item) => {
@@ -295,7 +309,8 @@ export default function EventPlansSection({
         >
           <p className="heading-3">選擇方案</p>
           <EventPlanSelector name="plan" plans={planData} />
-          <EventAddonCheckbox name="plan_addon" options={currentAddonOptions}/>
+          <EventAddonCheckbox name="plan_addons" options={currentAddonOptions}/>
+          <p className="text-2xl">您的總金額為$ {totalPrice}</p>
           <div className="flex w-[60%] mx-auto btn_wrap justify-between">
             <button type='submit' className="btn-primary">立即報名</button>
             <button className="btn-primary">加入購物車</button>
