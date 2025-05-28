@@ -2,12 +2,15 @@ import type { GetEventsParams } from "@/types/api/event/allEvents";
 import EventFilterShell from "@/components/EventFilterShell";
 import RestButton from "@/components/EventFilterShell/ResetButton";
 import { getEventTags } from "@/api/server-components/event/tags";
+
 export const dynamic = "force-dynamic";
+
 export default async function EventPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | undefined>;
+  searchParams: Promise<{ [key: string]: string }>
 }) {
+  // 取得 URLSearchParams
   const params = await searchParams;
 
   // filter 條件
