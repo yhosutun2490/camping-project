@@ -1,5 +1,6 @@
 "use client";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import clsx from "clsx";
 export type PlanFeatureItem = {
   id: string;
   event_plan_id: string;
@@ -27,6 +28,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const {
     data,
     unit = "NT$", // 預設單位為NT$
+    isSelected,
     onSelect = () => {}, // 預設點選處理為空函數
   } = props;
 
@@ -38,8 +40,10 @@ export default function EventPlanCard(props: EventPlanCardProps) {
 
   return (
     <div
-      className="event_plan_card border-1 border-primary-300 
-    p-6 rounded-2xl grid gap-4 grid-cols-1 md:grid-cols-[3fr_1fr]"
+      className={clsx(`event_plan_card border-1 border-primary-300 
+        p-6 rounded-2xl grid gap-4 grid-cols-1 md:grid-cols-[3fr_1fr]`,
+        isSelected && 'bg-zinc-300'
+      )}
     >
       {/*方案詳細資訊*/}
       <div className="plan_info space-y-2">
@@ -70,7 +74,10 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         </div>
         <button
           className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
-          onClick={() => onSelect(id)}
+          onClick={(e) => {
+            e.preventDefault();
+            onSelect(id)
+          }}
         >
           選擇方案
         </button>

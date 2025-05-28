@@ -32,10 +32,12 @@ export type EventPlan = {
 };
 
 export const eventPlanSchema = z.object({
-  event_plan_id: z.string({ required_error: "方案 ID 為必填" }),
-  quantity: z.number().int().min(1, "數量至少為 1"),
-  event_plan_price: z.number().min(0, "價格不能為負數"),
-  event_addons: z
+  plan: z.object({
+    event_plan_id: z.string({ required_error: "方案 ID 為必填" }),
+    quantity: z.number().int().min(1, "數量至少為 1"),
+    event_plan_price: z.number().min(0, "價格不能為負數"),
+  }),
+  plan_addons: z
     .array(
       z.object({
         addon_id: z.string({ required_error: "加購器具 ID 為必填" }),

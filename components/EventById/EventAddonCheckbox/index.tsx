@@ -2,7 +2,8 @@
 import { useFormContext, Controller } from "react-hook-form";
 
 // 加購選項資料
-type AddonItem = {
+export type AddonItem = {
+  id: string;
   label: string;
   price: number;
   value: string;
@@ -16,7 +17,7 @@ type Props = {
 export default function EventAddonCheckbox({ name, options }: Props) {
   const { control } = useFormContext(); // React Hook Form 的控制器
   return (
-    <div className="form-control">
+    <div className="form-control space-y-4">
       <label className="label">
         <span className="label-text heading-5">加購選項</span>
       </label>
@@ -24,6 +25,7 @@ export default function EventAddonCheckbox({ name, options }: Props) {
         name={name}
         control={control}
         render={({ field }) => {
+          console.log('目前加購選項',field.value)
           const selected: string[] = field.value || []; // 選中的加購選項
 
           // 處理選中或取消選中的事件
@@ -41,16 +43,24 @@ export default function EventAddonCheckbox({ name, options }: Props) {
             }
           };
           return (
-            <div className="flex flex-col gap-2">
+            <div className="flex gap-2 select-none">
               {options.map((option) => {
                 return (
                   <div className="addon_option" key={option.value}>
-                    <label className="cursor-pointer flex items-center gap-2">
+                    <label className="flex items-center gap-2 text-lg cursor-pointer">
                       <input
                         type="checkbox"
+                        value={option.value}
                         checked={selected.includes(option.value)}
                         onChange={handleSelectCheckbox}
+                        className="peer hidden"
                       />
+                      <div
+                        className="w-5 h-5 rounded-sm border border-gray-400 flex items-center justify-center text-sm
+                        peer-checked:bg-primary-500 peer-checked:text-white"
+                      >
+                        {selected.includes(option.value) && "✓"}
+                      </div>
                       <span>
                         {option.label} - {option.price}元
                       </span>
