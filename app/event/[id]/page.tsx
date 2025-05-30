@@ -6,6 +6,7 @@ import EventInfoDescription from "@/components/EventById/EventBasicInfo/EventInf
 import EventPriceCard from "@/components/EventById/EventPriceCard";
 import EventPlansSection from "@/components/EventById/EventPlansSection";
 import EventNewComment from "@/components/EventById/EventNewComment";
+import EventIntroduction from "@/components/EventById/EventIntroduction";
 
 
 // 假資料
@@ -66,21 +67,21 @@ export default async function EventByIdPage({
   return (
     <div className="bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
-        className="sticky top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
+        className="tab-list top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
       flex items-center justify-between border-b-2 border-primary-500"
       >
         <TabListAnchor />
       </div>
       <main
         id="main-scroll-container"
-        className="h-[100dvh] px-[5%] md:px-[8%] 2xl:px-[15%] relative overflow-y-auto"
+        className="h-[calc(100dvh-180px)] px-[5%] md:px-[8%] 2xl:px-[15%] relative overflow-y-auto"
       >
-        <div className="event_main_section min-h-0 py-[40px] 2xl:py-[80px] space-y-6">
+        <div className="event_main_section min-h-screen pt-[40px] 2xl:pt-[80px] space-y-6">
           {/* 1. 活動封面照 */}
           <div className="w-full h-[200px] md:h-[400px] 2xl:h-[636px]">
             <EventCoverGrid />
           </div>
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-10">
+          <div className="mt-4 min-h-0 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-10">
             {/* 活動主要資訊區塊 */}
             <section id="activity-intro" className="space-y-6 xl:space-y-10">
               {/* 2. 活動價格卡片(手機) */}
@@ -102,6 +103,9 @@ export default async function EventByIdPage({
                   comment_data: sampleComment,
                 }}
               />
+              <EventIntroduction detail={`創造一個戶外空間，讓大家可以親身體會到花蓮豐濱的美，
+              並且帶領大家一同了解阿美族的故事，我們有的很簡單，有山、有海、有草地、有星空、有陽光，
+              有原住民帥哥營主兄弟黨跟你聊天，還很多小米酒，來到這裡！記得放下手機、放下煩憂、放下工作、好好享受，花蓮豐濱海放生活`}/>
             </section>
             <aside className="relative h-full">
               <div className="hidden lg:block md:sticky md:top-5">
@@ -113,9 +117,8 @@ export default async function EventByIdPage({
                 />
               </div>
             </aside>
-
-            <p className="h-[1500px]">內容內容內容</p>
           </div>
+
         </div>
       </main>
     </div>

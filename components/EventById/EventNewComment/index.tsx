@@ -18,7 +18,7 @@ export default function EventNewComment({data}:Props) {
     comment_data
   } = data
   return (
-    <div id="event_comment" className="event_new_comment flex flex-col gap-10">
+    <div id="event_comment" className="md:mt-20 event_new_comment flex flex-col gap-10">
       <div className="comment_info flex gap-6 items-center">
         <p className="heading-2">最新評論</p>
         <div className="comment_rating flex items-center space-x-2">
