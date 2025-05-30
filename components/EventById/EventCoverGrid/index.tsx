@@ -1,7 +1,7 @@
 import Image from "next/image";
 export default function EventCoverGrid() {
   return (
-    <div id="total" className="event_cover_grid h-full grid grid-cols-[3fr_1fr] grid-rows-2 gap-4">
+    <div id="total" className="event_cover_grid h-full grid grid-cols-2 grid-rows-2 gap-5 2xl:gap-10">
       {/* 左側大圖：橫跨兩列 */}
       <figure className="relative col-span-2 md:col-span-1 row-span-2 h-full">
         <Image

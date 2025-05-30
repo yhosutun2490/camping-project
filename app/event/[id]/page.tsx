@@ -1,6 +1,8 @@
 import TabListAnchor from "@/components/EventById/TabListAnchor";
 import EventCoverGrid from "@/components/EventById/EventCoverGrid";
 import EventBasicInfo from "@/components/EventById/EventBasicInfo";
+import EventHost from "@/components/EventById/EventHost";
+import EventInfoDescription from "@/components/EventById/EventBasicInfo/EventInfoDescription";
 import EventPriceCard from "@/components/EventById/EventPriceCard";
 import EventPlansSection from "@/components/EventById/EventPlansSection";
 export default async function EventByIdPage({
@@ -26,14 +28,14 @@ export default async function EventByIdPage({
         id="main-scroll-container"
         className="h-[100dvh] px-[5%] md:px-[8%] 2xl:px-[15%] relative overflow-y-auto"
       >
-        <div className="event_main_section min-h-0 px-4 py-6 space-y-6">
+        <div className="event_main_section min-h-0 py-[40px] 2xl:py-[80px] space-y-6">
           {/* 1. 活動封面照 */}
-          <div className="w-full h-[400px]">
+          <div className="w-full h-[200px] md:h-[400px] 2xl:h-[636px]">
             <EventCoverGrid />
           </div>
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-4">
+          <div className="mt-4 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-10">
             {/* 活動主要資訊區塊 */}
-            <section id="activity-intro">
+            <section id="activity-intro" className="space-y-6 xl:space-y-10">
               {/* 2. 活動價格卡片(手機) */}
               <div className="lg:hidden mb-4">
                 <EventPriceCard
@@ -42,8 +44,9 @@ export default async function EventByIdPage({
                   discounts={["早鳥優惠", "團體優惠"]}
                 />
               </div>
-
               <EventBasicInfo />
+              <EventHost />
+              <EventInfoDescription />
               <EventPlansSection />
             </section>
             <aside className="relative h-full">
