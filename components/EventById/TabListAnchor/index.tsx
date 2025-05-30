@@ -1,19 +1,24 @@
 "use client";
 import { useState } from "react";
 import clsx from "clsx";
+
 type TabList = {
   id: string;
   label: string;
   href: string;
 };
-type ActiveTab = "活動總覽" | "選擇方案" | "評價" | "活動介紹" | "主辦方簡介";
+type ActiveTab = "總覽" | "選擇方案" | "評價" | "活動介紹" | "主辦方簡介";
 
-export default function TabListAnchor() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("活動總覽");
+interface Props {
+  offset?: number;
+}
+
+export default function TabListAnchor({ offset }: Props) {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("總覽");
   const tabList: TabList[] = [
     {
       id: "1",
-      label: "活動總覽",
+      label: "總覽",
       href: "#total",
     },
     {
@@ -23,7 +28,7 @@ export default function TabListAnchor() {
     },
     {
       id: "3",
-      label: "評價",
+      label: "最新評論",
       href: "#comment",
     },
     {
@@ -33,26 +38,33 @@ export default function TabListAnchor() {
     },
     {
       id: "5",
-      label: "主辦方簡介",
+      label: "行前提醒",
       href: "#host-intro",
     },
   ];
 
-  function handleClickTab(label: ActiveTab) {
+  function handleClickTab(label: ActiveTab, offset?: number) {
     setActiveTab(label);
     const targetTab = tabList.find((tab) => tab.label === label);
     if (targetTab) {
-      scrollIntoElement({ targetId: targetTab.href.slice(1) });
+      const isMobile = window.innerWidth < 1024;
+      const dynamicOffset = offset ?? (isMobile ? 52 : 90);
+
+      scrollIntoElement({
+        targetId: targetTab.href.slice(1),
+        containerId: "main-scroll-container",
+        offset: dynamicOffset,
+      });
     }
   }
   function scrollIntoElement({
     targetId,
-    containerId = "main-scroll-container", 
-    offset = 80,
+    containerId,
+    offset,
   }: {
     targetId: string;
-    containerId?: string;
-    offset?: number;
+    containerId: string;
+    offset: number;
   }) {
     const el = document.getElementById(targetId);
     const container = document.getElementById(containerId);
@@ -62,18 +74,32 @@ export default function TabListAnchor() {
     }
   }
   return (
-    <div className="w-full h-full flex flex-wrap justify-between items-center space-x-2 lg:space-x-10 justify-center bg-white">
+    <div className="w-full h-full relative px-[5%] md:px-[8%] 2xl:px-[15%] flex justify-between lg:justify-start items-center space-x-2 lg:space-x-10 bg-primary-50">
       {tabList.map((tab) => (
         <div
           key={tab.id}
           className={clsx(
-            "h-full cursor-pointer flex items-center text-primary-500 hover:text-primary-700 transition-colors",
+            "h-full cursor-pointer flex items-center heading-5 hover:text-primary-700 transition-colors",
             activeTab === tab.label
-              ? "border-b-2 border-primary-500 font-semibold"
-              : "border-b-2 border-transparent"
+              ? `text-primary-500 font-semibold relative
+              after:content-[''] after:rotate-[180deg] after:absolute 
+              after:-bottom-[2px]
+              after:left-1/2 after:-translate-x-1/2
+              after:w-[20px]
+              after:h-[10px] 
+              lg:after:w-[30px] 
+              lg:after:h-[15px] 
+              after:rounded-b-full 
+              after:bg-primary-50 
+              after:border-2
+              after:border-primary-500
+              after:border-t-primary-50
+              after:z-10`
+              : "text-neutral-500 hover:text-primary-700"
           )}
-          onClick={() => handleClickTab(tab.label as ActiveTab)}
+          onClick={() => handleClickTab(tab.label as ActiveTab, offset)}
         >
+  
           {tab.label}
         </div>
       ))}

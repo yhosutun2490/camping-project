@@ -56,6 +56,9 @@ export default function EventCard({
         src={image?.[0] || "/event/event_1.png"}
         alt="event"
         fill
+        priority
+        placeholder="blur"
+        blurDataURL="/main/main_bg_top_1.jpg" // 提前準備一張小圖
         className="rounded-xl w-full object-cover hover:scale-115 transition-transform duration-300"
       />
       <div className="absolute badge border-none bg-primary-100 text-primary-500 

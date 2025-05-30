@@ -3,12 +3,12 @@ import EventPlanSelector from "@/components/EventById/EventPlanSelector";
 import { useMemo } from "react";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import EventAddonCheckbox from "@/components/EventById/EventAddonCheckbox";
+import EventAddonCheckbox from "@/components/EventById/EventPlansSection/EventAddonCheckbox";
 import type { EventPlan } from "@/schema/EventPlanForm";
 import { eventPlanSchema } from "@/schema/EventPlanForm";
 // UI props type
 import { PlanData } from "@/components/EventById/EventPlanSelector/EventPlanCard";
-import { AddonItem } from "@/components/EventById/EventAddonCheckbox";
+import { AddonItem } from "@/components/EventById/EventPlansSection/EventAddonCheckbox";
 import { z } from "zod";
 
 type FormType = z.infer<typeof eventPlanSchema>;
@@ -229,8 +229,8 @@ const mockPlans: EventPlan[] = [
 ];
 
 interface Props {
-  data: EventPlan[];
-  close_Time: string; // 報名截止時間
+  data?: EventPlan[];
+  close_Time?: string; // 報名截止時間
 }
 // 集中方案表單資料 1.方案選項 2.加購選項
 export default function EventPlansSection({
@@ -263,7 +263,6 @@ export default function EventPlansSection({
     name: ["plan.event_plan_price",'plan_addons'],
   });
   
-  console.log('方案價格',planPrice, addon )
   const totalPrice =
     (typeof planPrice === "number" ? planPrice : 0) +
     (Array.isArray(addon)
@@ -302,7 +301,7 @@ export default function EventPlansSection({
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-6">
         <div
           id="plan"
           className="event_plan_section px-6 py-4 space-y-4 bg-gray-200 rounded-lg shadow-md"
