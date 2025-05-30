@@ -4,9 +4,11 @@ import { useFormContext, Controller } from "react-hook-form";
 // 加購選項資料
 export type AddonItem = {
   id: string;
-  label: string;
+  event_plan_id: string;
+  name: string;
   price: number;
-  value: string;
+  created_at: string;
+  updated_at: string;
 };
 
 type Props = {
@@ -48,14 +50,14 @@ export default function EventAddonCheckbox({ name, options }: Props) {
             }
           };
           return (
-            <div className="flex gap-2 select-none">
+            <div className="flex flex-wrap gap-2 select-none">
               {options.map((option) => {
                 return (
-                  <div className="addon_option" key={option.value}>
+                  <div className="addon_option" key={option.id}>
                     <label className="flex items-center gap-2 text-lg cursor-pointer">
                       <input
                         type="checkbox"
-                        value={option.value}
+                        value={option.id}
                         checked={checkItemSelected(selected,option)}
                         onChange={() => handleSelectCheckbox(option)}
                         className="peer hidden"
@@ -66,8 +68,9 @@ export default function EventAddonCheckbox({ name, options }: Props) {
                       >
                         {checkItemSelected(selected,option) && "✓"}
                       </div>
-                      <span>
-                        {option.label} - {option.price}元
+                      <span className="heading-6 space-x-2">
+                        <span>{option.name} </span>
+                        <span className="text-primary-500">NT$ {option.price}元</span>
                       </span>
                     </label>
                   </div>

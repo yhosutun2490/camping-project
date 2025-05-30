@@ -1,14 +1,11 @@
 "use client";
 import EventPlanSelector from "@/components/EventById/EventPlanSelector";
-import { useMemo } from "react";
-import { useForm, FormProvider, useWatch } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import EventAddonCheckbox from "@/components/EventById/EventPlansSection/EventAddonCheckbox";
 import type { EventPlan } from "@/schema/EventPlanForm";
 import { eventPlanSchema } from "@/schema/EventPlanForm";
 // UI props type
 import { PlanData } from "@/components/EventById/EventPlanSelector/EventPlanCard";
-import { AddonItem } from "@/components/EventById/EventPlansSection/EventAddonCheckbox";
 import { z } from "zod";
 
 type FormType = z.infer<typeof eventPlanSchema>;
@@ -250,24 +247,24 @@ export default function EventPlansSection({
     },
   });
 
-  const { control } = form;
+  // const { control } = form;
   // 監聽 plan 方案變化
-  const selectedPlanId = useWatch({
-    control,
-    name: "plan.event_plan_id",
-  });
+  // const selectedPlanId = useWatch({
+  //   control,
+  //   name: "plan.event_plan_id",
+  // });
   
   // 監聽方案價格和所有加購選項
-  const [planPrice, addon ] = useWatch({
-    control,
-    name: ["plan.event_plan_price",'plan_addons'],
-  });
+  // const [planPrice, addon ] = useWatch({
+  //   control,
+  //   name: ["plan.event_plan_price",'plan_addons'],
+  // });
   
-  const totalPrice =
-    (typeof planPrice === "number" ? planPrice : 0) +
-    (Array.isArray(addon)
-      ? addon.reduce((sum, item) => sum + (item?.price ?? 0), 0)
-      : 0);
+  // const totalPrice =
+  //   (typeof planPrice === "number" ? planPrice : 0) +
+  //   (Array.isArray(addon)
+  //     ? addon.reduce((sum, item) => sum + (item?.price ?? 0), 0)
+  //     : 0);
   
 
   // 將方案資料分割成 1.方案選項 2.加購選項 兩部份傳入元件
@@ -279,21 +276,22 @@ export default function EventPlansSection({
       features: item.eventPlanContentBox,
       price: item.discounted_price,
       originalPrice: item.price,
+      addonBox: item?.eventPlanAddonBox
     };
   });
   // 選擇方案的加購選項
-  const currentAddonOptions: AddonItem[] = useMemo(() => {
-    return (
-      data
-        .find((item) => item.id === selectedPlanId)
-        ?.eventPlanAddonBox.map((item) => ({
-          id: item.id,
-          label: item.name,
-          value: item.name,
-          price: item.price,
-        })) || []
-    );
-  }, [selectedPlanId, data]);
+  // const currentAddonOptions: AddonItem[] = useMemo(() => {
+  //   return (
+  //     data
+  //       .find((item) => item.id === selectedPlanId)
+  //       ?.eventPlanAddonBox.map((item) => ({
+  //         id: item.id,
+  //         label: item.name,
+  //         value: item.name,
+  //         price: item.price,
+  //       })) || []
+  //   );
+  // }, [selectedPlanId, data]);
 
   const onSubmit = (data: FormType) => {
     console.log("送出資料", data); // 看使用者勾了哪些加購項目
@@ -301,19 +299,19 @@ export default function EventPlansSection({
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-6">
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <div
           id="plan"
-          className="event_plan_section px-6 py-4 space-y-4 bg-gray-200 rounded-lg shadow-md"
+          className="event_plan_section space-y-10"
         >
-          <p className="heading-3">選擇方案</p>
+          <p className="heading-2">選擇方案</p>
           <EventPlanSelector name="plan" plans={planData} />
-          <EventAddonCheckbox name="plan_addons" options={currentAddonOptions}/>
-          <p className="text-2xl">您的總金額為$ {totalPrice}</p>
-          <div className="flex w-[60%] mx-auto btn_wrap justify-between">
+          {/* <EventAddonCheckbox name="plan_addons" options={currentAddonOptions}/> */}
+          {/* <p className="text-2xl">您的總金額為$ {totalPrice}</p> */}
+          {/* <div className="flex w-[60%] mx-auto btn_wrap justify-between">
             <button type='submit' className="btn-primary">立即報名</button>
             <button className="btn-primary">加入購物車</button>
-          </div>
+          </div> */}
         </div>
       </form>
     </FormProvider>

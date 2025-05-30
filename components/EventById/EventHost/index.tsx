@@ -38,16 +38,22 @@ export default function EventHost({ host }: Props) {
         />
       </div>
 
-      <div className="host_info w-full flex flex-col gap-1 md:flex-row md:justify-between">
+      <div className="host_info w-full flex flex-col sm:gap-1 sm:flex-row justify-between">
         <div className="host_name flex flex-col">
-          <p className="heading-5 text-primary-500">{name}</p>
-          <div className="rate mt-auto text-sm text-neutral-700">
-            <span>評分: {rating}</span>
+          <p className="hidden sm:block heading-5 text-primary-500">{name}</p>
+          <p className="heading-7 sm:hidden text-primary-500">{name}</p>
+          <div className="rate mt-auto hidden sm:block text-sm text-neutral-700">
+            <span className="text-sm">評分: {rating}</span>
+            <span className="pr-2 border-r-1">{response_count}</span>
+            <span className="pl-2">回復率: {response_rate}%</span>
+          </div>
+          <div className="rate mt-auto text-xs sm:hidden text-neutral-700">
+            <span className="text-xs">評分: {rating}</span>
             <span className="pr-2 border-r-1">{response_count}</span>
             <span className="pl-2">回復率: {response_rate}%</span>
           </div>
         </div>
-        <RatingStar rating={rating}/>
+        <RatingStar rating={rating} starSize="relative h-4 right-1 md:h-6 md:right-0" />
       </div>
     </div>
   );

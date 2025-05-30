@@ -5,6 +5,7 @@ type RatingStarProps = {
   readOnly?: boolean;
   ratingSizeClass?: string;
   starColor?: string; // Tailwind CSS class for star color
+  starSize?: string
   onChange?: (newRating: number) => void;
 };
 
@@ -13,6 +14,7 @@ export default function RatingStar({
   readOnly = true,
   ratingSizeClass,
   starColor = 'bg-primary-500',
+  starSize,
   onChange,
 }: RatingStarProps) {
   return (
@@ -31,6 +33,7 @@ export default function RatingStar({
               mask mask-star-2 mr-1
               ${isFilled ? clsx(starColor,'opacity-100') : 'bg-gray-400 opacity-60'}
               ${!readOnly ? 'cursor-pointer focus:outline-none' : ''}
+              ${starSize}
             `}
             onClick={() => {
               if (!readOnly && onChange) onChange(value);

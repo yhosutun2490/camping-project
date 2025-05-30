@@ -29,7 +29,7 @@ export default function TabListAnchor({ offset }: Props) {
     {
       id: "3",
       label: "最新評論",
-      href: "#comment",
+      href: "#event_comment",
     },
     {
       id: "4",
@@ -69,7 +69,7 @@ export default function TabListAnchor({ offset }: Props) {
     const el = document.getElementById(targetId);
     const container = document.getElementById(containerId);
     if (el && container) {
-      const y = el.offsetTop - offset;
+      const y = el.offsetTop - offset + 40;
       container.scrollTo({ top: y, behavior: "smooth" });
     }
   }
@@ -79,7 +79,7 @@ export default function TabListAnchor({ offset }: Props) {
         <div
           key={tab.id}
           className={clsx(
-            "h-full cursor-pointer flex items-center heading-5 hover:text-primary-700 transition-colors",
+            "h-full cursor-pointer flex items-center sm:heading-5 hover:text-primary-700 transition-colors",
             activeTab === tab.label
               ? `text-primary-500 font-semibold relative
               after:content-[''] after:rotate-[180deg] after:absolute 

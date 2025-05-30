@@ -1,3 +1,5 @@
+/* 在 global.css 或 index.css 中加入 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600&display=swap');
 @import "tailwindcss";
 /* 自訂樣式區塊 */
 @import "../styles/button.css";
@@ -40,18 +42,16 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Noto Sans TC', sans-serif;
   overflow-x: hidden;
 }
 
 
 @layer base {
-
   input:-moz-autofill {
     background-color: var(--input-bg) !important;
     color: var(--input-text) !important;
   }
-
 }
 
 

@@ -5,6 +5,51 @@ import EventHost from "@/components/EventById/EventHost";
 import EventInfoDescription from "@/components/EventById/EventBasicInfo/EventInfoDescription";
 import EventPriceCard from "@/components/EventById/EventPriceCard";
 import EventPlansSection from "@/components/EventById/EventPlansSection";
+import EventNewComment from "@/components/EventById/EventNewComment";
+
+
+// 假資料
+const sampleComment = [
+    {
+      userInfo: {
+        user_id: "u001",
+        name: "陳明輝",
+        image: "/header/user_image.jpg",
+      },
+      eventInfo: {
+        event_id: "e101",
+        event_name: "松林谷地露營區",
+        host_id: "h1001",
+        host_name: "蔚然海岸",
+      },
+      comment: {
+        id: "c0001",
+        description: "環境非常優美，樹木扶疏提供良好的遮蔭。營地平整且寬敞，方便帳篷搭建。廁所及淋浴設施乾淨整潔，管理人員服務態度親切。夜晚可以清楚看到滿天星斗，早晨還有機會看到壯麗的日出。絕對會再次造訪！",
+        date: "2025-01-01",
+        rating: 5,
+      },
+    },
+    {
+      userInfo: {
+        user_id: "u002",
+        name: "林佳穎",
+        image: "/header/user_image.jpg",
+      },
+      eventInfo: {
+        event_id: "e102",
+        event_name: "藍海灣露營地",
+        host_id: "h1002",
+        host_name: "嘎嘎作響",
+      },
+      comment: {
+        id: "c0002",
+        description: "位置靠近海邊最好的，但風稍強平是白天的（防曬）。有防風牆和樹遮擋視野的山。廚房設施完善，有提供基本調味料。夜晚可以聽到海浪聲，非常放鬆。少了一顆星是因為衛浴設施數量不足，尖峰時段需要排隊",
+        date: "2025-05-05",
+        rating: 4,
+      },
+    },
+  ];
+
 export default async function EventByIdPage({
   params,
 }: {
@@ -20,8 +65,10 @@ export default async function EventByIdPage({
   // 3. 渲染活動資料 若無資料導回活動搜尋頁
   return (
     <div className="bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
-      <div className="sticky top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
-      flex items-center justify-between border-b-2 border-primary-500">
+      <div
+        className="sticky top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
+      flex items-center justify-between border-b-2 border-primary-500"
+      >
         <TabListAnchor />
       </div>
       <main
@@ -41,13 +88,20 @@ export default async function EventByIdPage({
                 <EventPriceCard
                   price={1000}
                   unit="每人"
-                  discounts={["早鳥優惠", "團體優惠"]}
+                  discounts={["69", "79"]}
                 />
               </div>
               <EventBasicInfo />
               <EventHost />
               <EventInfoDescription />
               <EventPlansSection />
+              <EventNewComment
+                data={{
+                  rating: 4,
+                  counts: 78,
+                  comment_data: sampleComment,
+                }}
+              />
             </section>
             <aside className="relative h-full">
               <div className="hidden lg:block md:sticky md:top-5">
@@ -55,7 +109,7 @@ export default async function EventByIdPage({
                 <EventPriceCard
                   price={1000}
                   unit="每人"
-                  discounts={["早鳥優惠", "團體優惠"]}
+                  discounts={["69", "79"]}
                 />
               </div>
             </aside>

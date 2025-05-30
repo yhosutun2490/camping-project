@@ -1,5 +1,5 @@
 "use client"
-
+import DiscountRate from "../EventPlanSelector/EventPlanCard/DiscountRate";
 type EventPriceCardProps = {
   price: number;
   unit?: string;
@@ -27,13 +27,12 @@ export default function EventPriceCard({
           {discounts.map((discount) => (
             <div
               key={discount}
-              className="border border-gray-400 rounded-md px-2 py-1 text-sm font-medium text-gray-700"
+              className="px-2 py-1 text-sm font-medium text-gray-700"
             >
-              🎟 {discount}
+             <DiscountRate rate={discount}/>
             </div>
           ))}
         </div>
-        <div className="text-sm text-gray-500">折扣券 ▾</div>
       </div>
 
       <button
