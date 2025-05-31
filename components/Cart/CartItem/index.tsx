@@ -1,56 +1,97 @@
-interface CartItemProps {
-  title: string;
-  date: string;
-  type: string;
-  option: string;
-  quantity: number;
+"use client";
+import Image from "next/image";
+import IconWrapper from "@/components/ClientIcon/IconWrapper";
+
+type EventAddon = {
+  name: string;
   price: number;
-  imageUrl: string;
-}
+};
+
+export type Order = {
+  id: string;
+  member: string;
+  event_plan_id: string;
+  event_plan_price: number;
+  event_name: string;
+  quantity: number;
+  event_addons: EventAddon[];
+  total_price: number;
+  book_at: string;
+  created_at: string;
+  photo_url?: string;
+};
+
+type CartItemProps = {
+  order: Order;
+  isSelected: boolean;
+  onToggleSelect: (id: string) => void;
+};
 
 export default function CartItem({
-  title,
-  date,
-  type,
-  option,
-  quantity,
-  price,
-  imageUrl,
+  order,
+  isSelected,
+  onToggleSelect,
 }: CartItemProps) {
   return (
-    <div className="flex items-start border-b py-4">
-      {/* Checkbox + Image */}
-      <div className="flex-shrink-0 mr-4 mt-1">
-        <input type="checkbox" checked readOnly className="accent-primary" />
-      </div>
-      <img
-        src={imageUrl}
-        alt={title}
-        className="w-24 h-16 object-cover rounded-md mr-4"
-      />
-
-      {/* Info */}
-      <div className="flex-1">
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="font-bold text-base text-neutral-800">{title}</p>
-            <p className="text-sm text-neutral-500 mt-1">{date}</p>
-            <p className="text-sm text-neutral-500">{`[${type}] ${option}`}</p>
+    <div className="relative w-full flex flex-col gap-4 md:flex-row justify-between border-b py-4">
+      <div className="order_event_info flex">
+        {/* Checkbox */}
+        <div className="self-center flex-shrink-0 mr-4 mt-1">
+          <input
+            type="checkbox"
+            value={order.id}
+            checked={isSelected}
+            onChange={() => onToggleSelect(order.id)}
+            className="peer hidden"
+          />
+          <div
+            className="w-5 h-5 rounded-sm border border-gray-400 flex items-center justify-center text-sm
+          peer-checked:bg-primary-500 peer-checked:text-white"
+          >
+            {isSelected && "✓"}
           </div>
-          <p className="text-sm text-neutral-500">張 x {quantity}</p>
+        </div>
+        {/* 活動圖片 */}
+        <div className="relative w-[25vw] max-w-[120px] aspect-[5/3] mr-4 rounded-md">
+          <Image
+            src={order.photo_url || "/event_id/event_intro_test.png"}
+            alt="訂單活動照片"
+            fill
+            className="object-cover w-full rounded-xl"
+          />
+        </div>
+
+        {/* Info */}
+        <div className="flex-1">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="font-bold text-base text-neutral-800">
+                {order.event_name}
+              </p>
+              {/* 加購項目 */}
+              <div className="addon flex flex-wrap gap-1 mt-1">
+                {order.event_addons.map((item, index) => (
+                  <span key={index} className="text-sm text-gray-400 mr-2">
+                    • {item.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Price & Actions */}
-      <div className="flex flex-col items-end justify-between ml-4 h-full">
-        <p className="font-bold text-black whitespace-nowrap">NT${price.toLocaleString()}</p>
-        <div className="flex space-x-2 text-gray-400 mt-2 text-xl">
-          <button title="收藏">
-            <i className="icon-[material-symbols--favorite-border]" />
-          </button>
-          <button title="刪除">
-            <i className="icon-[material-symbols--delete-outline]" />
-          </button>
+      <div className="flex items-center md:justify-between ml-4 gap-4 h-full">
+        <p className="text-sm text-neutral-500 whitespace-nowrap">
+          數量 x {order.quantity}
+        </p>
+        <p className="font-bold text-black whitespace-nowrap">
+          NT${order.total_price.toLocaleString()}
+        </p>
+        <div className="flex space-x-2 text-gray-400 text-xl">
+          <IconWrapper icon="material-symbols-light:favorite-outline" />
+          <IconWrapper icon="material-symbols:delete-outline-rounded" />
         </div>
       </div>
     </div>

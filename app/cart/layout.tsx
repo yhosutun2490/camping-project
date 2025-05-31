@@ -5,12 +5,14 @@ export default function CartLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="h-screen flex flex-col bg-primary-50">
+    <div className="cart_layout min-h-screen flex flex-col bg-primary-50">
       {/* 步驟列 */}
-      <CartSteps />
-
+      <div className="z-1 sticky top-0">
+          <CartSteps />
+      </div>
+    
       {/* 主區塊要可滾動 */}
-      <main className="flex-1 min-h-0 overflow-y-auto">{children}</main>
+      <main className="cart_page_content flex-1 min-h-0 px-[4%] sm:px-[10%] xl:px-[15%]">{children}</main>
     </div>
   );
 }
