@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import clsx from "clsx";
+import {scrollIntoElement} from "@/utils/scrollToView"
 
 type TabList = {
   id: string;
@@ -39,7 +40,7 @@ export default function TabListAnchor({ offset }: Props) {
     {
       id: "5",
       label: "行前提醒",
-      href: "#host-intro",
+      href: "#event-notice",
     },
   ];
 
@@ -55,22 +56,6 @@ export default function TabListAnchor({ offset }: Props) {
         containerId: "main-scroll-container",
         offset: dynamicOffset,
       });
-    }
-  }
-  function scrollIntoElement({
-    targetId,
-    containerId,
-    offset,
-  }: {
-    targetId: string;
-    containerId: string;
-    offset: number;
-  }) {
-    const el = document.getElementById(targetId);
-    const container = document.getElementById(containerId);
-    if (el && container) {
-      const y = el.offsetTop - offset + 40;
-      container.scrollTo({ top: y, behavior: "smooth" });
     }
   }
   return (

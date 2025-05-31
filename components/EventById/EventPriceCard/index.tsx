@@ -1,5 +1,7 @@
-"use client"
+"use client";
 import DiscountRate from "../EventPlanSelector/EventPlanCard/DiscountRate";
+import { scrollIntoElement } from "@/utils/scrollToView";
+
 type EventPriceCardProps = {
   price: number;
   unit?: string;
@@ -13,8 +15,15 @@ export default function EventPriceCard({
   discounts = [],
 }: EventPriceCardProps) {
  
-  function onSelectPlan() {
-    console.log("選擇方案被點擊");
+  function handleClickPlan() {
+    const isMobile = window.innerWidth < 1024;
+    const dynamicOffset = isMobile ? 52 : 90;
+
+    scrollIntoElement({
+      targetId: "plan",
+      containerId: "main-scroll-container",
+      offset: dynamicOffset,
+    });
   }
   return (
     <div className="border rounded-md p-4 w-full bg-white">
@@ -29,14 +38,14 @@ export default function EventPriceCard({
               key={discount}
               className="px-2 py-1 text-sm font-medium text-gray-700"
             >
-             <DiscountRate rate={discount}/>
+              <DiscountRate rate={discount} />
             </div>
           ))}
         </div>
       </div>
 
       <button
-        onClick={onSelectPlan}
+        onClick={handleClickPlan}
         className="w-full btn-primary text-white py-2 rounded-md text-center font-semibold"
       >
         選擇方案
