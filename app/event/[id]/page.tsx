@@ -146,7 +146,6 @@ export default async function EventByIdPage({
         <TabListAnchor />
       </div>
       <main
-        id="main-scroll-container"
         className="flex-1 px-[5%] md:px-[8%] 2xl:px-[15%] relative"
       >
         <div className="event_main_section min-h-screen pt-[40px] 2xl:pt-[80px] space-y-6">
