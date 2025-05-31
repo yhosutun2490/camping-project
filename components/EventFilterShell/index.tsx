@@ -136,7 +136,7 @@ export default function EventFilterShell({
   const rowCount = Math.ceil(filteredEvents.length / itemsPerRow);
 
   return (
-    <div className="h-screen flex flex-col bg-primary-50">
+    <div className="min-h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
       <div className="border-b border-zinc-300 py-2 px-4">
         <div className="hidden md:block">
@@ -151,14 +151,14 @@ export default function EventFilterShell({
       {/* ——— 主體區：左側 Filter + 右側 List ——— */}
       <div className="flex flex-1 min-h-0">
         {/* 左側 Filter */}
-        <aside className="hidden md:block w-[300px] py-6 px-4">
+        <aside className="hidden md:block w-[300px] h-full py-6 px-4">
           <div className="sticky top-6">
             <PriceRangeFilter />
           </div>
         </aside>
 
         {/* 右側列表 */}
-        <div className="flex-1 min-h-screen p-6">
+        <div className="flex-1 min-h-screen p-6 bg-primary-50">
           {filteredEvents.length === 0 && (
             <p className="text-xl text-primary-500 text-center">
               暫無匹配活動資料

@@ -138,16 +138,16 @@ export default async function EventByIdPage({
 
   // 3. 渲染活動資料 若無資料導回活動搜尋頁
   return (
-    <div className="bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
+    <div className="relative bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
-        className="tab-list top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
+        className="tab-list sticky top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
       flex items-center justify-between border-b-2 border-primary-500"
       >
         <TabListAnchor />
       </div>
       <main
         id="main-scroll-container"
-        className="h-[calc(100dvh-180px)] px-[5%] md:px-[8%] 2xl:px-[15%] relative overflow-y-auto"
+        className="flex-1 px-[5%] md:px-[8%] 2xl:px-[15%] relative"
       >
         <div className="event_main_section min-h-screen pt-[40px] 2xl:pt-[80px] space-y-6">
           {/* 1. 活動封面照 */}
@@ -186,7 +186,7 @@ export default async function EventByIdPage({
               />
             </section>
             <aside className="relative h-full">
-              <div className="hidden lg:block md:sticky md:top-5">
+              <div className="hidden md:block md:sticky md:top-[100px]">
                 {/* 2. 活動價格卡片 */}
                 <EventPriceCard
                   price={1000}
