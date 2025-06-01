@@ -1,39 +1,40 @@
 import Image from "next/image";
-export default function EventCoverGrid() {
+import BackgroundSlider from "@/components/BackgroundSlider";
+
+interface Props {
+  event_images: string[];
+}
+
+export default function EventCoverGrid({ event_images }: Props) {
   return (
-    <div id="total" className="event_cover_grid h-full grid grid-cols-2 grid-rows-2 gap-5 2xl:gap-10">
-      {/* 左側大圖：橫跨兩列 */}
-      <figure className="relative col-span-2 md:col-span-1 row-span-2 h-full">
-        <Image
-          src="/main/main_bg_top_3.jpg"
-          fill
-          sizes="100%"
-          alt="cover"
-          className="object-cover rounded-lg"
-        />
-      </figure>
+    <div id="total" className="w-full h-full">
+      {/* 桌機顯示 Grid，手機隱藏 */}
+      <div className="event_cover_grid hidden md:grid w-full h-screen grid-cols-2 grid-rows-2 gap-5 2xl:gap-10">
+        {event_images.map((src, index) => {
+          const isMainImage = index === 0;
+          return (
+            <figure
+              key={index}
+              className={`relative h-full ${
+                isMainImage ? "col-span-2 md:col-span-1 row-span-2" : "block"
+              }`}
+            >
+              <Image
+                src={src}
+                fill
+                sizes="100%"
+                alt={`cover-${index}`}
+                className="object-cover rounded-lg"
+              />
+            </figure>
+          );
+        })}
+      </div>
 
-      {/* 右上圖 */}
-      <figure className="hidden md:block relative h-full">
-        <Image
-          src="/main/main_bg_top_3.jpg"
-          fill
-          sizes="100%"
-          alt="cover"
-          className="object-cover rounded-lg"
-        />
-      </figure>
-
-      {/* 右下圖 */}
-      <figure className="hidden md:block relative h-full">
-        <Image
-          src="/main/main_bg_top_3.jpg"
-          fill
-          sizes="100%"
-          alt="cover"
-          className="object-cover rounded-lg"
-        />
-      </figure>
+      {/* 手機 Slider 滿版 */}
+      <div className="md:hidden relative left-1/2 right-1/2 -translate-x-1/2 w-screen max-w-none">
+        <BackgroundSlider slides={event_images} />
+      </div>
     </div>
   );
 }

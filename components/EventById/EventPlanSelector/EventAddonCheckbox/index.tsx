@@ -1,5 +1,6 @@
 "use client";
 import { useFormContext, Controller } from "react-hook-form";
+import CheckboxStyle from "@/components/CheckBoxStyle";
 
 // 加購選項資料
 export type AddonItem = {
@@ -50,24 +51,16 @@ export default function EventAddonCheckbox({ name, options }: Props) {
             }
           };
           return (
-            <div className="flex flex-wrap gap-2 select-none">
+            <div className="flex flex-wrap gap-6 select-none">
               {options.map((option) => {
                 return (
                   <div className="addon_option" key={option.id}>
-                    <label className="flex items-center gap-2 text-lg cursor-pointer">
-                      <input
-                        type="checkbox"
-                        value={option.id}
-                        checked={checkItemSelected(selected,option)}
+                    <label className="flex items-center text-lg cursor-pointer">
+                      <CheckboxStyle
+                        checked={checkItemSelected(selected, option)}
                         onChange={() => handleSelectCheckbox(option)}
-                        className="peer hidden"
+                        value={option.id}
                       />
-                      <div
-                        className="w-5 h-5 rounded-sm border border-gray-400 flex items-center justify-center text-sm
-                        peer-checked:bg-primary-500 peer-checked:text-white"
-                      >
-                        {checkItemSelected(selected,option) && "✓"}
-                      </div>
                       <span className="heading-6 space-x-2">
                         <span>{option.name} </span>
                         <span className="text-primary-500">NT$ {option.price}元</span>

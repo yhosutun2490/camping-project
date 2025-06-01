@@ -75,10 +75,10 @@ export default function TabListAnchor({ offset }: Props) {
               lg:after:w-[30px] 
               lg:after:h-[15px] 
               after:rounded-b-full 
-              after:bg-primary-50 
+              after:bg-white
               after:border-2
               after:border-primary-500
-              after:border-t-primary-50
+              after:border-t-transparent
               after:z-10`
               : "text-neutral-500 hover:text-primary-700"
           )}

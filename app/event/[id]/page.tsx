@@ -10,6 +10,12 @@ import EventIntroduction from "@/components/EventById/EventIntroduction";
 import EventNotice from "@/components/EventById/EventNotice";
 
 // 假資料
+
+const event_images = [
+  "/main/main_bg_top_1.jpg",
+  "/main/main_bg_top_2.jpg",
+  "/main/main_bg_top_3.jpg",
+];
 const sampleComment = [
   {
     userInfo: {
@@ -145,15 +151,13 @@ export default async function EventByIdPage({
       >
         <TabListAnchor />
       </div>
-      <main
-        className="flex-1 px-[5%] md:px-[8%] 2xl:px-[15%] relative"
-      >
-        <div className="event_main_section min-h-screen pt-[40px] 2xl:pt-[80px] space-y-6">
+      <main className="flex-1 px-[5%] md:px-[8%] 2xl:px-[15%] relative bg-white">
+        <div className="event_main_section min-h-screen md:py-[40px] 2xl:py-[80px] pace-y-6">
           {/* 1. 活動封面照 */}
-          <div className="w-full h-[200px] md:h-[400px] 2xl:h-[636px]">
-            <EventCoverGrid />
+          <div className="w-full">
+            <EventCoverGrid event_images={event_images}/>
           </div>
-          <div className="mt-4 min-h-0 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-10">
+          <div className="mt-4 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10">
             {/* 活動主要資訊區塊 */}
             <section id="activity-intro" className="space-y-6 xl:space-y-10">
               {/* 2. 活動價格卡片(手機) */}
@@ -180,12 +184,10 @@ export default async function EventByIdPage({
               並且帶領大家一同了解阿美族的故事，我們有的很簡單，有山、有海、有草地、有星空、有陽光，
               有原住民帥哥營主兄弟黨跟你聊天，還很多小米酒，來到這裡！記得放下手機、放下煩憂、放下工作、好好享受，花蓮豐濱海放生活`}
               />
-              <EventNotice
-                notices={notices}
-              />
+              <EventNotice notices={notices} />
             </section>
             <aside className="relative h-full">
-              <div className="hidden md:block md:sticky md:top-[100px]">
+              <div className="hidden lg:block md:sticky md:top-[100px]">
                 {/* 2. 活動價格卡片 */}
                 <EventPriceCard
                   price={1000}

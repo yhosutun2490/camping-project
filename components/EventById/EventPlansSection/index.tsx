@@ -279,19 +279,7 @@ export default function EventPlansSection({
       addonBox: item?.eventPlanAddonBox
     };
   });
-  // 選擇方案的加購選項
-  // const currentAddonOptions: AddonItem[] = useMemo(() => {
-  //   return (
-  //     data
-  //       .find((item) => item.id === selectedPlanId)
-  //       ?.eventPlanAddonBox.map((item) => ({
-  //         id: item.id,
-  //         label: item.name,
-  //         value: item.name,
-  //         price: item.price,
-  //       })) || []
-  //   );
-  // }, [selectedPlanId, data]);
+  
 
   const onSubmit = (data: FormType) => {
     console.log("送出資料", data); // 看使用者勾了哪些加購項目
@@ -306,12 +294,6 @@ export default function EventPlansSection({
         >
           <p className="heading-2">選擇方案</p>
           <EventPlanSelector name="plan" plans={planData} />
-          {/* <EventAddonCheckbox name="plan_addons" options={currentAddonOptions}/> */}
-          {/* <p className="text-2xl">您的總金額為$ {totalPrice}</p> */}
-          {/* <div className="flex w-[60%] mx-auto btn_wrap justify-between">
-            <button type='submit' className="btn-primary">立即報名</button>
-            <button className="btn-primary">加入購物車</button>
-          </div> */}
         </div>
       </form>
     </FormProvider>

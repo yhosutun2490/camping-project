@@ -46,10 +46,10 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   return (
     <div
       className={clsx(`event_plan_card
-        p-6 rounded-2xl grid gap-4 grid-cols-1 bg-neutral-50`)}
+        p-4 md:p-6 rounded-2xl grid gap-4 grid-cols-1 bg-neutral-50`)}
     >
       {/*方案詳細資訊*/}
-      <div className="plan_info space-y-2">
+      <div className="plan_info space-y-6 pb-6 border-b-1 border-primary-300">
         <p className="title heading-3">{title}</p>
         <div className="register_end_date flex items-center gap-2 text-lg font-semibold">
           <Icon
@@ -66,40 +66,47 @@ export default function EventPlanCard(props: EventPlanCardProps) {
           ))}
         </div>
       </div>
-
-      {/*方案價格區*/}
-      <div className="select_btn_wrap rounded-xl bg-white py-6 px-4 flex gap-2 justify-between">
-        <div className="discount_info flex items-center space-y-2 space-x-4">
-          <DiscountRate rate={discountedRate}/>
-          <div className="discount text-primary-500 heading-3">
-            {unit} {price?.toLocaleString() || "0"}
-          </div>
-          <div className="original text-gray-500 text-base line-through">
-            {unit} {originalPrice?.toLocaleString() || "0"}
-          </div>
-        </div>
-      </div>
       {/*加購選擇區*/}
       <EventAddonCheckbox name="plan_addons" options={data.addonBox} />
-      <div className="btn_wrap w-[50%] mx-auto flex justify-between">
-         <button
-          className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
-          onClick={(e) => {
-            e.preventDefault();
-            onSelect(id);
-          }}
-        >
-         直接報名
-        </button>
-        <button
-          className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
-          onClick={(e) => {
-            e.preventDefault();
-            onSelect(id);
-          }}
-        >
-          加入購物車
-        </button>
+
+      {/*方案價格區*/}
+      <div className="select_btn_wrap rounded-2xl bg-white py-6 px-4 
+      flex flex-col md:flex-row flex-wrap gap-2 justify-between items-start">
+        <div className="discount_info flex items-center space-y-2 space-x-4">
+          <DiscountRate rate={discountedRate} />
+          <div className="event_price flex gap-2 items-start">
+            <p className="discount text-primary-500 heading-4 md:heading-3">
+              {unit} {price?.toLocaleString() || "0"}
+            </p>
+            <p className="original text-gray-500 text-base line-through">
+              {unit} {originalPrice?.toLocaleString() || "0"}
+              </p>
+          </div>
+        
+        </div>
+
+        <div className="btn_wrap md:ml-auto flex gap-4 justify-center lg:justify-between">
+          <button
+            className="cursor-pointer border-2 border-primary-700 bg-white 
+            text-primary-700 py-2 px-4 rounded-md min-w-[100px] h-[40px]
+            leading-[20px] hover:bg-primary-300"
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(id);
+            }}
+          >
+            直接報名
+          </button>
+          <button
+            className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
+            onClick={(e) => {
+              e.preventDefault();
+              onSelect(id);
+            }}
+          >
+            加入購物車
+          </button>
+        </div>
       </div>
     </div>
   );
