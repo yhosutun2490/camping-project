@@ -10,9 +10,10 @@ import { ErrorResponse } from "@/types/api/response";
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ): Promise<NextResponse<UploadEventImagesResponse | ErrorResponse>> {
-  const { eventId } = params;
+  // 在 Next.js App Router 中，params 是一個 Promise，需要先 await
+  const { eventId } = await params;
   
   // 檢查活動 ID 是否存在
   if (!eventId) {

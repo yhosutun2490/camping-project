@@ -22,9 +22,11 @@ interface EventInfoFormProps {
   onNextStep: () => void;
   /** 返回上一步 */
   onPrevStep?: () => void;
+  /** 活動建立後的回調函式，提供活動 ID */
+  onEventCreated?: (id: string) => void;
 }
 
-function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
+function EventInfoForm({ onNextStep, onPrevStep, onEventCreated }: EventInfoFormProps) {
   // 使用 useEventTags 取得活動標籤
   const {
     data: eventTagsResponse,
@@ -130,6 +132,11 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
 
       // 取得活動ID，並設定為目前ID
       const eventId = createResult.data.event.id;
+      
+      // 通知父元件活動已建立並傳遞 ID
+      if (onEventCreated) {
+        onEventCreated(eventId);
+      }
 
       // 步驟2: 準備更新資料
       const updateData = prepareUpdateNoticesTagsData(eventInfo);

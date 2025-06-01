@@ -10,6 +10,9 @@ import UploadEventImageForm from './UploadEventImageForm'
 import PlanAccordion from './PlanAccordion'
 
 const CreateActivityForm: React.FC = () => {
+  // 添加 eventId 狀態
+  const [eventId, setEventId] = useState<string | null>(null)
+
   const methods = useForm<FormData>({
     resolver: zodResolver(FormDataSchema),
     mode: 'onChange',
@@ -85,15 +88,32 @@ const CreateActivityForm: React.FC = () => {
           completedSteps={undefined}
         />
         <div className="mt-4">
-          {currentStep === 1 && <EventInfoForm onNextStep={handleNextStep} />}
+          {currentStep === 1 && (
+            <EventInfoForm 
+              onNextStep={handleNextStep} 
+              onEventCreated={setEventId} 
+            />
+          )}
           {currentStep === 2 && (
-            <UploadCoverForm onNextStep={handleNextStep} onPrevStep={handlePrevStep} />
+            <UploadCoverForm 
+              onNextStep={handleNextStep} 
+              onPrevStep={handlePrevStep}
+              eventId={eventId} 
+            />
           )}
           {currentStep === 3 && (
-            <UploadEventImageForm onNextStep={handleNextStep} onPrevStep={handlePrevStep} />
+            <UploadEventImageForm 
+              onNextStep={handleNextStep} 
+              onPrevStep={handlePrevStep}
+              eventId={eventId}
+            />
           )}
           {currentStep === 4 && (
-            <PlanAccordion onPrevStep={handlePrevStep} onSubmit={methods.handleSubmit(data => console.log(data))} />
+            <PlanAccordion 
+              onPrevStep={handlePrevStep} 
+              onSubmit={methods.handleSubmit(data => console.log(data))}
+              eventId={eventId} 
+            />
           )}
         </div>
       </div>
