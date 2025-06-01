@@ -1,22 +1,53 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import FormField from '../../../components/form/FormField';
 import FormInput from '../../../components/form/FormInput';
 import FormNumberInput from '../../../components/form/FormNumberInput';
-import FormRadioGroup from '../../../components/form/FormRadioGroup';
 import FormSwitch from '../../../components/form/FormSwitch';
 import FormDynamicInputs from '../../../components/form/FormDynamicInputs';
+import { useEventTags } from '@/swr/meta/useEventTags';
+import { useCreateEvent } from '@/swr/events/useCreateEvent';
+import { useUpdateEventNoticesTags } from '@/swr/events/useUpdateEventNoticesTags';
+import {
+  CreateEventRequest,
+  UpdateEventNoticesTagsRequest,
+  EventNotice,
+} from '@/types/api/events';
+import toast from 'react-hot-toast';
 
 interface EventInfoFormProps {
   /** 下一步 */
   onNextStep: () => void;
   /** 返回上一步 */
   onPrevStep?: () => void;
+  /** 活動建立後的回調函式，提供活動 ID */
+  onEventCreated?: (id: string) => void;
 }
 
-function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
+function EventInfoForm({ onNextStep, onPrevStep, onEventCreated }: EventInfoFormProps) {
+  // 使用 useEventTags 取得活動標籤
+  const {
+    data: eventTagsResponse,
+    error: eventTagsError,
+    isLoading: eventTagsLoading,
+  } = useEventTags();
+
+  // API 操作狀態管理
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 初始化 API Hooks
+  const { trigger: triggerCreateEvent, isMutating: isCreating } =
+    useCreateEvent();
+  const { trigger: triggerUpdateEventNoticesTags, isMutating: isUpdating } =
+    useUpdateEventNoticesTags();
+
+  // 如果標籤載入錯誤，直接在渲染時顯示錯誤訊息
+  if (eventTagsError && !eventTagsLoading) {
+    toast.error('無法載入活動標籤，請稍後再試', { id: 'event-tags-error' });
+  }
+
   const {
     register,
     getValues,
@@ -32,21 +63,97 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
   // 產生分鐘選項：00, 15, 30, 45
   const minutes = ['00', '15', '30', '45'];
 
+  // 處理表單資料轉換為 API 請求格式
+  const prepareCreateEventData = (
+    formData: FormData['eventInfo']
+  ): CreateEventRequest => {
+    // 組合日期和時間為完整ISO格式
+    const startDateTime = `${formData.startDate}T${formData.startTime}:00`;
+    const endDateTime = `${formData.endDate}T${formData.endTime}:00`;
+
+    return {
+      title: formData.title,
+      address: formData.address,
+      description: formData.description,
+      start_time: startDateTime,
+      end_time: endDateTime,
+      max_participants: formData.max_participants,
+      cancel_policy: formData.cancel_policy ? '15 天前可免費取消' : '不可取消',
+      registration_open_time: formData.registration_open_time,
+      registration_close_time: formData.registration_close_time,
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+    };
+  };
+
+  // 處理標籤和通知資料轉換為 API 請求格式
+  const prepareUpdateNoticesTagsData = (
+    formData: FormData['eventInfo']
+  ): UpdateEventNoticesTagsRequest => {
+    // 標籤ID已經是字串，直接使用
+    const tagIds = formData.tags;
+
+    // 處理通知資料
+    const notices: EventNotice[] = Array.isArray(formData.event_notifications)
+      ? formData.event_notifications.map((content) => ({
+          type: 'event', // 固定類型為 event
+          content,
+        }))
+      : [];
+
+    return {
+      tagIds,
+      notices,
+    };
+  };
+
   // 處理下一步按鈕點擊
   const handleNextStep = async () => {
     // 先觸發表單驗證，僅驗證 eventInfo 欄位
     const isValid = await trigger('eventInfo');
 
-    // 印出當前表單狀態與驗證結果
-    console.log('繼續填寫按鈕點擊，表單狀態:', {
-      表單資料: getValues(),
-      驗證結果: isValid,
-      錯誤訊息: errors,
-    });
+    if (!isValid) {
+      return;
+    }
 
-    // 如果驗證通過，才進行下一步
-    if (isValid) {
-      onNextStep();
+    try {
+      // 開始提交，設定載入狀態
+      setIsSubmitting(true);
+
+      const eventInfo = getValues('eventInfo');
+
+      // 步驟1: 建立活動
+      const createEventData = prepareCreateEventData(eventInfo);
+      const createResult = await triggerCreateEvent(createEventData);
+
+      if (!createResult?.data?.event?.id) {
+        throw new Error('活動建立失敗，未返回活動ID');
+      }
+
+      // 取得活動ID，並設定為目前ID
+      const eventId = createResult.data.event.id;
+      
+      // 通知父元件活動已建立並傳遞 ID
+      if (onEventCreated) {
+        onEventCreated(eventId);
+      }
+
+      // 步驟2: 準備更新資料
+      const updateData = prepareUpdateNoticesTagsData(eventInfo);
+
+      // 這裡我們觸發更新操作，同時傳入最新的 eventId
+      const updateResult = await triggerUpdateEventNoticesTags(
+        updateData,
+        eventId
+      );
+
+      // 如果更新成功，進入下一步
+      if (updateResult) {
+        onNextStep();
+      }
+    } catch (error) {
+      console.error('表單提交錯誤:', error);
+      setIsSubmitting(false);
     }
   };
 
@@ -90,29 +197,59 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
               {/* 活動地點 */}
               <FormField
                 label="活動地點"
-                name="eventInfo.location"
+                name="eventInfo.address"
                 required
-                error={errors.eventInfo?.location?.message}
+                error={errors.eventInfo?.address?.message}
               >
                 <FormInput
-                  name="eventInfo.location"
+                  name="eventInfo.address"
                   placeholder="請輸入活動地點（最多200字）"
                 />
+              </FormField>
+
+              {/* 經度座標 */}
+              <FormField
+                label="經度"
+                name="eventInfo.longitude"
+                required
+                error={errors.eventInfo?.longitude?.message}
+              >
+                <FormNumberInput name="eventInfo.longitude" step={0.000001} />
+              </FormField>
+
+              {/* 緯度座標 */}
+              <FormField
+                label="緯度"
+                name="eventInfo.latitude"
+                required
+                error={errors.eventInfo?.latitude?.message}
+              >
+                <FormNumberInput name="eventInfo.latitude" step={0.000001} />
               </FormField>
 
               {/* 上限人數 */}
               <FormField
                 label="上限人數"
-                name="eventInfo.maxParticipants"
+                name="eventInfo.max_participants"
                 required
-                error={errors.eventInfo?.maxParticipants?.message}
+                error={errors.eventInfo?.max_participants?.message}
               >
                 <FormNumberInput
-                  name="eventInfo.maxParticipants"
+                  name="eventInfo.max_participants"
                   min={1}
                   max={10000}
                   step={1}
                 />
+              </FormField>
+
+              {/* 活動價格 */}
+              <FormField
+                label="活動價格"
+                name="eventInfo.price"
+                required
+                error={errors.eventInfo?.price?.message}
+              >
+                <FormNumberInput name="eventInfo.price" min={0} />
               </FormField>
             </div>
           </div>
@@ -251,6 +388,32 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
                   </select>
                 </div>
               </FormField>
+
+              <FormField
+                label="報名開始時間"
+                name="eventInfo.registration_open_time"
+                required
+                error={errors.eventInfo?.registration_open_time?.message}
+              >
+                <input
+                  type="datetime-local"
+                  className="input input-bordered w-full"
+                  {...register('eventInfo.registration_open_time')}
+                />
+              </FormField>
+
+              <FormField
+                label="報名截止時間"
+                name="eventInfo.registration_close_time"
+                required
+                error={errors.eventInfo?.registration_close_time?.message}
+              >
+                <input
+                  type="datetime-local"
+                  className="input input-bordered w-full"
+                  {...register('eventInfo.registration_close_time')}
+                />
+              </FormField>
             </div>
           </div>
         </div>
@@ -283,17 +446,56 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
               error={errors.eventInfo?.tags?.message}
             >
               <div className="bg-base-100 p-3 rounded-lg">
-                <FormRadioGroup
-                  name="eventInfo.tags"
-                  options={[
-                    { value: '寵物友善', label: '寵物友善' },
-                    { value: '閤家同樂', label: '閤家同樂' },
-                    { value: '新手友善', label: '新手友善' },
-                    { value: '進階挑戰', label: '進階挑戰' },
-                    { value: '秘境探索', label: '秘境探索' },
-                    { value: '奢豪露營', label: '奢豪露營' },
-                  ]}
-                />
+                <div className="flex flex-wrap gap-2">
+                  {eventTagsLoading ? (
+                    <div className="w-full flex justify-center py-2">
+                      <span className="loading loading-spinner loading-md"></span>
+                      <span className="ml-2">載入標籤中...</span>
+                    </div>
+                  ) : eventTagsError ? (
+                    <div className="w-full text-error text-center py-2">
+                      無法載入標籤，請重新整理頁面
+                    </div>
+                  ) : (
+                    eventTagsResponse?.data?.eventTags.map((tag) => (
+                      <label
+                        key={tag.id}
+                        className="flex items-center space-x-2 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          className="checkbox checkbox-primary"
+                          value={tag.id}
+                          checked={(getValues('eventInfo.tags') || []).includes(
+                            tag.id
+                          )}
+                          onChange={(e) => {
+                            const currentTags =
+                              getValues('eventInfo.tags') || [];
+                            const tagId = e.target.value; // 直接使用字串值
+
+                            if (e.target.checked) {
+                              // 新增標籤ID到陣列
+                              setValue('eventInfo.tags', [
+                                ...currentTags,
+                                tagId,
+                              ]);
+                            } else {
+                              // 從陣列中移除標籤ID
+                              setValue(
+                                'eventInfo.tags',
+                                currentTags.filter((id) => id !== tagId)
+                              );
+                            }
+
+                            trigger('eventInfo.tags');
+                          }}
+                        />
+                        <span>{tag.name}</span>
+                      </label>
+                    ))
+                  )}
+                </div>
               </div>
             </FormField>
           </div>
@@ -307,12 +509,12 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
             {/* 取消政策 */}
             <FormField
               label="取消政策"
-              name="eventInfo.cancelPolicy"
-              error={errors.eventInfo?.cancelPolicy?.message}
+              name="eventInfo.cancel_policy"
+              error={errors.eventInfo?.cancel_policy?.message}
             >
               <div className="bg-base-100 p-3 rounded-lg">
                 <FormSwitch
-                  name="eventInfo.cancelPolicy"
+                  name="eventInfo.cancel_policy"
                   label="15 天前可免費取消"
                 />
               </div>
@@ -321,8 +523,8 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
             {/* 行前通知 */}
             <FormField
               label="行前通知（選填）"
-              name="eventInfo.notifications"
-              error={errors.eventInfo?.notifications?.message}
+              name="eventInfo.event_notifications"
+              error={errors.eventInfo?.event_notifications?.message}
             >
               <div className="bg-base-100 p-3 rounded-lg">
                 <FormDynamicInputs
@@ -350,8 +552,18 @@ function EventInfoForm({ onNextStep, onPrevStep }: EventInfoFormProps) {
               type="button"
               className="btn btn-primary px-8"
               onClick={handleNextStep}
+              disabled={
+                isSubmitting || eventTagsLoading || isCreating || isUpdating
+              }
             >
-              繼續填寫，下一步
+              {isSubmitting || isCreating || isUpdating ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  <span className="ml-2">處理中...</span>
+                </>
+              ) : (
+                '繼續填寫，下一步'
+              )}
             </button>
           </div>
         </div>

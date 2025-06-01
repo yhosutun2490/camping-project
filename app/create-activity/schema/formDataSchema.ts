@@ -5,7 +5,11 @@ export const EventInfoSchema = z
   .object({
     title: z.string().min(1, '請輸入活動主題').max(100, '最多100字'),
     organizer: z.string().min(1, '請輸入主辦方名稱').max(50, '最多50字'),
-    location: z.string().min(1, '請輸入活動地點').max(200, '最多200字'),
+    // 更改為 address
+    address: z.string().min(1, '請輸入活動地點').max(200, '最多200字'),
+    // 新增經緯度
+    longitude: z.number().refine(lon => lon >= -180 && lon <= 180, '經度範圍應在 -180 到 180 之間'),
+    latitude: z.number().refine(lat => lat >= -90 && lat <= 90, '緯度範圍應在 -90 到 90 之間'),
     startDate: z
       .string()
       .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
@@ -18,18 +22,20 @@ export const EventInfoSchema = z
     endTime: z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
-    maxParticipants: z.number().min(1, '至少1人').max(10000, '最多10000人'),
+    // 新增報名時間
+    registration_open_time: z.string(),
+    registration_close_time: z.string(),
+    // 改為 max_participants
+    max_participants: z.number().min(1, '至少1人').max(10000, '最多10000人'),
+    // 新增價格
+    price: z.number().min(0, '價格不可為負'),
     description: z.string().min(1, '請輸入活動描述').max(5000, '最多5000字'),
-    tags: z.enum([
-      '寵物友善',
-      '閤家同樂',
-      '新手友善',
-      '進階挑戰',
-      '秘境探索',
-      '奢豪露營',
-    ]),
-    cancelPolicy: z.boolean(),
-    notifications: z.array(z.string().min(5, '至少5字')).optional(),
+    // 改為多選字串陣列
+    tags: z.array(z.string()).min(1, '請至少選擇一個標籤'),
+    // 改為 cancel_policy
+    cancel_policy: z.boolean(),
+    // 改為 event_notifications
+    event_notifications: z.array(z.string().min(5, '至少5字')).optional(),
   })
   .refine((data) => data.endDate >= data.startDate, {
     message: '結束日期不可早於開始日期',

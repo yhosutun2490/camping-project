@@ -5,21 +5,34 @@ import { FormData } from '../schema/formDataSchema';
 import FileUploader from '../../../components/form/FileUploader';
 import ImagePreview from '../../../components/form/ImagePreview';
 import FormField from '../../../components/form/FormField';
+import { useUploadEventImages } from '@/swr/events/useUploadEventImages';
+import toast from 'react-hot-toast';
+import { EventImageType } from '@/types/api/events';
 
 interface UploadCoverFormProps {
   /** 下一步 */
   onNextStep: () => void;
   /** 返回上一步 */
   onPrevStep: () => void;
+  /** 活動 ID */
+  eventId: string | null;
 }
 
-function UploadCoverForm({ onNextStep, onPrevStep }: UploadCoverFormProps) {
+function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormProps) {
   const {
     setValue,
     getValues,
     trigger,
     formState: { errors },
   } = useFormContext<FormData>();
+
+  // 整合 useUploadEventImages hook
+  // 使用空字符串作為預設值，避免條件式呼叫 Hook
+  const hookParams = eventId || '';
+  const { trigger: uploadImages, isMutating: isUploading } = useUploadEventImages(
+    hookParams, 
+    'cover' as EventImageType
+  );
 
   // 本地狀態管理上傳的檔案
   const [coverFiles, setCoverFiles] = useState<File[]>(() => {
@@ -36,13 +49,17 @@ function UploadCoverForm({ onNextStep, onPrevStep }: UploadCoverFormProps) {
     return [];
   });
 
-  // 處理檔案選擇
-  const handleFileSelect = (file: File) => {
-    if (coverFiles.length >= 3) {
-      return; // 已達到最大上限
+  // 處理多檔案選擇（暫存到本地狀態）
+  const handleMultipleFileSelect = (files: File[]) => {
+    // 檢查總數是否會超過限制
+    const totalFiles = coverFiles.length + files.length;
+    if (totalFiles > 3) {
+      toast.error(`最多只能上傳 3 張封面圖片，目前已有 ${coverFiles.length} 張，只能再新增 ${3 - coverFiles.length} 張`);
+      return;
     }
 
-    const newFiles = [...coverFiles, file];
+    // 暫存到本地狀態，等待下一步時才上傳
+    const newFiles = [...coverFiles, ...files];
     setCoverFiles(newFiles);
     setValue('coverImages', newFiles);
     trigger('coverImages'); // 觸發驗證
@@ -61,8 +78,38 @@ function UploadCoverForm({ onNextStep, onPrevStep }: UploadCoverFormProps) {
   const handleNextStep = async () => {
     // 先觸發驗證
     const isValid = await trigger('coverImages');
-    if (isValid) {
-      onNextStep();
+    if (!isValid) {
+      return; // 驗證失敗，不繼續執行
+    }
+    
+    // 檢查是否有圖片
+    if (coverFiles.length === 0) {
+      toast.error('請至少上傳一張封面圖片');
+      return;
+    }
+    
+    // 檢查 eventId 是否存在
+    if (!eventId) {
+      toast.error('無法上傳圖片：活動 ID 未設定');
+      return;
+    }
+    
+    try {
+      // 上傳圖片到伺服器
+      const result = await uploadImages({ 
+        files: coverFiles 
+      });
+      
+      if (result && result.data) {
+        // 顯示成功訊息
+        toast.success('封面圖片上傳成功！');
+        
+        // 上傳成功後進入下一步
+        onNextStep();
+      }
+    } catch (error) {
+      console.error('圖片上傳失敗:', error);
+      toast.error('圖片上傳失敗，請重試');
     }
   };
 
@@ -84,22 +131,35 @@ function UploadCoverForm({ onNextStep, onPrevStep }: UploadCoverFormProps) {
                 <FileUploader
                   accept="image/jpeg, image/png, image/webp"
                   maxSize={4 * 1024 * 1024} // 4MB
-                  onFileSelect={handleFileSelect}
+                  onMultipleFileSelect={handleMultipleFileSelect}
                   error={errors.coverImages?.message as string}
+                  disabled={isUploading} // 上傳中時禁用
+                  multiple={true}
+                  maxFiles={Math.max(1, 3 - coverFiles.length)} // 確保至少為 1，避免 0 或負數
                 />
+                {isUploading && (
+                  <div className="flex items-center gap-2 mt-2 text-sm text-primary">
+                    <span className="loading loading-spinner loading-sm"></span>
+                    <span>正在上傳圖片...</span>
+                  </div>
+                )}
               </div>
             )}
 
             {/* 上傳提示 */}
             <div className="text-sm text-base-content/70 mb-6">
-              <p>最多新增3張活動封面，至少需要上傳1張</p>
+              <p>
+                最多新增3張活動封面，至少需要上傳1張
+                {coverFiles.length > 0 && ` (目前已選擇 ${coverFiles.length} 張，還可選擇 ${3 - coverFiles.length} 張)`}
+              </p>
               <p>建議尺寸：1080 x 540 pixel，格式：JPEG、PNG、WebP</p>
+              <p className="text-primary mt-1">💡 支援一次選擇多張圖片，點擊「下一步」時上傳</p>
             </div>
 
-            {/* 已上傳圖片預覽 */}
+            {/* 已選擇圖片預覽 */}
             {coverFiles.length > 0 && (
               <div>
-                <h3 className="text-lg font-medium mb-3">已上傳的封面圖片</h3>
+                <h3 className="text-lg font-medium mb-3">已選擇的封面圖片</h3>
                 <div className="flex flex-wrap gap-4">
                   {coverFiles.map((file, index) => (
                     <ImagePreview
@@ -130,8 +190,9 @@ function UploadCoverForm({ onNextStep, onPrevStep }: UploadCoverFormProps) {
             type="button"
             className="btn btn-primary px-8"
             onClick={handleNextStep}
+            disabled={coverFiles.length === 0 || isUploading} // 沒有圖片或上傳中時禁用
           >
-            繼續填寫，下一步
+            {isUploading ? '上傳中...' : '上傳圖片並繼續下一步'}
           </button>
         </div>
       </div>
