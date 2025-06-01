@@ -39,7 +39,7 @@ const CreateActivityForm: React.FC = () => {
       coverImages: [],
       eventImages: [],
       plans: [
-        { title: '', price: 0, discountPrice: undefined, content: [], addOns: [] }
+        { title: '基本方案', price: 100, discountPrice: undefined, content: [], addOns: [] }
       ],
     },
   })
@@ -111,7 +111,6 @@ const CreateActivityForm: React.FC = () => {
           {currentStep === 4 && (
             <PlanAccordion 
               onPrevStep={handlePrevStep} 
-              onSubmit={methods.handleSubmit(data => console.log(data))}
               eventId={eventId} 
             />
           )}

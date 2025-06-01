@@ -106,3 +106,39 @@ export type UpdateEventNoticesTagsResponse = SuccessResponse<{
   notices: EventNotice[];
   tags: EventTag[];
 }>;
+
+// 活動方案加購項目介面
+export interface EventPlanAddon {
+  name: string;
+  price: number;
+}
+
+// 活動方案介面（請求用）
+export interface EventPlanRequest {
+  title: string;
+  price: number;
+  discounted_price?: number;
+  contents: string[];
+  addons: EventPlanAddon[];
+}
+
+// 活動方案介面（回應用）
+export interface EventPlan {
+  id: string;
+  title: string;
+  price: number;
+  discounted_price: number | null;
+  contents: string[];
+  addons: EventPlanAddon[];
+}
+
+// 建立活動方案請求參數介面
+export interface CreateEventPlansRequest {
+  plans: EventPlanRequest[];
+}
+
+// 建立活動方案回應介面
+export type CreateEventPlansResponse = SuccessResponse<{
+  event_info_id: string;
+  plans: EventPlan[];
+}>;
