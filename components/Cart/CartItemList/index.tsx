@@ -10,9 +10,20 @@ interface Props {
   orders: Order[] | [];
 }
 export default function CartItemList({ orders }: Props) {
-  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
-  const totalPrice = orders?.reduce((sum, item) => sum + item.total_price, 0);
+  const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
+  const totalPrice = selectedOrders?.reduce((sum, item) => sum + item.total_price, 0);
   const hasOrderList = orders?.length > 0
+
+
+  function handleOnToggleSelect(order:Order):void {
+    // 如果訂單已經存在需從清單移除，否則加入清單中
+    const hasOrderInSelected = selectedOrders.find(item=>item.id === order.id)
+    if (hasOrderInSelected) {
+      setSelectedOrders(prev=> prev.filter(order=>order.id !== hasOrderInSelected.id ))
+    } else {
+      setSelectedOrders([...selectedOrders,order])
+    }
+  }
 
   return (
     <div className="bg-white rounded-md p-6 shadow">
@@ -24,12 +35,8 @@ export default function CartItemList({ orders }: Props) {
           <CartItem
             key={item.id}
             order={item}
-            isSelected={selectedOrders.includes(item.id)}
-            onToggleSelect={(id) =>
-              setSelectedOrders((prev) =>
-                prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
-              )
-            }
+            isSelected={selectedOrders.some(selected => selected.id === item.id)}
+            onToggleSelect={(order) => handleOnToggleSelect(order)}
           />
         ))}
 
@@ -45,7 +52,7 @@ export default function CartItemList({ orders }: Props) {
                 if (selectedOrders.length === orders.length) {
                   setSelectedOrders([]);
                 } else {
-                  setSelectedOrders(orders.map((item) => item.id));
+                  setSelectedOrders(orders);
                 }
               }}
             />
@@ -56,8 +63,8 @@ export default function CartItemList({ orders }: Props) {
 
           <div className="text-right mr-4 md:ml-auto">
             <p className="text-sm text-gray-500">
-              商品合計{" "}
-              <span className="text-lg font-bold text-black ml-2">
+              {selectedOrders.length?? "0"} 件商品合計
+              <span className="heading-3 ml-2">
                 NT${totalPrice.toLocaleString()}
               </span>
             </p>

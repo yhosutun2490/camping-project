@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
+import CheckboxStyle from "@/components/CheckBoxStyle";
 
 type EventAddon = {
   name: string;
@@ -24,7 +25,7 @@ export type Order = {
 type CartItemProps = {
   order: Order;
   isSelected: boolean;
-  onToggleSelect: (id: string) => void;
+  onToggleSelect: (order:Order) => void;
 };
 
 export default function CartItem({
@@ -37,19 +38,11 @@ export default function CartItem({
       <div className="order_event_info flex">
         {/* Checkbox */}
         <div className="self-center flex-shrink-0 mr-4 mt-1">
-          <input
-            type="checkbox"
+          <CheckboxStyle
             value={order.id}
             checked={isSelected}
-            onChange={() => onToggleSelect(order.id)}
-            className="peer hidden"
+            onChange={() => onToggleSelect(order)}
           />
-          <div
-            className="w-5 h-5 rounded-sm border border-gray-400 flex items-center justify-center text-sm
-          peer-checked:bg-primary-500 peer-checked:text-white"
-          >
-            {isSelected && "✓"}
-          </div>
         </div>
         {/* 活動圖片 */}
         <div className="relative w-[25vw] max-w-[120px] aspect-[5/3] mr-4 rounded-md">
