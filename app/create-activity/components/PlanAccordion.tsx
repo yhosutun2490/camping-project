@@ -113,6 +113,7 @@ function PlanAccordion({ onPrevStep, onSubmit, eventId }: PlanAccordionProps) {
         .map((key) => parseInt(key))
         .filter((index) => !isNaN(index));
 
+
       if (plansWithErrors.length > 0) {
         setExpandedPlans((prev) => [...new Set([...prev, ...plansWithErrors])]);
       }
@@ -136,10 +137,6 @@ function PlanAccordion({ onPrevStep, onSubmit, eventId }: PlanAccordionProps) {
       // 呼叫 API 建立方案
       await createEventPlans(apiRequestData);
       
-      // API 成功後顯示成功訊息
-      toast.success('活動方案建立成功！');
-      
-      // 如果有提供 onSubmit 回調，則呼叫它（用於導航到下一步或完成頁面）
       if (onSubmit) {
         onSubmit();
       }

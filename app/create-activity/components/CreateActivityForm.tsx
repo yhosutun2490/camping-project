@@ -8,6 +8,7 @@ import EventInfoForm from './EventInfoForm'
 import UploadCoverForm from './UploadCoverForm'
 import UploadEventImageForm from './UploadEventImageForm'
 import PlanAccordion from './PlanAccordion'
+import ActivityCreationSuccess from './ActivityCreationSuccess'
 
 const CreateActivityForm: React.FC = () => {
   // 添加 eventId 狀態
@@ -54,20 +55,31 @@ const CreateActivityForm: React.FC = () => {
       case 2: return methods.trigger('coverImages')
       case 3: return methods.trigger('eventImages')
       case 4: return methods.trigger('plans')
+      case 5: return true // 第 5 步不需要驗證，只是結果展示
       default: return false
     }
   }
 
   const handleNextStep = async () => {
     const valid = await validateStep(currentStep)
-    if (valid && currentStep < 4) setCurrentStep(currentStep + 1)
+    if (valid && currentStep < 5) setCurrentStep(currentStep + 1)
   }
 
   const handlePrevStep = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1)
   }
 
+  /**
+   * 處理方案建立完成後導航到成功頁面
+   */
+  const handlePlansComplete = () => {
+    setCurrentStep(5);
+  }
+
   const handleStepChange = async (step: number) => {
+    // 防止用戶跳轉到步驟 5（必須完成整個流程）
+    if (step === 5) return;
+    
     const checks = Array.from({ length: step - 1 }, (_, i) => validateStep(i + 1))
     if ((await Promise.all(checks)).every(Boolean)) setCurrentStep(step)
   }
@@ -77,12 +89,13 @@ const CreateActivityForm: React.FC = () => {
       <div className="p-40">
         <EventStepper
           currentStep={currentStep}
-          totalSteps={4}
+          totalSteps={5}
           stepTitles={[
             '基本資訊',
             '活動封面',
             '活動內容圖片',
             '方案設計',
+            '建立完成',
           ]}
           onStepChange={handleStepChange}
           completedSteps={undefined}
@@ -111,8 +124,31 @@ const CreateActivityForm: React.FC = () => {
           {currentStep === 4 && (
             <PlanAccordion 
               onPrevStep={handlePrevStep} 
+              onSubmit={handlePlansComplete}
               eventId={eventId} 
             />
+          )}
+          {currentStep === 5 && (
+            eventId ? (
+              <ActivityCreationSuccess
+                eventId={eventId}
+                onPrevStep={handlePrevStep}
+              />
+            ) : (
+              <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm text-center">
+                <h2 className="text-2xl font-bold mb-4 text-error">發生錯誤</h2>
+                <p className="text-base-content/70 mb-6">
+                  活動 ID 遺失，無法顯示建立結果。
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setCurrentStep(1)}
+                >
+                  重新開始
+                </button>
+              </div>
+            )
           )}
         </div>
       </div>
