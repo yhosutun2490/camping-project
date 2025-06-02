@@ -14,11 +14,13 @@ export default function EventNotice({ notices }: Props) {
     <div id="event-notice" className="notice_section md:mt-20">
       <p className="heading-2 mb-4">行前提醒</p>
       <div className="notice_contents rounded-2xl bg-neutral-50 p-4">
-        {notices.map((item) => (
-          <li key={item.id} className="w-[calc(100%-1rem)] text-base relative left-4 mt-2">
-            <p>{item.content}</p>
-          </li>
-        ))}
+        <ul className="list-disc pl-6">
+          {notices.map((item) => (
+            <li key={item.id} className="w-[calc(100%-1rem)] text-base relative mt-2">
+              <p>{item.content}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

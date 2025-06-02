@@ -12,6 +12,7 @@ import { useEventList } from "@/swr/events/useEventList";
 import InfiniteLoader from "react-window-infinite-loader";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import SkeletonCard from "../EventCard/SkeletonCard";
 
 type Props = {
   initialFilter: GetEventsParams;
@@ -76,7 +77,7 @@ export default function EventFilterShell({
 
   // 無限載入實作
   // 1. 從 hook 拿資料、總筆數、分頁控制方法
-  const { events, hasMore, isLoadingMore, loadMore } =
+  const { events, hasMore, isLoading, isLoadingMore, loadMore } =
     useEventList(initialFilter);
 
   const filteredEvents = useMemo(() => {
@@ -158,40 +159,51 @@ export default function EventFilterShell({
         </aside>
 
         {/* 右側列表 */}
+        {/*Loading -> No Data -> Actual Data */}
         <div className="flex-1 min-h-screen p-6 bg-primary-50">
-          {filteredEvents.length === 0 && (
+          {isLoading ? (
+            <div className="skeleton_cards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+              {(Array.from({ length: 6 }).map((_, idx) => (
+                <SkeletonCard key={idx} />
+              )))}
+            </div>
+          ) : filteredEvents.length === 0 ? (
             <p className="text-xl text-primary-500 text-center">
               暫無匹配活動資料
             </p>
+          ) : (
+            (
+              <div className="flex-1 min-h-0 h-full">
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <InfiniteLoader
+                      isItemLoaded={isItemLoaded}
+                      itemCount={rowCount}
+                      loadMoreItems={loadMoreItems}
+                      threshold={5}
+                      minimumBatchSize={10}
+                    >
+                      {({ onItemsRendered, ref }) => (
+                        <FixedSizeList
+                          height={height}
+                          width={width}
+                          itemCount={rowCount}
+                          itemSize={450}
+                          onItemsRendered={onItemsRendered}
+                          outerRef={ref}
+                        >
+                          {Row}
+                        </FixedSizeList>
+                      )}
+                    </InfiniteLoader>
+                  )}
+                </AutoSizer>
+              </div>
+            )
+
           )}
-          {filteredEvents.length && (
-            <div className="flex-1 min-h-0 h-full">
-              <AutoSizer>
-                {({ height, width }) => (
-                  <InfiniteLoader
-                    isItemLoaded={isItemLoaded}
-                    itemCount={rowCount}
-                    loadMoreItems={loadMoreItems}
-                    threshold={5}
-                    minimumBatchSize={10}
-                  >
-                    {({ onItemsRendered, ref }) => (
-                      <FixedSizeList
-                        height={height}
-                        width={width}
-                        itemCount={rowCount}
-                        itemSize={450}
-                        onItemsRendered={onItemsRendered}
-                        outerRef={ref}
-                      >
-                        {Row}
-                      </FixedSizeList>
-                    )}
-                  </InfiniteLoader>
-                )}
-              </AutoSizer>
-            </div>
-          )}
+
+
         </div>
       </div>
     </div>
