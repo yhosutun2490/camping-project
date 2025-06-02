@@ -9,7 +9,7 @@ export default function EventCoverGrid({ event_images }: Props) {
   return (
     <div id="total" className="w-full h-full">
       {/* 桌機顯示 Grid，手機隱藏 */}
-      <div className="event_cover_grid hidden md:grid w-full h-screen grid-cols-2 grid-rows-2 gap-5 2xl:gap-10">
+      <div className="event_cover_grid hidden md:grid w-full h-[636px] grid-cols-2 grid-rows-2 gap-5 2xl:gap-10">
         {event_images.map((src, index) => {
           const isMainImage = index === 0;
           return (

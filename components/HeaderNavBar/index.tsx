@@ -12,6 +12,7 @@ import CreateHostModal from "../CreateHostModal";
 import clsx from "clsx";
 import useClickOutside from "@/hook/useClickOutSide";
 import { useTopIntersectStore } from "@/stores/topIntersectStore";
+import IconWrapper from "@/components/ClientIcon/IconWrapper";
 
 interface PropsType {
   username: string;
@@ -136,6 +137,10 @@ export default function HeaderNavBar({
             />
           )
         ) : null}
+
+        <div className="shopping-cart w-[36px] flex items-center" onClick={()=>router.push('/cart')}>
+          <IconWrapper icon={'mdi:shopping-cart-outline'} className="hover:text-primary-300"/>
+        </div>
 
         {username ? (
           <MemberMenu user={username} />
