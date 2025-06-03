@@ -5,17 +5,15 @@ import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react"
 import { useEffect,useState } from "react"
 
-export default function BackgroundSlider() {
+interface Props {
+  slides: string[]
+  children?: React.ReactNode
+}
+export default function BackgroundSlider({slides, children}:Props) {
   // 目前觀看的slider
   const [currentSlide, setCurrentSlide] = useState<number>(0)
   // 設定 loop、自動播放速度等等
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true,})
-
-  const slides = [
-    "/main/main_bg_top_1.jpg",
-    "/main/main_bg_top_2.jpg",
-    "/main/main_bg_top_3.jpg",
-  ]
 
   // 註冊active slider註冊active slider
   useEffect(() => {
@@ -34,7 +32,7 @@ export default function BackgroundSlider() {
   }, [emblaApi])
 
   return (
-    <div className="relative overflow-hidden w-full h-screen" ref={emblaRef}>
+    <div className="background_slider relative overflow-hidden w-full h-screen" ref={emblaRef}>
       {/* Slide Container 必須是 flex 才能水平排列 */}
       <div className="flex h-full">
         {slides.map((src, idx) => (
@@ -54,18 +52,18 @@ export default function BackgroundSlider() {
         top-[45%] left-[50%] translate-[-50%] 
         ${currentSlide == 1 && "text-zinc-300"}
         ${currentSlide == 2 && "text-primary-500"}`}>
-          走進森林 <br/> 享受不息的感動
+        {children}
       </h1>
       {/* Prev／Next 按鈕 */}
       <button
-        className="absolute left-[1.5rem] w-10 h-10 top-1/2 transform -translate-y-1/2 p-2 bg-white rounded-full 
+        className="hidden md:block absolute left-[1.5rem] w-10 h-10 top-1/2 transform -translate-y-1/2 p-2 bg-white rounded-full 
         border-neutral-900 border-2 hover:bg-white/50 cursor-pointer"
         onClick={() => emblaApi?.scrollPrev()}
       >
         <Icon icon='ri:arrow-left-line' className="text-black" width={20} height={20} />
       </button>
       <button
-        className="absolute right-[1.5rem] w-10 h-10  top-1/2 transform -translate-y-1/2 p-2 
+        className="hidden md:block absolute right-[1.5rem] w-10 h-10  top-1/2 transform -translate-y-1/2 p-2 
         bg-white rounded-full border-neutral-900 border-2 hover:bg-white/50 cursor-pointer"
         onClick={() => emblaApi?.scrollNext()}
       >

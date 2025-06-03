@@ -12,6 +12,7 @@ import { useEventList } from "@/swr/events/useEventList";
 import InfiniteLoader from "react-window-infinite-loader";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import SkeletonCard from "../EventCard/SkeletonCard";
 
 type Props = {
   initialFilter: GetEventsParams;
@@ -76,7 +77,7 @@ export default function EventFilterShell({
 
   // 無限載入實作
   // 1. 從 hook 拿資料、總筆數、分頁控制方法
-  const { events, hasMore, isLoadingMore, loadMore } =
+  const { events, hasMore, isLoading, isLoadingMore, loadMore } =
     useEventList(initialFilter);
 
   const filteredEvents = useMemo(() => {
@@ -119,8 +120,9 @@ export default function EventFilterShell({
         className="grid grid-cols-1 justify-center md:grid-cols-2 lg:grid-cols-3 gap-4 px-4"
       >
         {rowItems.map((item) => (
-          <div className="min-w-[300px] max-w-[500px] mx-auto" key={item.id}>
+          <div className="min-w-[300px] max-w-[400px] mx-auto" key={item.id}>
             <EventCard
+              id={item.id}
               title={item.title}
               date={{ start: item.start_time, end: item.end_time }}
               price={item.price}
@@ -135,7 +137,7 @@ export default function EventFilterShell({
   const rowCount = Math.ceil(filteredEvents.length / itemsPerRow);
 
   return (
-    <div className="h-screen flex flex-col bg-primary-50">
+    <div className="min-h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
       <div className="border-b border-zinc-300 py-2 px-4">
         <div className="hidden md:block">
@@ -150,20 +152,26 @@ export default function EventFilterShell({
       {/* ——— 主體區：左側 Filter + 右側 List ——— */}
       <div className="flex flex-1 min-h-0">
         {/* 左側 Filter */}
-        <aside className="hidden md:block w-[300px] py-6 px-4">
+        <aside className="hidden md:block w-[300px] h-full py-6 px-4">
           <div className="sticky top-6">
             <PriceRangeFilter />
           </div>
         </aside>
 
         {/* 右側列表 */}
-        <div className="flex-1 min-h-screen p-6">
-          {filteredEvents.length === 0 && (
+        {/*Loading -> No Data -> Actual Data */}
+        <div className="flex-1 min-h-screen p-6 bg-primary-50">
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <SkeletonCard key={idx} />
+              ))}
+            </div>
+          ) : filteredEvents.length === 0 ? (
             <p className="text-xl text-primary-500 text-center">
               暫無匹配活動資料
             </p>
-          )}
-          {filteredEvents.length && (
+          ) : (
             <div className="flex-1 min-h-0 h-full">
               <AutoSizer>
                 {({ height, width }) => (
