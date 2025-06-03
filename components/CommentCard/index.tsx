@@ -1,8 +1,8 @@
 import Image from "next/image";
 import RatingStar from "../RatingStar";
 
-interface Props {
-  userInfo: {
+export interface TypeCommentCard  {
+    userInfo: {
     user_id: string;
     name: string;
     image: string;
@@ -21,7 +21,7 @@ interface Props {
   };
 }
 
-export default function CommentCard({ userInfo, eventInfo, comment }: Props) {
+export default function CommentCard({ userInfo, eventInfo, comment }: TypeCommentCard) {
   return (
     <div className="comment_card_wrap space-y-[1.25rem]">
       <div className="user_row flex gap-4 justify-between">

@@ -1,5 +1,9 @@
+"use client"
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 interface Props {
+  id?:string
   date?: {
     start: string;
     end: string;
@@ -17,6 +21,7 @@ interface Props {
 }
 
 export default function EventCard({
+  id,
   date = {
     start: '2025-05-05',
     end: '2025-06-30'
@@ -37,6 +42,8 @@ export default function EventCard({
     const day = date.getDate().toString().padStart(2, '0');
     return `${month}/${day}`;
   };
+
+  const router = useRouter()
   return (
     <div className="card bg-white w-full max-w-full h-full p-8 shadow-sm flex flex-col gap-2">
     <div className="date_info flex text-base justify-between items-center">
@@ -49,6 +56,9 @@ export default function EventCard({
         src={image?.[0] || "/event/event_1.png"}
         alt="event"
         fill
+        priority
+        placeholder="blur"
+        blurDataURL="/main/main_bg_top_1.jpg" // 提前準備一張小圖
         className="rounded-xl w-full object-cover hover:scale-115 transition-transform duration-300"
       />
       <div className="absolute badge border-none bg-primary-100 text-primary-500 
@@ -68,7 +78,7 @@ export default function EventCard({
         <span className="text-xl text-primary-500 font-bold">NT$ {price}</span>
         <span className="text-base text-neutral-700 pl-2">/ 每人</span>
       </div>
-      <div className="card-actions mt-auto">
+      <div className="card-actions mt-auto" onClick={()=>router.push(`event/${id}`)}>
         <button className="w-full btn-primary">更多資訊</button>
       </div>
     </div>

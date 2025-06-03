@@ -1,59 +1,79 @@
 @layer utilities {
-   .heading-7 {
-     font-size: 12px;
-     line-height: 18px;
-     font-weight: 600;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-  .heading-5 {
-     font-size: 18px;
-     line-height: 27px;
-     font-weight: 600;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-   .heading-4 {
-     font-size: 20px;
-     line-height: 30px;
-     font-weight: 600;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-  .heading-3 {
-     font-size: 24px;
-     line-height: 36px;
-     font-weight: 600;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-   .heading-1 {
-     font-size: 36px;
-     line-height: 54px;
-     font-weight: 600;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-  .text-base {
-     font-size: 16px;
-     line-height: 24px;
-     font-weight: 400;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-  .text-sm {
-     font-size: 14px;
-     line-height: 21px;
-     font-weight: 400;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
-  }
-  .text-lg {
-     font-size: 18px;
-     line-height: 27px;
-     font-weight: 400;
-     font-family: 'Noto Sans TC', sans-serif;
-     letter-spacing: 0;
+  /* base 樣式 */
+  .heading-1 { @apply text-[36px] leading-[54px] font-semibold; letter-spacing: 0; }
+  .heading-2 { @apply text-[30px] leading-[45px] font-semibold; letter-spacing: 0; }
+  .heading-3 { @apply text-[24px] leading-[36px] font-semibold; letter-spacing: 0; }
+  .heading-4 { @apply text-[20px] leading-[30px] font-semibold; letter-spacing: 0; }
+  .heading-5 { @apply text-[18px] leading-[27px] font-semibold; letter-spacing: 0; }
+  .heading-6 { @apply text-[14px] leading-[21px] font-semibold; letter-spacing: 0; }
+  .heading-7 { @apply text-[12px] leading-[18px] font-semibold; letter-spacing: 0; }
+
+  /* sm 響應式版本 */
+  @media (min-width: 640px) {
+    .sm\:heading-1 { @apply text-[36px] leading-[54px] font-semibold; letter-spacing: 0; }
+    .sm\:heading-2 { @apply text-[30px] leading-[45px] font-semibold; letter-spacing: 0; }
+    .sm\:heading-3 { @apply text-[24px] leading-[36px] font-semibold; letter-spacing: 0; }
+    .sm\:heading-4 { @apply text-[20px] leading-[30px] font-semibold; letter-spacing: 0; }
+    .sm\:heading-5 { @apply text-[18px] leading-[27px] font-semibold; letter-spacing: 0; }
+    .sm\:heading-6 { @apply text-[14px] leading-[21px] font-semibold; letter-spacing: 0; }
+    .sm\:heading-7 { @apply text-[12px] leading-[18px] font-semibold; letter-spacing: 0; }
   }
 
+  /* md 響應式版本 */
+  @media (min-width: 768px) {
+    .md\:heading-1 { @apply text-[36px] leading-[54px] font-semibold; letter-spacing: 0; }
+    .md\:heading-2 { @apply text-[30px] leading-[45px] font-semibold; letter-spacing: 0; }
+    .md\:heading-3 { @apply text-[24px] leading-[36px] font-semibold; letter-spacing: 0; }
+    .md\:heading-4 { @apply text-[20px] leading-[30px] font-semibold; letter-spacing: 0; }
+    .md\:heading-5 { @apply text-[18px] leading-[27px] font-semibold; letter-spacing: 0; }
+    .md\:heading-6 { @apply text-[14px] leading-[21px] font-semibold; letter-spacing: 0; }
+    .md\:heading-7 { @apply text-[12px] leading-[18px] font-semibold; letter-spacing: 0; }
+  }
+
+  /* lg 響應式版本 */
+  @media (min-width: 1024px) {
+    .lg\:heading-1 { @apply text-[36px] leading-[54px] font-semibold; letter-spacing: 0; }
+    .lg\:heading-2 { @apply text-[30px] leading-[45px] font-semibold; letter-spacing: 0; }
+    .lg\:heading-3 { @apply text-[24px] leading-[36px] font-semibold; letter-spacing: 0; }
+    .lg\:heading-4 { @apply text-[20px] leading-[30px] font-semibold; letter-spacing: 0; }
+    .lg\:heading-5 { @apply text-[18px] leading-[27px] font-semibold; letter-spacing: 0; }
+    .lg\:heading-6 { @apply text-[14px] leading-[21px] font-semibold; letter-spacing: 0; }
+    .lg\:heading-7 { @apply text-[12px] leading-[18px] font-semibold; letter-spacing: 0; }
+  }
+}@layer utilities {
+  .heading-7 {
+    @apply text-[12px] leading-[18px] font-semibold tracking-[0];
+  }
+
+  .heading-5 {
+    @apply text-[18px] leading-[27px] font-semibold  tracking-[0];
+  }
+
+  .heading-4 {
+    @apply text-[20px] leading-[30px] font-semibold tracking-[0];
+  }
+
+  .heading-3 {
+    @apply text-[24px] leading-[36px] font-semibold tracking-[0];
+  }
+
+  .heading-2 {
+    @apply text-[30px] leading-[45px] font-semibold  tracking-[0];
+  }
+
+  .heading-1 {
+    @apply text-[36px] leading-[54px] font-semibold  tracking-[0];
+  }
+
+  .text-base {
+    @apply text-[16px] leading-[24px] font-normal tracking-[0];
+  }
+
+  .text-sm {
+    @apply text-[14px] leading-[21px] font-normal tracking-[0];
+  }
+
+  .text-lg {
+    @apply text-[18px] leading-[27px] font-normal  tracking-[0];
+  }
 }

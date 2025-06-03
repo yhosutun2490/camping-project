@@ -21,12 +21,12 @@ function FormDynamicInputs({
     formState: { errors },
     trigger,
   } = useFormContext<FormData>();
-  const notifications = watch('eventInfo.notifications') || [];
+  const notifications = watch('eventInfo.event_notifications') || [];
   const [key, setKey] = useState(0); // 用於強制重新渲染
 
   // 新增通知項目
   const handleAddNotification = () => {
-    setValue('eventInfo.notifications', [...notifications, '']);
+    setValue('eventInfo.event_notifications', [...notifications, '']);
     setKey((prev) => prev + 1);
   };
 
@@ -34,13 +34,13 @@ function FormDynamicInputs({
   const handleRemoveNotification = (index: number) => {
     const newNotifications = [...notifications];
     newNotifications.splice(index, 1);
-    setValue('eventInfo.notifications', newNotifications);
+    setValue('eventInfo.event_notifications', newNotifications);
     setKey((prev) => prev + 1);
   };
 
   // 在輸入後立即驗證
   const handleBlur = () => {
-    trigger('eventInfo.notifications');
+    trigger('eventInfo.event_notifications');
   };
 
   return (
@@ -49,13 +49,13 @@ function FormDynamicInputs({
         <div key={index} className="flex items-center space-x-2 mb-2">
           <input
             type="text"
-            {...register(`eventInfo.notifications.${index}`, {
+            {...register(`eventInfo.event_notifications.${index}`, {
               onChange: () => handleBlur(), // 輸入變更時立即驗證
               onBlur: () => handleBlur(), // 失去焦點時立即驗證
             })}
             placeholder={placeholder}
             className={`input input-bordered flex-1 ${
-              errors.eventInfo?.notifications?.[index] ? 'input-error' : ''
+              errors.eventInfo?.event_notifications?.[index] ? 'input-error' : ''
             }`}
           />
           <button
@@ -69,9 +69,9 @@ function FormDynamicInputs({
         </div>
       ))}
       {/* 顯示在欄位下方的錯誤訊息 */}
-      {errors.eventInfo?.notifications && (
+      {errors.eventInfo?.event_notifications && (
         <p className="text-error mt-1">
-          {errors.eventInfo?.notifications.message || '每個通知至少需要5個字'}
+          {errors.eventInfo?.event_notifications.message || '每個通知至少需要5個字'}
         </p>
       )}
       <button

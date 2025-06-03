@@ -27,7 +27,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased h-screen flex flex-col`}
       >
         <HeaderNavBar 
           username={user?.data?.member?.username ?? ''} 
