@@ -1,5 +1,6 @@
-import Image from "next/image";
+
 import BackgroundSlider from "@/components/BackgroundSlider";
+import ImageSkeleton from "@/components/ImageSkeleton";
 
 interface Props {
   event_images: string[];
@@ -19,12 +20,13 @@ export default function EventCoverGrid({ event_images }: Props) {
                 isMainImage ? "col-span-2 md:col-span-1 row-span-2" : "block"
               }`}
             >
-              <Image
+              <ImageSkeleton
                 src={src}
-                fill
-                sizes="100%"
                 alt={`cover-${index}`}
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-cover rounded-lg"
+                fallbackSrc="/main/main_bg_top_3.jpg"
               />
             </figure>
           );

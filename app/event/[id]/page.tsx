@@ -9,13 +9,11 @@ import EventNewComment from "@/components/EventById/EventNewComment";
 import EventIntroduction from "@/components/EventById/EventIntroduction";
 import EventNotice from "@/components/EventById/EventNotice";
 
+import { getEventById } from "@/api/server-components/event/eventId";
+import { redirect } from "next/navigation";
+
 // 假資料
 
-const event_images = [
-  "/main/main_bg_top_1.jpg",
-  "/main/main_bg_top_2.jpg",
-  "/main/main_bg_top_3.jpg",
-];
 const sampleComment = [
   {
     userInfo: {
@@ -137,12 +135,29 @@ export default async function EventByIdPage({
 }) {
   // 1. 取得活動id
   const { id } = await params;
-  console.log("活動ID:", id);
 
   // 2. api 取得單一活動資料
-  // const event = await getEventById(id);
+  const eventIdData = await getEventById(id);
 
   // 3. 渲染活動資料 若無資料導回活動搜尋頁
+  if (!eventIdData) {
+    redirect("/event");
+  }
+  console.log("單一活動結果", eventIdData);
+
+  // 活動資料區
+  const fallbackImages = [
+    "/main/main_bg_top_1.jpg",
+    "/main/main_bg_top_2.jpg",
+    "/main/main_bg_top_3.jpg",
+  ];
+
+  const coverPhotos =
+    eventIdData?.photos
+      ?.filter((photo) => photo.type === "cover")
+      .map((photo) => photo.photo_url) ?? [];
+
+  const event_cover = [...coverPhotos, ...fallbackImages].slice(0, 3);
   return (
     <div className="relative bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
@@ -155,7 +170,7 @@ export default async function EventByIdPage({
         <div className="event_main_section min-h-screen md:py-[40px] 2xl:py-[80px] pace-y-6">
           {/* 1. 活動封面照 */}
           <div className="w-full">
-            <EventCoverGrid event_images={event_images}/>
+            <EventCoverGrid event_images={event_cover} />
           </div>
           <div className="mt-4 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-10">
             {/* 活動主要資訊區塊 */}
