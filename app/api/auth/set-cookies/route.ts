@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
-
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  const url = new URL(req.url);
-  const accessToken = url.searchParams.get("accessToken");
-  const refreshToken = url.searchParams.get("refreshToken");
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const { accessToken, refreshToken } = await req.json();
 
   if (!accessToken || !refreshToken) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
   }
 
-  const response = NextResponse.redirect(new URL("/", req.url));
+  const response = NextResponse.json({ success: true });
 
   response.cookies.set("access_token", accessToken, {
     path: "/",
     httpOnly: true,
     secure: true,
-    sameSite: "none",
+    sameSite: "none", 
     maxAge: 60 * 15, // 15 分鐘
   });
 

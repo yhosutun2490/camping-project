@@ -13,6 +13,7 @@ import clsx from "clsx";
 import useClickOutside from "@/hook/useClickOutSide";
 import { useTopIntersectStore } from "@/stores/topIntersectStore";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
+import { useGoogleAuthRedirect } from "@/hook/useGoogleAuthRedirect"; 
 
 interface PropsType {
   username: string;
@@ -30,6 +31,8 @@ export default function HeaderNavBar({
   const isHome = pathname === "/";
   const [isBarScaleUp, setIsBarScaleUp] = useState<boolean>(isBarOpen || false);
   const headerSearchBarRef = useRef<HTMLDivElement | null>(null);
+  // Google 第三方登入的cookie
+  useGoogleAuthRedirect();
   // 檢查使用者是否為主辦方
   const isHost = userRole === "host";
   // 點擊外部就收起
