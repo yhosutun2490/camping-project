@@ -3,20 +3,27 @@ import React, { useState, useCallback } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import PlanAccordionItem from './PlanAccordionItem';
+import { useCreateEventPlans } from '@/swr/events/useCreateEventPlans';
+import { CreateEventPlansRequest } from '@/types/api/events';
+import toast from 'react-hot-toast';
 
 interface PlanAccordionProps {
-  /** 返回上一部 */
+  /** 返回上一步 */
   onPrevStep: () => void;
-  /** 提交表單 */
-  onSubmit: () => void;
+  /** 提交表單（可選，用於自訂成功後的導航邏輯） */
+  onSubmit?: () => void;
+  /** 活動 ID（用於 API 呼叫） */
+  eventId?: string | null;
 }
 
-function PlanAccordion({ onPrevStep, onSubmit }: PlanAccordionProps) {
+function PlanAccordion({ onPrevStep, onSubmit, eventId }: PlanAccordionProps) {
+  
   // 從 formContext 獲取方法
   const {
     control,
     trigger,
-    formState: { errors, isSubmitting },
+    getValues,
+    formState: { errors },
   } = useFormContext<FormData>();
 
   // 使用 useFieldArray 管理多方案
@@ -24,6 +31,29 @@ function PlanAccordion({ onPrevStep, onSubmit }: PlanAccordionProps) {
     control,
     name: 'plans',
   });
+
+  // 整合 useCreateEventPlans hook - 只有當 eventId 存在時才使用
+  const { 
+    createEventPlans, 
+    isCreating
+  } = useCreateEventPlans(eventId || 'temp'); // 提供一個暫時的值
+
+  /**
+   * 將表單資料轉換為 API 請求格式
+   * @param formPlans 表單中的方案資料
+   * @returns API 請求格式的資料
+   */
+  const convertFormDataToApiFormat = useCallback((formPlans: FormData['plans']): CreateEventPlansRequest => {
+    return {
+      plans: formPlans.map(plan => ({
+        title: plan.title,
+        price: plan.price,
+        discounted_price: plan.discountPrice,
+        contents: plan.content?.map(item => item.value) || [],
+        addons: plan.addOns || []
+      }))
+    };
+  }, []);
 
   // 控制哪些方案面板是展開的
   const [expandedPlans, setExpandedPlans] = useState<number[]>([0]); // 默認第一個展開
@@ -71,20 +101,48 @@ function PlanAccordion({ onPrevStep, onSubmit }: PlanAccordionProps) {
     );
   }, []);
 
-  // 檢查表單提交前的驗證
+  // 檢查表單提交前的驗證並呼叫 API
   const handleSubmit = async () => {
+    
+    // 先進行表單驗證
     const isValid = await trigger('plans');
-    if (isValid) {
-      onSubmit();
-    } else {
+    
+    if (!isValid) {
       // 自動展開有錯誤的方案
       const plansWithErrors = Object.keys(errors.plans || {})
         .map((key) => parseInt(key))
         .filter((index) => !isNaN(index));
 
+
       if (plansWithErrors.length > 0) {
         setExpandedPlans((prev) => [...new Set([...prev, ...plansWithErrors])]);
       }
+      toast.error('請檢查表單中的錯誤');
+      return;
+    }
+
+    // 檢查是否有 eventId
+    if (!eventId) {
+      toast.error('無法建立方案：活動 ID 未設定');
+      return;
+    }
+
+    try {
+      
+      // 獲取表單資料並轉換為 API 格式
+      const formPlans = getValues('plans');
+      
+      const apiRequestData = convertFormDataToApiFormat(formPlans);
+
+      // 呼叫 API 建立方案
+      await createEventPlans(apiRequestData);
+      
+      if (onSubmit) {
+        onSubmit();
+      }
+      
+    } catch (error) {
+      console.error('❌ 建立活動方案時發生錯誤:', error);
     }
   };
 
@@ -167,10 +225,14 @@ function PlanAccordion({ onPrevStep, onSubmit }: PlanAccordionProps) {
           <button
             type="button"
             className="btn btn-primary px-8"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSubmit();
+            }}
+            disabled={isCreating}
           >
-            {isSubmitting ? '提交中...' : '提交'}
+            {isCreating ? '建立中...' : '建立方案'}
           </button>
         </div>
       </div>
