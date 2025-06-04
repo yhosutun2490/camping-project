@@ -10,7 +10,7 @@ import { ErrorResponse } from "@/types/api/response";
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }>  }
 ): Promise<NextResponse<UpdateEventNoticesTagsResponse | ErrorResponse>> {
   const { eventId } = await params;
 
