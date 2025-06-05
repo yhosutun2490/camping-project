@@ -1,15 +1,17 @@
 "use client"
 
-import Image from "next/image"
 import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react"
 import { useEffect,useState } from "react"
+import ImageSkeleton from "../ImageSkeleton";
+import clsx from "clsx";
 
 interface Props {
   slides: string[]
-  children?: React.ReactNode
+  children?: React.ReactNode,
+  className?: string
 }
-export default function BackgroundSlider({slides, children}:Props) {
+export default function BackgroundSlider({slides, children, className}:Props) {
   // 目前觀看的slider
   const [currentSlide, setCurrentSlide] = useState<number>(0)
   // 設定 loop、自動播放速度等等
@@ -32,18 +34,19 @@ export default function BackgroundSlider({slides, children}:Props) {
   }, [emblaApi])
 
   return (
-    <div className="background_slider relative overflow-hidden w-full h-screen" ref={emblaRef}>
+    <div className={clsx("background_slider relative overflow-hidden w-full",className)} ref={emblaRef}>
       {/* Slide Container 必須是 flex 才能水平排列 */}
       <div className="flex h-full">
         {slides.map((src, idx) => (
           <div key={idx} className="relative flex-shrink-0 w-full h-full">
-            <Image
+            <ImageSkeleton 
               src={src}
               alt={`Slide ${idx + 1}`}
               fill
               sizes="100vw"
               style={{ objectFit: "cover", objectPosition: "center" }}
               priority={idx === 0}  // 第一張優先載入
+              fallbackSrc="/main/main_bg_top_3.jpg"
             />
           </div>
         ))}

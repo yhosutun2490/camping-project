@@ -93,7 +93,7 @@ export default async function EventByIdPage({
   const discount_rates = eventIdData.plans
     .map((plan) => {
       const discountRate = plan.discounted_price / plan.price;
-      return (discountRate * 10).toFixed(1); // 幾折
+      return (discountRate * 100).toFixed(0); // 幾折
     })
     .map(Number)
     .sort((a, b) => a - b);

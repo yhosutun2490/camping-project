@@ -26,17 +26,17 @@ export default function EventPriceCard({
     });
   }
   return (
-    <div className="border rounded-md p-4 w-full bg-white">
-      <div className="text-xl font-bold mb-2">
-        NT${price}({unit}) 最低
+    <div className="border border-2 border-primary-300 rounded-2xl p-4 w-full bg-white">
+      <div className="price mb-2">
+        <span className="heading-3 text-primary-500">NT${price} </span>
+        <span className="text-base text-neutral-700">/ ({unit}) 最低</span>
       </div>
 
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-2">
+      <div className="flex items-center mb-4">
+        <div className="flex space-x-3">
           {discounts.map((discount) => (
             <div
               key={discount}
-              className="px-2 py-1 text-sm font-medium text-gray-700"
             >
               <DiscountRate rate={discount} />
             </div>
@@ -46,7 +46,7 @@ export default function EventPriceCard({
 
       <button
         onClick={handleClickPlan}
-        className="w-full btn-primary text-white py-2 rounded-md text-center font-semibold"
+        className="w-full btn-primary"
       >
         選擇方案
       </button>
