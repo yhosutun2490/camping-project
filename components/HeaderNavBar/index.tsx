@@ -114,7 +114,7 @@ export default function HeaderNavBar({
           onClick={() => setIsBarScaleUp(false)}
         />
       )}
-      <div className="flex item-center space-x-4 h-10 z-1">
+      <div className="flex item-center space-x-1 md:space-x-4 h-10 z-1">
         <Link href="/event" className="flex items-center">
           <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
             活動列表
@@ -138,14 +138,14 @@ export default function HeaderNavBar({
           )
         ) : null}
 
-        <div className="shopping-cart w-[36px] flex items-center" onClick={()=>router.push('/cart')}>
+        <div className="shopping-cart flex items-center" onClick={()=>router.push('/cart')}>
           <IconWrapper icon={'mdi:shopping-cart-outline'} className="hover:text-primary-300"/>
         </div>
 
         {username ? (
           <MemberMenu user={username} />
         ) : (
-          <div className="flex space-x-3">
+          <div className="flex space-x-1 md:space-x-3">
             <LoginLabelModal />
             <RegisterModal />
           </div>
