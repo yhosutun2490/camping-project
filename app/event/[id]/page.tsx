@@ -57,77 +57,6 @@ const sampleComment = [
   },
 ];
 
-const notices = [
-  {
-    id: "f4d1642d-a800-4acb-8b36-6963d001ecff",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content: "請攜帶防蚊液與防曬乳，以應對夏季戶外活動中的蚊蟲與陽光曝曬。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "529fc98e-e4a7-4219-a033-78da97e7cda5",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content: "集合地點：台北車站東三門，請準時集合以便順利出發。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "2997d5ef-4fac-4855-9a96-4e8b689f30e5",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content:
-      "此活動為親子家庭專屬，請準備適合孩童的服裝與泳具，並攜帶必要的兒童用品。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "470cef9e-8b03-4716-89cc-43590b6df308",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content:
-      "營地設有溪邊活動區，適合水上遊戲與親子互動，請準備防水鞋與換洗衣物。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "ade7ee43-a947-4307-9c8a-7a55765a4af8",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content:
-      "夜晚營火晚會時，請準備適合戶外寒冷氣候的衣物，避免夜間低溫影響舒適度。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "3fa78ead-80c6-4be7-acc3-252105329378",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content:
-      "活動期間將安排徒步探險，建議穿著舒適的運動鞋，並攜帶足夠水源與防曬用品。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "be663ba8-21a9-4a5b-99ea-248ef14d2225",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content:
-      "提醒各位家長與孩童，在溪邊活動時務必注意安全，請隨時留意孩子們的行為並協助其安全渡過。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-  {
-    id: "fbef7791-6692-4da7-83f8-d39f517c7abf",
-    event_info_id: "d30a54cf-b1bb-4b2b-bafe-607dcae4a985",
-    type: "行前提醒",
-    content: "集合與散場時，請遵守活動指引，並確保垃圾帶回，不留任何環境痕跡。",
-    created_at: "2025-05-06T06:05:49.058Z",
-    updated_at: "2025-05-06T06:05:49.058Z",
-  },
-];
 export default async function EventByIdPage({
   params,
 }: {
@@ -151,13 +80,71 @@ export default async function EventByIdPage({
     "/main/main_bg_top_2.jpg",
     "/main/main_bg_top_3.jpg",
   ];
-
+  // 封面圖
   const coverPhotos =
     eventIdData?.photos
       ?.filter((photo) => photo.type === "cover")
       .map((photo) => photo.photo_url) ?? [];
 
   const event_cover = [...coverPhotos, ...fallbackImages].slice(0, 3);
+
+  // 最低方案和價格
+
+  const discount_rates = eventIdData.plans
+    .map((plan) => {
+      const discountRate = plan.discounted_price / plan.price;
+      return (discountRate * 10).toFixed(1); // 幾折
+    })
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  // ➤ 找出最低價格方案
+  const lowestPlan = eventIdData.plans.reduce((prev, current) => {
+    return current.discounted_price < prev.discounted_price ? current : prev;
+  });
+
+  // 活動基本資訊
+  const event_basic_info = {
+    eventName: eventIdData.title,
+    startTime: new Date(eventIdData.start_time).toISOString().slice(0, 10),
+    endTime: new Date(eventIdData.end_time).toISOString().slice(0, 10),
+    address: eventIdData.address.slice(0, 3),
+    policy: eventIdData.cancel_policy,
+    rating: 0,
+    ratingCount: 0,
+    commentCount: "",
+  };
+
+  // host 主辦方資訊
+  const event_host_info = {
+    photo_url: eventIdData.host.photo_url,
+    name: eventIdData.host.name,
+    member_id: eventIdData.host.member_info_id,
+    rating: 0,
+    response_count: 0,
+    response_rate: 0,
+  };
+  // 活動描述
+  const event_description = eventIdData.description;
+
+  // 活動方案和截止報名時間
+  const event_register_end = new Date(eventIdData.registration_close_time)
+    .toISOString()
+    .slice(0, 10);
+  const event_plans = eventIdData.plans;
+
+  // 活動詳細圖片和介紹
+  const event_detail_photo = eventIdData.photos.find(
+    (item) => item.type === "detail"
+  );
+  const event_detail_introduction = {
+    photo_url: event_detail_photo?.photo_url,
+    detail: event_detail_photo?.description,
+  };
+
+  // 行前提醒notice
+  const event_notices = eventIdData.notices;
+
   return (
     <div className="relative bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
@@ -178,15 +165,18 @@ export default async function EventByIdPage({
               {/* 2. 活動價格卡片(手機) */}
               <div className="lg:hidden mb-4">
                 <EventPriceCard
-                  price={1000}
+                  price={lowestPlan.price}
                   unit="每人"
-                  discounts={["69", "79"]}
+                  discounts={discount_rates.map(String)}
                 />
               </div>
-              <EventBasicInfo />
-              <EventHost />
-              <EventInfoDescription />
-              <EventPlansSection />
+              <EventBasicInfo data={event_basic_info} />
+              <EventHost host={event_host_info} />
+              <EventInfoDescription description={event_description} />
+              <EventPlansSection
+                data={event_plans}
+                close_Time={event_register_end}
+              />
               <EventNewComment
                 data={{
                   rating: 4,
@@ -195,19 +185,18 @@ export default async function EventByIdPage({
                 }}
               />
               <EventIntroduction
-                detail={`創造一個戶外空間，讓大家可以親身體會到花蓮豐濱的美，
-              並且帶領大家一同了解阿美族的故事，我們有的很簡單，有山、有海、有草地、有星空、有陽光，
-              有原住民帥哥營主兄弟黨跟你聊天，還很多小米酒，來到這裡！記得放下手機、放下煩憂、放下工作、好好享受，花蓮豐濱海放生活`}
+                photo_url={event_detail_introduction.photo_url ?? ""}
+                detail={event_detail_introduction.detail ?? ""}
               />
-              <EventNotice notices={notices} />
+              <EventNotice notices={event_notices} />
             </section>
             <aside className="relative h-full">
               <div className="hidden lg:block md:sticky md:top-[100px]">
                 {/* 2. 活動價格卡片 */}
                 <EventPriceCard
-                  price={1000}
+                  price={lowestPlan.price}
                   unit="每人"
-                  discounts={["69", "79"]}
+                  discounts={discount_rates.map(String)}
                 />
               </div>
             </aside>
