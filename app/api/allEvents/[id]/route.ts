@@ -16,7 +16,7 @@ export async function GET(
     const { id } = params;
     // 根據 id 查詢資料
     const data = await axiosInstance.get<GetApiV1EventsEventIdResponse>(
-      `/events/${id}`
+      `/allEvents/${id}`
     );
 
     return NextResponse.json({ code: 200, data: data.data });
