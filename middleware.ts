@@ -90,6 +90,7 @@ export const config = {
     "/host/:path*",
     "/create-event/:path*",
     "/edit-event/:path*",
+    "/cart/:path*",
     "/api/:path*",
   ],
 };

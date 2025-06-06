@@ -153,7 +153,7 @@ export default async function EventByIdPage({
       >
         <TabListAnchor />
       </div>
-      <main className="flex-1 px-[5%] md:px-[8%] 2xl:px-[15%] relative bg-white">
+      <main className="flex-1 px-[5%] md:px-[8%] 2xl:px-[15%] relative bg-primary-50">
         <div className="event_main_section min-h-screen md:py-[40px] 2xl:py-[80px] pace-y-6">
           {/* 1. 活動封面照 */}
           <div className="w-full">
