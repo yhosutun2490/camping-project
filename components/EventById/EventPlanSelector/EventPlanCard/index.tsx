@@ -4,7 +4,7 @@ import type { AddonItem } from "@/components/EventById/EventPlanSelector/EventAd
 import EventAddonCheckbox from "@/components/EventById/EventPlanSelector/EventAddonCheckbox";
 import DiscountRate from "./DiscountRate";
 import clsx from "clsx";
-
+import { useFormContext} from "react-hook-form";
 export type PlanFeatureItem = {
   id: string;
   event_plan_id: string;
@@ -27,21 +27,36 @@ export type EventPlanCardProps = {
   data: PlanData;
   isSelected?: boolean; // 是否選中
   unit?: string; // 單位（如每人、每組等）
-  onSelect?: (id: string) => void; // 點選處理
 };
 
 export default function EventPlanCard(props: EventPlanCardProps) {
   const {
     data,
     unit = "NT$", // 預設單位為NT$
-    onSelect = () => {}, // 預設點選處理為空函數
   } = props;
-
   const { id, title, deadline, features, price, originalPrice } = data;
+  const { watch } = useFormContext(); // 設定表單選取資料
+  /**
+   * 選取的加購選項
+   */
+  const addonBoxItems = watch("plan_addons");
+  const currentPlanAddonItems = addonBoxItems.filter((item: { event_plan_id: string; })=>item.event_plan_id === id)
+
 
   const discountedRate = originalPrice
     ? ((price / originalPrice) * 100).toFixed(0)
     : "100"; // 計算折扣價格比例
+
+  // 點擊購物車行為
+  function handleOnClickAddCart () {
+    console.log('目前加入購物車的方案',data,"addonBoxItems",currentPlanAddonItems)
+
+  }
+
+  // 直接報名
+  function handleOnClickSignupEvent () {
+     console.log('目前直接報名資料',data,"addonBoxItems",currentPlanAddonItems)
+  }
 
   return (
     <div
@@ -92,7 +107,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             leading-[20px] hover:bg-primary-300"
             onClick={(e) => {
               e.preventDefault();
-              onSelect(id);
+              handleOnClickSignupEvent()
             }}
           >
             直接報名
@@ -101,7 +116,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
             onClick={(e) => {
               e.preventDefault();
-              onSelect(id);
+              handleOnClickAddCart()
             }}
           >
             加入購物車

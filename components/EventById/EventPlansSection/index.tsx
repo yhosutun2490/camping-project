@@ -52,11 +52,12 @@ export default function EventPlansSection({
   //     : 0);
   
 
-  // 將方案資料分割成 1.方案選項 2.加購選項 兩部份傳入元件
+  // 將方案資料傳入元件
   const planData: PlanData[] = (data ?? []).map((item) => {
     return {
       id: item.id,
       title: item.title,
+      event_id: item.event_info_id,
       deadline: close_Time,
       features: item.eventPlanContentBox,
       price: item.discounted_price,
