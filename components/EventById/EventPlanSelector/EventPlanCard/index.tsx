@@ -4,7 +4,9 @@ import type { AddonItem } from "@/components/EventById/EventPlanSelector/EventAd
 import EventAddonCheckbox from "@/components/EventById/EventPlanSelector/EventAddonCheckbox";
 import DiscountRate from "./DiscountRate";
 import clsx from "clsx";
-import { useFormContext} from "react-hook-form";
+import { useFormContext } from "react-hook-form";
+import { useShoppingCartStore } from "@/stores/useShoppingCartStore";
+
 export type PlanFeatureItem = {
   id: string;
   event_plan_id: string;
@@ -16,6 +18,7 @@ export type PlanFeatureItem = {
 export type PlanData = {
   id: string;
   title: string;
+  event_info_id: string;
   deadline: string;
   features: PlanFeatureItem[];
   price: number;
@@ -36,26 +39,45 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   } = props;
   const { id, title, deadline, features, price, originalPrice } = data;
   const { watch } = useFormContext(); // 設定表單選取資料
+
+  // shopping cart store
+  const shoppingCartPlan = useShoppingCartStore((s) => s);
+  console.log('shoppingCartPlan', shoppingCartPlan) 
+  const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
    * 選取的加購選項
    */
   const addonBoxItems = watch("plan_addons");
-  const currentPlanAddonItems = addonBoxItems.filter((item: { event_plan_id: string; })=>item.event_plan_id === id)
-
+  const currentPlanAddonItems = addonBoxItems.filter(
+    (item: { event_plan_id: string }) => item.event_plan_id === id
+  );
 
   const discountedRate = originalPrice
     ? ((price / originalPrice) * 100).toFixed(0)
     : "100"; // 計算折扣價格比例
 
   // 點擊購物車行為
-  function handleOnClickAddCart () {
-    console.log('目前加入購物車的方案',data,"addonBoxItems",currentPlanAddonItems)
-
+  function handleOnClickAddCart() {
+    console.log(
+      "目前加入購物車的方案",
+      data,
+      "addonBoxItems",
+      currentPlanAddonItems
+    );
+    addStorePlan({
+      ...data,
+      addonBox: currentPlanAddonItems,
+    });
   }
 
   // 直接報名
-  function handleOnClickSignupEvent () {
-     console.log('目前直接報名資料',data,"addonBoxItems",currentPlanAddonItems)
+  function handleOnClickSignupEvent() {
+    console.log(
+      "目前直接報名資料",
+      data,
+      "addonBoxItems",
+      currentPlanAddonItems
+    );
   }
 
   return (
@@ -85,8 +107,10 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       <EventAddonCheckbox name="plan_addons" options={data.addonBox} />
 
       {/*方案價格區*/}
-      <div className="select_btn_wrap rounded-2xl bg-white py-6 px-4 
-      flex flex-col md:flex-row flex-wrap gap-2 justify-between items-start">
+      <div
+        className="select_btn_wrap rounded-2xl bg-white py-6 px-4 
+      flex flex-col md:flex-row flex-wrap gap-2 justify-between items-start"
+      >
         <div className="discount_info flex items-center space-y-2 space-x-4">
           <DiscountRate rate={discountedRate} />
           <div className="event_price flex gap-2 items-start">
@@ -95,9 +119,8 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             </p>
             <p className="original text-gray-500 text-base line-through">
               {unit} {originalPrice?.toLocaleString() || "0"}
-              </p>
+            </p>
           </div>
-        
         </div>
 
         <div className="btn_wrap md:ml-auto flex gap-4 justify-center lg:justify-between">
@@ -107,7 +130,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             leading-[20px] hover:bg-primary-300"
             onClick={(e) => {
               e.preventDefault();
-              handleOnClickSignupEvent()
+              handleOnClickSignupEvent();
             }}
           >
             直接報名
@@ -116,7 +139,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
             onClick={(e) => {
               e.preventDefault();
-              handleOnClickAddCart()
+              handleOnClickAddCart();
             }}
           >
             加入購物車
