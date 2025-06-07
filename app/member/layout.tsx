@@ -57,10 +57,10 @@ export default async function MemberLayout({
   return (
     <div
       className="member_page_layout relative
-     grid grid-cols-[300px_3fr] h-screen"
+     grid grid-cols-[304px_1fr] h-screen px-[15%] py-[40px]"
     >
 
-      <aside className="h-full sticky top-5 shadow-md bg-primary-50">
+      <aside className="w-full h-full sticky top-5 space-y-6">
         <AvatarCard userInfo={{photo_url: memberInfo?.data.member.photo_url, username: memberInfo?.data.member.username}}/>
         <SideBarMenu lists={menuLists}/>
       </aside>

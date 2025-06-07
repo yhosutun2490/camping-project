@@ -9,8 +9,8 @@ type Props = {
 export default function AvatarCard({ userInfo }: Props) {
   return (
     <div
-      className="member_info_avatar_card flex flex-col 
-     rounded-3xl items-center px-[3rem] pt-[1.5rem]"
+      className="member_info_avatar_card bg-neutral-100 border-1 border-neutral-300 t flex flex-col 
+     rounded-3xl items-center px-[84px] py-[1.5rem] space-y-2"
     >
       <div className="avatar">
         <div className="w-24 rounded-full">
@@ -23,7 +23,7 @@ export default function AvatarCard({ userInfo }: Props) {
           />
         </div>
       </div>
-      <p className="text-primary-500">{userInfo.username}</p>
+      <p className="heading-6 text-neutral-950">{userInfo.username || 'User'}</p>
     </div>
   );
 }
