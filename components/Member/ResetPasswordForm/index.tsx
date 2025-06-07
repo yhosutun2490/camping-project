@@ -36,25 +36,43 @@ export default function ResetPasswordForm() {
   return (
     <div
       className="member_chang_password_form flex flex-col
-    text-primary-500 border-1 border-gray-300 rounded-2xl py-3 px-6"
+    text-primary-500"
     >
-      <div className="rules">
-        <h3 className="text-2xl"> 修改密碼</h3>
-        <p className="text-zinc-400 text-base">設定高強度密碼，強化帳戶安全</p>
-        <p className="text-zinc-400 text-base">
-          密碼須為8-20個字元，且至少包含1個數字、1個字母及1個特殊符號
-        </p>
-      </div>
       <form
-        className="mt-9 grid grid-cols-1 gap-3"
+        className="grid grid grid-cols-1 gap-4"
         onSubmit={handleSubmit(onSubmit)}
       >
+        <div className="rules">
+          <p className="heading-2 text-primary-700"> 修改密碼</p>
+          <div className="btn-wrap h-[61px] flex justify-between items-center border-b-1 border-primary-300">
+            <span className="text-sm text-neutral-700">
+              設定高強度密碼，強化帳戶安全
+            </span>
+            <button
+              type="submit"
+              className="text-primary-700 rounded-2xl border-2 border-primary-700 
+          w-[100px] h-[40px] col-span-2 justify-self-end 
+          cursor-pointer hover:bg-primary-500 hover:text-white"
+              disabled={isValidating || isMutating}
+            >
+              {isMutating ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                "重設密碼"
+              )}
+            </button>
+          </div>
+          <p className="text-primary-500 text-sm my-4">
+            密碼須為8-20個字元，且至少包含1個數字、1個字母及1個特殊符號
+          </p>
+        </div>
         <FormHookInput
           label="新密碼"
           type="password"
           placeholder="請填入新密碼"
           register={register("new_password")}
           error={errors.new_password}
+          className="md:w-1/2"
         />
         <FormHookInput
           label="確認新密碼"
@@ -62,18 +80,8 @@ export default function ResetPasswordForm() {
           placeholder="請再次確認新密碼"
           register={register("re_password")}
           error={errors.re_password}
+          className="md:w-1/2"
         />
-        <button
-          type="submit"
-          className="btn-primary w-[150px] h-[40px] mt-auto ml-auto"
-          disabled={isValidating || isMutating}
-        >
-          {isMutating ? (
-            <span className="loading loading-spinner"></span>
-          ) : (
-            "重設密碼"
-          )}
-        </button>
       </form>
     </div>
   );
