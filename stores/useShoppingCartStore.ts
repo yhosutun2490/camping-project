@@ -1,7 +1,7 @@
 import {create} from "zustand";
 import type {PlanData} from "@/components/EventById/EventPlanSelector/EventPlanCard"
 
-
+export type CartPlan = PlanData[]
 
 interface ShoppingCartState {
   plans: PlanData[];

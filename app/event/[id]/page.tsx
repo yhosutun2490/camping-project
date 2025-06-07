@@ -72,7 +72,6 @@ export default async function EventByIdPage({
   if (!eventIdData) {
     redirect("/event");
   }
-  console.log("單一活動結果", eventIdData);
 
   // 活動資料區
   const fallbackImages = [

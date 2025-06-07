@@ -32,32 +32,13 @@ export default function EventPlansSection({
     },
   });
 
-  // const { control } = form;
-  // 監聽 plan 方案變化
-  // const selectedPlanId = useWatch({
-  //   control,
-  //   name: "plan.event_plan_id",
-  // });
-  
-  // 監聽方案價格和所有加購選項
-  // const [planPrice, addon ] = useWatch({
-  //   control,
-  //   name: ["plan.event_plan_price",'plan_addons'],
-  // });
-  
-  // const totalPrice =
-  //   (typeof planPrice === "number" ? planPrice : 0) +
-  //   (Array.isArray(addon)
-  //     ? addon.reduce((sum, item) => sum + (item?.price ?? 0), 0)
-  //     : 0);
-  
 
   // 將方案資料傳入元件
   const planData: PlanData[] = (data ?? []).map((item) => {
     return {
       id: item.id,
       title: item.title,
-      event_id: item.event_info_id,
+      event_info_id: item.event_info_id,
       deadline: close_Time,
       features: item.eventPlanContentBox,
       price: item.discounted_price,

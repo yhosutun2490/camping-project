@@ -41,8 +41,6 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const { watch } = useFormContext(); // 設定表單選取資料
 
   // shopping cart store
-  const shoppingCartPlan = useShoppingCartStore((s) => s);
-  console.log('shoppingCartPlan', shoppingCartPlan) 
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
    * 選取的加購選項
