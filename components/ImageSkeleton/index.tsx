@@ -32,6 +32,7 @@ export default function ImageSkeleton({
       {/*圖片來源失敗會觸發onError換成預設圖*/}
       <Image
         {...rest}
+        quality={100}
         src={imgSrc}
         className={clsx(className, !isLoaded && "invisible")}
         onLoad={() => setIsLoaded(true)}
