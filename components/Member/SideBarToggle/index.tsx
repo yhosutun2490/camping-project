@@ -46,9 +46,9 @@ export default function SidebarToggle({
         className={`
             aside_scroll_container
             z-40 transition-transform duration-300 ease-in-out
-            fixed inset-0 top-[120px]   bg-white p-6
+            fixed inset-0 top-[120px]  bg-white p-6
             ${showSidebar ? "translate-x-0" : "-translate-x-full"}
-            md:relative md:translate-x-0 md:bg-transparent md:p-0 md:block
+            md:relative md:translate-x-0 md:bg-transparent md:p-0 md:block md:top-0
         `}
       >
         <aside className="sticky top-[40px] self-start space-y-6">
