@@ -2,25 +2,11 @@
 import Image from "next/image";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
 import CheckboxStyle from "@/components/CheckBoxStyle";
+import type {MemberOrder} from "@/types/api/member/orders"
+import ImageSkeleton from "@/components/ImageSkeleton";
 
-type EventAddon = {
-  name: string;
-  price: number;
-};
 
-export type Order = {
-  id: string;
-  member: string;
-  event_plan_id: string;
-  event_plan_price: number;
-  event_name: string;
-  quantity: number;
-  event_addons: EventAddon[];
-  total_price: number;
-  book_at: string;
-  created_at: string;
-  photo_url?: string;
-};
+export type Order = MemberOrder
 
 type CartItemProps = {
   order: Order;
@@ -46,12 +32,19 @@ export default function CartItem({
         </div>
         {/* 活動圖片 */}
         <div className="relative w-[25vw] max-w-[120px] aspect-[5/3] mr-4 rounded-md">
-          <Image
-            src={order.photo_url || "/event_id/event_intro_test.png"}
+          <ImageSkeleton 
+            src={order.event_info.image || "/event_id/event_intro_test.png"}
             alt="訂單活動照片"
             fill
             className="object-cover w-full rounded-xl"
+            fallbackSrc="/main/main_bg_top_3.jpg"
           />
+          {/* <Image
+            src={order.event_info.image || "/event_id/event_intro_test.png"}
+            alt="訂單活動照片"
+            fill
+            className="object-cover w-full rounded-xl"
+          /> */}
         </div>
 
         {/* Info */}
@@ -59,7 +52,7 @@ export default function CartItem({
           <div className="flex justify-between items-start">
             <div>
               <p className="font-bold text-base text-neutral-800">
-                {order.event_name}
+                {order.event_info.name}
               </p>
               {/* 加購項目 */}
               <div className="addon flex flex-wrap gap-1 mt-1">

@@ -6,6 +6,9 @@ import DiscountRate from "./DiscountRate";
 import clsx from "clsx";
 import { useFormContext } from "react-hook-form";
 import { useShoppingCartStore } from "@/stores/useShoppingCartStore";
+import { usePostMemberOrders } from "@/swr/member/orders/useMemberOrders"; // 創建會員訂單SWR
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export type PlanFeatureItem = {
   id: string;
@@ -40,6 +43,8 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const { id, title, deadline, features, price, originalPrice } = data;
   const { watch } = useFormContext(); // 設定表單選取資料
 
+  // 創建會員訂單API
+  const { trigger, isMutating } = usePostMemberOrders();
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
@@ -55,7 +60,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     : "100"; // 計算折扣價格比例
 
   // 點擊購物車行為
-  function handleOnClickAddCart() {
+  async function handleOnClickAddCart() {
     console.log(
       "目前加入購物車的方案",
       data,
@@ -66,6 +71,21 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       ...data,
       addonBox: currentPlanAddonItems,
     });
+
+    try {
+      await trigger({
+        event_plan_id: data.id,
+        quantity: 1,
+        event_addons: currentPlanAddonItems,
+      });
+      toast.success('新增購物車品項成功')
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data?.message;
+        console.log("api有誤", message);
+        toast.error(message)
+      }
+    }
   }
 
   // 直接報名
@@ -140,7 +160,11 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               handleOnClickAddCart();
             }}
           >
-            加入購物車
+            {isMutating ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              "加入購物車"
+            )}
           </button>
         </div>
       </div>

@@ -1,19 +1,19 @@
 import axiosInstance from "@/api/axiosIntance";
-import type { GetMemberOrders } from "@/types/api/member/orders";
+import type { GetMemberOrdersResponse } from "@/types/api/member/orders";
 import { formatAxiosError } from "@/utils/errors";
 import { cookies } from "next/headers";
 import { ErrorResponse } from "@/types/api/response";
 
-const endpoint = "/member/order";
+const endpoint = "/member/orders";
 
 /**
  * 會員取得自己的訂單
  */
-export const memberGetOrders = async (): Promise<GetMemberOrders['data'] | null> => {
+export const memberGetOrders = async (): Promise<GetMemberOrdersResponse['data'] | null> => {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
-    const response = await axiosInstance.get<GetMemberOrders>(
+    const response = await axiosInstance.get<GetMemberOrdersResponse>(
       endpoint,
       {
         headers: {
