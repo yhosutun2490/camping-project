@@ -1,5 +1,6 @@
-import AvatarCard from "@/components/Member/AvatarCard";
-import SideBarMenu from "@/components/Member/SideBarMenu";
+// import AvatarCard from "@/components/Member/AvatarCard";
+// import SideBarMenu from "@/components/Member/SideBarMenu";
+import SidebarToggle from "@/components/Member/SideBarToggle";
 import { memberGetProfile } from "@/api/server-components/member/profile";
 export const dynamic = "force-dynamic";
 export default async function MemberLayout({
@@ -58,7 +59,7 @@ export default async function MemberLayout({
       className="member_page_layout
     grid md:grid-cols-[304px_1fr] min-h-screen px-[5%] lg:px-[15%] pt-[40px] gap-10"
     >
-      <div className="aside_scroll_container h-full relative">
+      {/* <div className="aside_scroll_container h-full relative">
         <aside className="sticky top-[40px] self-start space-y-6 hidden md:block">
           <AvatarCard
             userInfo={{
@@ -68,7 +69,14 @@ export default async function MemberLayout({
           />
           <SideBarMenu lists={menuLists} />
         </aside>
-      </div>
+      </div> */}
+      <SidebarToggle
+        memberInfo={{
+          photo_url: memberInfo?.data.member.photo_url ?? "",
+          username: memberInfo?.data.member.username ?? "",
+        }}
+        menuLists={menuLists}
+      />
 
       <main className=" min-h-0">{children}</main>
     </div>

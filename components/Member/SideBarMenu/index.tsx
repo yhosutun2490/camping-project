@@ -8,21 +8,25 @@ type Props = {
     title: string;
     icon: string;
   }[];
+  setShowSidebar?: (state: boolean)=>void
 };
 
-export default function SideBarMenu({ lists }: Props) {
+export default function SideBarMenu({ lists, setShowSidebar }: Props) {
   return (
     <div className="menu_list text-neutral-500">
       <ul className="menu rounded-box w-full flex flex-col 2xl:gap-4">
-        {lists.map(item=> 
-           <button key={item.id} className='w-full h-[45px] hover:bg-primary-100 rounded-lg px-4 py-2'>
-              <Link href={item.link}  className='flex items-center space-x-2'>
-             <Icon icon={item.icon} width={20} height={20} className='text-neutral-500'/>
-             <p className='text-sm'>{item.title}</p>
-           </Link>
-           </button>
-         
-        )}
+        {lists.map((item) => (
+          <li key={item.id}>
+            <Link
+              href={item.link}
+              onClick={() => setShowSidebar?.(false)} // 手機版點擊後收合
+              className="w-full h-[45px] hover:bg-primary-100 rounded-lg px-4 py-2 flex items-center space-x-2"
+            >
+              <Icon icon={item.icon} width={20} height={20} className="text-neutral-500" />
+              <p className="text-sm">{item.title}</p>
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );
