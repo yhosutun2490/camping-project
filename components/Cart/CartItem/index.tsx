@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
 import CheckboxStyle from "@/components/CheckBoxStyle";
 import type {MemberOrder} from "@/types/api/member/orders"
@@ -39,12 +38,6 @@ export default function CartItem({
             className="object-cover w-full rounded-xl"
             fallbackSrc="/main/main_bg_top_3.jpg"
           />
-          {/* <Image
-            src={order.event_info.image || "/event_id/event_intro_test.png"}
-            alt="訂單活動照片"
-            fill
-            className="object-cover w-full rounded-xl"
-          /> */}
         </div>
 
         {/* Info */}

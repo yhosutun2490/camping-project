@@ -6,6 +6,7 @@ import DiscountRate from "./DiscountRate";
 import clsx from "clsx";
 import { useFormContext } from "react-hook-form";
 import { useShoppingCartStore } from "@/stores/useShoppingCartStore";
+import { useMemberLogin } from "@/stores/useMemberLogin";
 import { usePostMemberOrders } from "@/swr/member/orders/useMemberOrders"; // 創建會員訂單SWR
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -42,6 +43,8 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   } = props;
   const { id, title, deadline, features, price, originalPrice } = data;
   const { watch } = useFormContext(); // 設定表單選取資料
+  const memberData = useMemberLogin((state)=>state.member)
+  const isMemberLogin = !!memberData?.id; // 是否登入
 
   // 創建會員訂單API
   const { trigger, isMutating } = usePostMemberOrders();
@@ -67,24 +70,34 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       "addonBoxItems",
       currentPlanAddonItems
     );
-    addStorePlan({
-      ...data,
-      addonBox: currentPlanAddonItems,
-    });
 
-    try {
-      await trigger({
-        event_plan_id: data.id,
-        quantity: 1,
-        event_addons: currentPlanAddonItems,
-      });
-      toast.success('新增購物車品項成功')
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const message = err.response?.data?.message;
-        console.log("api有誤", message);
-        toast.error(message)
+    // 需登入才有member id 進行訂單創建
+    if (isMemberLogin) {
+      try {
+        await trigger({
+          event_plan_id: data.id,
+          quantity: 1,
+          event_addons: currentPlanAddonItems,
+        });
+        toast.success("新增購物車品項成功");
+        // 同步store購物車狀態
+        addStorePlan({
+          ...data,
+          addonBox: currentPlanAddonItems,
+        });
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const message = err.response?.data?.message;
+          console.log("api有誤", message);
+          toast.error(message);
+        }
       }
+    } else {
+       // 未登入 暫存於store
+        addStorePlan({
+          ...data,
+          addonBox: currentPlanAddonItems,
+        });
     }
   }
 
