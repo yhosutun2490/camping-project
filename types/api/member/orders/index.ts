@@ -1,11 +1,9 @@
-import {
-    SuccessResponse,
-  } from "@/types/api/response";
+import { SuccessResponse } from "@/types/api/response";
 type EventAddon = {
-  id: string,
-  name: string
-  price: number
-}
+  id: string;
+  name: string;
+  price: number;
+};
 
 export type MemberOrder = {
   id: string;
@@ -53,4 +51,15 @@ export type PostMemberOrderResponse = SuccessResponse<{
       price: number;
     }[];
   };
+}>;
+export interface DeleteMemberOrderRequest {
+  reason?: string; // 取消原因（選填）
+}
+
+// 回應結果
+export type DeleteMemberOrderResponse = SuccessResponse<{
+  id: string;
+  status: "Cancelled";
+  cancelled_at: string;
+  cancellation_reason: string;
 }>;

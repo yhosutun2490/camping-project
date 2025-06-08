@@ -1,16 +1,19 @@
 "use client";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
 import CheckboxStyle from "@/components/CheckBoxStyle";
-import type {MemberOrder} from "@/types/api/member/orders"
+import type { MemberOrder } from "@/types/api/member/orders";
 import ImageSkeleton from "@/components/ImageSkeleton";
+import { useDeleteMemberOrders } from "@/swr/member/orders/useMemberOrders";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-
-export type Order = MemberOrder
+export type Order = MemberOrder;
 
 type CartItemProps = {
   order: Order;
   isSelected: boolean;
-  onToggleSelect: (order:Order) => void;
+  onToggleSelect: (order: Order) => void;
 };
 
 export default function CartItem({
@@ -18,6 +21,24 @@ export default function CartItem({
   isSelected,
   onToggleSelect,
 }: CartItemProps) {
+  // SWR 刪除會員訂單API
+  const { trigger } = useDeleteMemberOrders();
+  const router = useRouter()
+
+  async function handleOnClickDeleteIcon(orderId: string) {
+    if (!orderId) return;
+    try {
+      await trigger({ id: orderId });
+      toast.success('刪除購物車選項成功')
+      router.refresh()
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message = err.response?.data?.message;
+        console.log("api有誤", message);
+        toast.error(message);
+      }
+    }
+  }
   return (
     <div className="relative w-full flex flex-col gap-4 md:flex-row justify-between border-b py-4">
       <div className="order_event_info flex">
@@ -31,7 +52,7 @@ export default function CartItem({
         </div>
         {/* 活動圖片 */}
         <div className="relative w-[25vw] max-w-[120px] aspect-[5/3] mr-4 rounded-md">
-          <ImageSkeleton 
+          <ImageSkeleton
             src={order.event_info.image || "/event_id/event_intro_test.png"}
             alt="訂單活動照片"
             fill
@@ -70,7 +91,9 @@ export default function CartItem({
         </p>
         <div className="flex space-x-2 text-gray-400 text-xl">
           <IconWrapper icon="material-symbols-light:favorite-outline" />
-          <IconWrapper icon="material-symbols:delete-outline-rounded" />
+          <div className="delete_order_icon cursor-pointer" onClick={()=>handleOnClickDeleteIcon(order.id)}>
+            <IconWrapper icon="material-symbols:delete-outline-rounded" />
+          </div>
         </div>
       </div>
     </div>
