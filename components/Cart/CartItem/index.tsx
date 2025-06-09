@@ -51,7 +51,7 @@ export default function CartItem({
           />
         </div>
         {/* 活動圖片 */}
-        <div className="relative w-[25vw] max-w-[120px] aspect-[5/3] mr-4 rounded-md">
+        <div className="w-[25dvw] max-w-[120px] max-h-[72px] aspect-[5/3] mr-4 rounded-md">
           <ImageSkeleton
             src={order.event_info.image || "/event_id/event_intro_test.png"}
             alt="訂單活動照片"
@@ -91,7 +91,7 @@ export default function CartItem({
         </p>
         <div className="flex space-x-2 text-gray-400 text-xl">
           <IconWrapper icon="material-symbols-light:favorite-outline" />
-          <div className="delete_order_icon cursor-pointer" onClick={()=>handleOnClickDeleteIcon(order.id)}>
+          <div className="delete_order_icon cursor-pointer" onClick={() => handleOnClickDeleteIcon(order.id)}>
             <IconWrapper icon="material-symbols:delete-outline-rounded" />
           </div>
         </div>
