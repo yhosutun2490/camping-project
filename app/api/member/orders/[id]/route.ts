@@ -4,8 +4,8 @@ import {
   DeleteMemberOrderRequest,
   DeleteMemberOrderResponse,
   PatchMemberOrderRequest,
-  PatchMemberOrderResponse
-} from "@/types/api/member/orders"
+  PatchMemberOrderResponse,
+} from "@/types/api/member/orders";
 import { ErrorResponse } from "@/types/api/response";
 import axiosInstance from "@/api/axiosIntance";
 import { AxiosResponse } from "axios";
@@ -14,7 +14,6 @@ import { AxiosResponse } from "axios";
 export async function PATCH(
   req: NextRequest
 ): Promise<NextResponse<PatchMemberOrderResponse | ErrorResponse>> {
-
   const accessToken = req.headers.get("access_token");
   if (!accessToken) {
     return NextResponse.json(
@@ -22,8 +21,8 @@ export async function PATCH(
       { status: 401 }
     );
   }
-  const pathname = req.nextUrl.pathname; 
-  const id = pathname.split("/").pop();  // 取得最後一段，訂單 id
+  const pathname = req.nextUrl.pathname;
+  const id = pathname.split("/").pop(); // 取得最後一段，訂單 id
 
   if (!id) {
     return NextResponse.json(
@@ -33,14 +32,14 @@ export async function PATCH(
   }
 
   try {
-    const body: PatchMemberOrderRequest = await req.json();
-    const res: AxiosResponse<PatchMemberOrderResponse> = await axiosInstance.patch(`/member/orders/${id}`, {
-      data: body,
-      headers: {
-        Cookie: `access_token=${accessToken}`,
-      },
-      withCredentials: true,
-    });
+    const { body }: { body: PatchMemberOrderRequest } = await req.json();
+    const res: AxiosResponse<PatchMemberOrderResponse> =
+      await axiosInstance.patch(`/member/orders/${id}`, body, {
+        headers: {
+          Cookie: `access_token=${accessToken}`,
+        },
+        withCredentials: true,
+      });
     return NextResponse.json(res.data, { status: 200 });
   } catch (error) {
     const apiErr = formatAxiosError(error);
@@ -58,7 +57,6 @@ export async function PATCH(
 export async function DELETE(
   req: NextRequest
 ): Promise<NextResponse<DeleteMemberOrderResponse | ErrorResponse>> {
-
   const accessToken = req.headers.get("access_token");
   if (!accessToken) {
     return NextResponse.json(
@@ -66,8 +64,8 @@ export async function DELETE(
       { status: 401 }
     );
   }
-  const pathname = req.nextUrl.pathname; 
-  const id = pathname.split("/").pop();  // 取得最後一段，訂單 id
+  const pathname = req.nextUrl.pathname;
+  const id = pathname.split("/").pop(); // 取得最後一段，訂單 id
 
   if (!id) {
     return NextResponse.json(
@@ -78,13 +76,14 @@ export async function DELETE(
 
   try {
     const body: DeleteMemberOrderRequest = await req.json();
-    const res: AxiosResponse<DeleteMemberOrderResponse> = await axiosInstance.delete(`/member/orders/${id}`, {
-      data: body,
-      headers: {
-        Cookie: `access_token=${accessToken}`,
-      },
-      withCredentials: true,
-    });
+    const res: AxiosResponse<DeleteMemberOrderResponse> =
+      await axiosInstance.delete(`/member/orders/${id}`, {
+        data: body,
+        headers: {
+          Cookie: `access_token=${accessToken}`,
+        },
+        withCredentials: true,
+      });
     return NextResponse.json(res.data, { status: 200 });
   } catch (error) {
     const apiErr = formatAxiosError(error);

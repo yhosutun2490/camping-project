@@ -44,6 +44,7 @@ export default function EventPlansSection({
     orderId,
     planId,
     defaultAddons,
+    selectedPlan
   });
 
   // 表單資料主體連接 預設為編輯表單資料
@@ -53,7 +54,7 @@ export default function EventPlansSection({
       plan: {
         event_plan_id: selectedPlan?.id || data?.[0]?.id,
         quantity: 1,
-        event_plan_price: selectedPlan?.discounted_price ?? data?.[0]?.discounted_price,
+        event_plan_price: Number(selectedPlan?.discounted_price ?? data?.[0]?.discounted_price),
       },
       plan_addons: defaultAddons,
     },

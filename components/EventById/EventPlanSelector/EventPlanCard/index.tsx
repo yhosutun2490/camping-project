@@ -7,7 +7,10 @@ import clsx from "clsx";
 import { useFormContext } from "react-hook-form";
 import { useShoppingCartStore } from "@/stores/useShoppingCartStore";
 import { useMemberLogin } from "@/stores/useMemberLogin";
-import { usePostMemberOrders } from "@/swr/member/orders/useMemberOrders"; // 創建會員訂單SWR
+import {
+  usePostMemberOrders,
+  usePatchMemberOrders,
+} from "@/swr/member/orders/useMemberOrders"; // 創建/修改會員訂單SWR
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams } from "next/navigation";
@@ -56,6 +59,9 @@ export default function EventPlanCard(props: EventPlanCardProps) {
 
   // 創建會員訂單API
   const { trigger, isMutating } = usePostMemberOrders();
+  const { trigger: triggerPatch, isMutating: isMutatingPatch } =
+    usePatchMemberOrders();
+
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
@@ -82,7 +88,15 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       try {
         if (isEditing) {
           // 修改訂單
-          console.log("修改訂單");
+          await triggerPatch({
+            id: orderId ?? '',
+            body: {
+              event_plan_id: data.id,
+              quantity: 1,
+              event_addons: currentPlanAddonItems,
+            },
+          });
+          toast.success("修改購物車品項成功");
         } else {
           // 新增訂單
           await trigger({
@@ -188,7 +202,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               handleOnClickAddCart();
             }}
           >
-            {isMutating ? (
+            {isMutating || isMutatingPatch ? (
               <span className="loading loading-spinner"></span>
             ) : (
               "加入購物車"
