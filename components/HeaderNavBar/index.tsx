@@ -15,6 +15,7 @@ import { useTopIntersectStore } from "@/stores/topIntersectStore";
 import { useMemberLogin } from "@/stores/useMemberLogin";
 import ShoppingCartIcon from "./ShoppingCartIcon";
 import type { UserCheckData } from "@/types/api/auth";
+import { useGoogleAuthRedirect } from "@/hook/useGoogleAuthRedirect"; 
 
 interface PropsType {
   username: string;
@@ -34,6 +35,8 @@ export default function HeaderNavBar({
   const isHome = pathname === "/";
   const [isBarScaleUp, setIsBarScaleUp] = useState<boolean>(isBarOpen || false);
   const headerSearchBarRef = useRef<HTMLDivElement | null>(null);
+  // Google 第三方登入的cookie
+  useGoogleAuthRedirect();
   // 檢查使用者是否為主辦方
   const isHost = userRole === "host";
   // 點擊外部就收起
