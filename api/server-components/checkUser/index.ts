@@ -9,7 +9,7 @@ export async function getUserInfo(): Promise<UserCheckResponse | null> {
       const token = cookieStore.get('access_token')?.value
       if (!token) {
          return null; // 沒有 token，直接返回null
-     }
+      }
       const res = await axiosInstance.get<UserCheckResponse>(
         "/auth/check",
         {

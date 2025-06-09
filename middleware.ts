@@ -10,15 +10,15 @@ const excludeApiList = [
   "/api/auth/check",
   "/api/auth/forgot-password",
   "/api/event",
-  "/api/auth/oauth/google"
+  "/api/auth/oauth/google",
 ];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
- if (excludeApiList.some((prefix) => pathname.startsWith(prefix))) {
-  return NextResponse.next(); // 動態路由也放行
-}
+  if (excludeApiList.some((prefix) => pathname.startsWith(prefix))) {
+    return NextResponse.next(); // 動態路由也放行
+  }
   // 取得目前token資訊
   const accessToken = request.cookies.get("access_token")?.value; // 過期token瀏覽器不會讓你夾帶
   const refreshToken = request.cookies.get("refresh_token")?.value;
@@ -31,6 +31,12 @@ export async function middleware(request: NextRequest) {
       method: "POST",
       headers: { cookie: `refresh_token=${refreshToken}` },
     });
+    // const refreshRes = await fetch(`${API_BASE}/auth/refresh`, {
+    //   method: "POST",
+    //   headers: {
+    //     cookie: request.headers.get("cookie") || "",
+    //   },
+    // });
 
     if (refreshRes.status !== 200) {
       return NextResponse.redirect(new URL("/", request.url));
@@ -52,15 +58,15 @@ export async function middleware(request: NextRequest) {
 
       // 4. 直接把最新的 access_token 提煉出來
       const newAccessToken = cookiePairs
-       .find((c) => c.startsWith("access_token="))
-       ?.split("=")[1]
+        .find((c) => c.startsWith("access_token="))
+        ?.split("=")[1];
 
-     // 並把它塞到 Authorization header（或自訂 header）
-     if (newAccessToken) {
-       newReqHeaders.set("access_token", newAccessToken)
-     }
-      
-      // 5. next() 傳接給下一個api route 
+      // 並把它塞到 Authorization header（或自訂 header）
+      if (newAccessToken) {
+        newReqHeaders.set("access_token", newAccessToken);
+      }
+
+      // 5. next() 傳接給下一個api route
       const response = NextResponse.next({
         request: { headers: newReqHeaders },
       });
@@ -69,7 +75,7 @@ export async function middleware(request: NextRequest) {
       for (const header of cookies) {
         response.headers.append("Set-Cookie", header);
       }
-    
+
       return response;
     }
   }
