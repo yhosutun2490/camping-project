@@ -52,6 +52,34 @@ export type PostMemberOrderResponse = SuccessResponse<{
     }[];
   };
 }>;
+
+export interface PatchMemberOrderRequest {
+  event_plan_id: string;
+  quantity: number;
+  event_addons: {
+    id: string;
+    name: string;
+    price: number;
+  }[];
+}
+
+export type PatchMemberOrderResponse = SuccessResponse<{
+  order_info: {
+    orderid: string;
+    event_plan_id: string;
+    event_title: string;
+    event_plan_price: number;
+    quantity: number;
+    total_price: number;
+    updated_at: string;
+    event_addons: {
+      id: string;
+      name: string;
+      price: number;
+    }[];
+  };
+}>;
+
 export interface DeleteMemberOrderRequest {
   reason?: string; // 取消原因（選填）
 }

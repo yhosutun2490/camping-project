@@ -23,14 +23,29 @@ export default function CartItem({
 }: CartItemProps) {
   // SWR 刪除會員訂單API
   const { trigger } = useDeleteMemberOrders();
-  const router = useRouter()
+  const router = useRouter();
+
+  function handleOnClickOrderEventInfo(order: Order) {
+    console.log("點選的訂單", order);
+    const eventId = order.event_info.id;
+    const orderId = order.id;
+    const planId = order.event_plan.id;
+    const addonIds = order.event_addons.map((item) => item.id);
+
+    const query = new URLSearchParams({
+      orderId,
+      planId,
+      addonIds: addonIds.join(","),
+    }).toString();
+    router.push(`/event/${eventId}?${query}`);
+  }
 
   async function handleOnClickDeleteIcon(orderId: string) {
     if (!orderId) return;
     try {
       await trigger({ id: orderId });
-      toast.success('刪除購物車選項成功')
-      router.refresh()
+      toast.success("刪除購物車選項成功");
+      router.refresh();
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const message = err.response?.data?.message;
@@ -65,7 +80,11 @@ export default function CartItem({
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-bold text-base text-neutral-800">
+              <p
+                className="font-bold text-base 
+              text-neutral-800 underline"
+                onClick={() => handleOnClickOrderEventInfo(order)}
+              >
                 {order.event_info.name}
               </p>
               {/* 加購項目 */}
@@ -91,7 +110,10 @@ export default function CartItem({
         </p>
         <div className="flex space-x-2 text-gray-400 text-xl">
           <IconWrapper icon="material-symbols-light:favorite-outline" />
-          <div className="delete_order_icon cursor-pointer" onClick={() => handleOnClickDeleteIcon(order.id)}>
+          <div
+            className="delete_order_icon cursor-pointer"
+            onClick={() => handleOnClickDeleteIcon(order.id)}
+          >
             <IconWrapper icon="material-symbols:delete-outline-rounded" />
           </div>
         </div>

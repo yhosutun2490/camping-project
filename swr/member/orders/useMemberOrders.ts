@@ -2,7 +2,9 @@ import axios from "axios";
 import {
  PostMemberOrderRequest,
  PostMemberOrderResponse,
- DeleteMemberOrderResponse
+ DeleteMemberOrderResponse,
+ PatchMemberOrderRequest,
+ PatchMemberOrderResponse
 } from "@/types/api/member/orders";
 import useSWRMutation from "swr/mutation";
 
@@ -26,6 +28,30 @@ export function usePostMemberOrders() {
     error,
   };
 }
+
+/**
+ * 修改會員訂單
+ */
+export function usePatchMemberOrders() {
+  const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/member/orders/patch",
+    async (_key: string, { arg: payload }: { arg: PatchMemberOrderRequest }) => {
+      const data = await axios.patch<PatchMemberOrderResponse>(
+        "/api/member/orders",
+        payload
+      );
+      return data;
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+  };
+}
+
 /** 刪除會員訂單 */
 type DeleteOrderParams = {
   id: string,

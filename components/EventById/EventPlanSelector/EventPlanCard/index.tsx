@@ -10,6 +10,7 @@ import { useMemberLogin } from "@/stores/useMemberLogin";
 import { usePostMemberOrders } from "@/swr/member/orders/useMemberOrders"; // 創建會員訂單SWR
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useParams, useSearchParams } from "next/navigation";
 
 export type PlanFeatureItem = {
   id: string;
@@ -43,17 +44,29 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   } = props;
   const { id, title, deadline, features, price, originalPrice } = data;
   const { watch } = useFormContext(); // 設定表單選取資料
-  const memberData = useMemberLogin((state)=>state.member)
+  const memberData = useMemberLogin((state) => state.member);
   const isMemberLogin = !!memberData?.id; // 是否登入
+
+  // 是否有訂單id
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const eventId = params?.id;
+  const orderId = searchParams.get("orderId");
+  const isEditing = Boolean(orderId && eventId);
 
   // 創建會員訂單API
   const { trigger, isMutating } = usePostMemberOrders();
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
+   * 選擇的方案
+   */
+  const selectPlanId = watch("plan").event_plan_id;
+  /**
    * 選取的加購選項
    */
   const addonBoxItems = watch("plan_addons");
+
   const currentPlanAddonItems = addonBoxItems.filter(
     (item: { event_plan_id: string }) => item.event_plan_id === id
   );
@@ -64,22 +77,22 @@ export default function EventPlanCard(props: EventPlanCardProps) {
 
   // 點擊購物車行為
   async function handleOnClickAddCart() {
-    console.log(
-      "目前加入購物車的方案",
-      data,
-      "addonBoxItems",
-      currentPlanAddonItems
-    );
-
     // 需登入才有member id 進行訂單創建
     if (isMemberLogin) {
       try {
-        await trigger({
-          event_plan_id: data.id,
-          quantity: 1,
-          event_addons: currentPlanAddonItems,
-        });
-        toast.success("新增購物車品項成功");
+        if (isEditing) {
+          // 修改訂單
+          console.log("修改訂單");
+        } else {
+          // 新增訂單
+          await trigger({
+            event_plan_id: data.id,
+            quantity: 1,
+            event_addons: currentPlanAddonItems,
+          });
+          toast.success("新增購物車品項成功");
+        }
+
         // 同步store購物車狀態
         addStorePlan({
           ...data,
@@ -93,11 +106,11 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         }
       }
     } else {
-       // 未登入 暫存於store
-        addStorePlan({
-          ...data,
-          addonBox: currentPlanAddonItems,
-        });
+      // 未登入 暫存於store
+      addStorePlan({
+        ...data,
+        addonBox: currentPlanAddonItems,
+      });
     }
   }
 
@@ -113,8 +126,10 @@ export default function EventPlanCard(props: EventPlanCardProps) {
 
   return (
     <div
-      className={clsx(`event_plan_card
-        p-4 md:p-6 rounded-2xl grid gap-4 grid-cols-1 bg-neutral-50`)}
+      className={clsx(
+        "event_plan_card p-4 md:p-6 rounded-2xl grid gap-4 grid-cols-1 bg-neutral-50",
+        selectPlanId === data.id && "border-2 border-primary-500 bg-zinc-100"
+      )}
     >
       {/*方案詳細資訊*/}
       <div className="plan_info space-y-6 pb-6 border-b-1 border-primary-300">
