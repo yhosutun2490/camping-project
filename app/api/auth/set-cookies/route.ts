@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const { accessToken, refreshToken } = await req.json();
+  const { accessToken } = await req.json();
 
-  if (!accessToken || !refreshToken) {
+  if (!accessToken) {
     return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
   }
 
@@ -17,13 +17,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     maxAge: 60 * 15, // 15 分鐘
   });
 
-  response.cookies.set("refresh_token", refreshToken, {
-    path: "/",
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 60 * 60 * 24 * 7, // 7 天
-  });
+  // response.cookies.set("refresh_token", refreshToken, {
+  //   path: "/",
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: "none",
+  //   maxAge: 60 * 60 * 24 * 7, // 7 天
+  // });
 
   return response;
 }
