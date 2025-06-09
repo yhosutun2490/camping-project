@@ -14,6 +14,8 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams } from "next/navigation";
+import { useRef } from "react";
+import DialogModal from "@/components/DialogModal";
 
 export type PlanFeatureItem = {
   id: string;
@@ -47,6 +49,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   } = props;
   const { id, title, deadline, features, price, originalPrice } = data;
   const { watch } = useFormContext(); // 設定表單選取資料
+  const modalRef = useRef<HTMLInputElement>(null);
   const memberData = useMemberLogin((state) => state.member);
   const isMemberLogin = !!memberData?.id; // 是否登入
 
@@ -89,7 +92,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         if (isEditing) {
           // 修改訂單
           await triggerPatch({
-            id: orderId ?? '',
+            id: orderId ?? "",
             body: {
               event_plan_id: data.id,
               quantity: 1,
@@ -120,22 +123,27 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         }
       }
     } else {
+      modalRef.current?.click(); // ✅ 開啟 modal
       // 未登入 暫存於store
-      addStorePlan({
-        ...data,
-        addonBox: currentPlanAddonItems,
-      });
+      // addStorePlan({
+      //   ...data,
+      //   addonBox: currentPlanAddonItems,
+      // });
     }
   }
 
   // 直接報名
   function handleOnClickSignupEvent() {
-    console.log(
-      "目前直接報名資料",
-      data,
-      "addonBoxItems",
-      currentPlanAddonItems
-    );
+    if (isMemberLogin) {
+      console.log(
+        "目前直接報名資料",
+        data,
+        "addonBoxItems",
+        currentPlanAddonItems
+      );
+    } else {
+      modalRef.current?.click(); // ✅ 開啟 modal
+    }
   }
 
   return (
@@ -210,6 +218,20 @@ export default function EventPlanCard(props: EventPlanCardProps) {
           </button>
         </div>
       </div>
+
+      <DialogModal
+        id="login-reminder"
+        modalRef={modalRef}
+        modalWidth="max-w-md"
+      >
+        <h3 className="font-bold heading-3 text-primary-500">請先登入</h3>
+        <p className="py-4 heading-5 text-black">登入後才能執行此操作</p>
+        <div className="modal-action">
+          <label htmlFor="login-reminder" className="btn-primary">
+            關閉
+          </label>
+        </div>
+      </DialogModal>
     </div>
   );
 }
