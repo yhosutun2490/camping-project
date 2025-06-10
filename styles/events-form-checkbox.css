@@ -1,0 +1,58 @@
+/* Figma 設計的 Checkbox Group 樣式 - 基於 Radio Group 設計 */
+
+.events-form-checkbox {
+  /* 隱藏原生 checkbox input */
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px; /* checkbox 使用方角而非圓角 */
+  border: 2px solid #4F4F4F;
+  background-color: transparent;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* 選取狀態 */
+  &:checked {
+    border-color: #5C795F;
+    background-color: #5C795F;
+    
+    /* 勾選圖示 */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      width: 8px;
+      height: 14px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+  
+  /* Hover 狀態 */
+  &:hover:not(:checked) {
+    border-color: #5C795F;
+  }
+}
+
+.figma-checkbox-label {
+  /* Figma 文字樣式 - 與 radio 相同 */
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #121212;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* 預先保留底線空間以避免跳動 */
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  
+  /* 選取狀態：顯示底線 */
+  &.checked {
+    border-bottom-color: #B0B0B0;
+  }
+}

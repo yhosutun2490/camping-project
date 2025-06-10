@@ -12,20 +12,23 @@ interface FormRadioGroupProps {
 
 function FormRadioGroup({ name, options }: FormRadioGroupProps) {
   const { register } = useFormContext<FormData>();
+  
   return (
-    <div className="flex space-x-4">
+    <div className="flex flex-wrap items-center gap-6">
       {options.map((opt) => (
         <label
           key={opt.value}
-          className="label cursor-pointer flex items-center"
+          className="flex items-center gap-2 cursor-pointer group"
         >
           <input
             type="radio"
             value={opt.value}
             {...register(name)}
-            className="radio"
+            className="events-form-radio"
           />
-          <span className="label-text ml-2">{opt.label}</span>
+          <span className="events-form-radio-label">
+            {opt.label}
+          </span>
         </label>
       ))}
     </div>

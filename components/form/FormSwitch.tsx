@@ -14,8 +14,8 @@ function FormSwitch({ name, label }: FormSwitchProps) {
   const { register } = useFormContext<FormData>();
   return (
     <label className="label cursor-pointer flex justify-start items-center gap-2">
-      <input type="checkbox" className="toggle" {...register(name)} />
-      <span className="label-text">{label}</span>
+      <input type="checkbox" className="toggle toggle-sm text-[#B0B0B0] bg-[##E7E7E7] checked:bg-[#5C795F] checked:text-[#FFFFFF]" {...register(name)} />
+      <span className="label-text text-base text-[#121212]">{label}</span>
     </label>
   );
 }
