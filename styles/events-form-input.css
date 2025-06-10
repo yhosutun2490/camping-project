@@ -1,0 +1,56 @@
+/* Figma 設計的輸入欄位樣式 - 覆蓋 daisyUI 預設樣式 */
+
+.events-form-input {
+  /* 基礎樣式 */
+  @apply rounded-2xl px-4 py-3 h-12 text-base font-normal font-[Noto_Sans_TC] bg-white;
+  
+  /* 預設狀態 - 灰色邊框 */
+  border-color: #B0B0B0;
+  color: black;
+  
+  /* Placeholder 樣式 */
+  &::placeholder {
+    color: #B0B0B0;
+  }
+  
+  /* Focus 狀態 - 綠色邊框 */
+  &:focus {
+    border-color: #5C795F;
+    outline: none;
+    box-shadow: none;
+    color: black;
+  }
+  
+  /* 錯誤狀態 - 紅色邊框 */
+  &.input-error {
+    border-color: #AB5F5F;
+    
+    &:focus {
+      border-color: #AB5F5F;
+    }
+  }
+  
+  /* 禁用狀態 - 灰色背景 */
+  &:disabled {
+    background-color: #E7E7E7;
+    border-color: transparent;
+    color: #4F4F4F;
+    cursor: not-allowed;
+    
+    &::placeholder {
+      color: #4F4F4F;
+    }
+  }
+  
+  /* 隱藏數字輸入框的步進按鈕 */
+  &[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+    
+    /* Chrome/Safari/Edge */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}

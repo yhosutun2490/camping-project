@@ -1,0 +1,52 @@
+/* Figma 設計的 Radio Group 樣式 */
+
+.events-form-radio {
+  /* 隱藏原生 radio input */
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #4F4F4F;
+  background-color: transparent;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* 選取狀態 */
+  &:checked {
+    border-color: #5C795F;
+    
+    /* 內部圓點 */
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #5C795F;
+    }
+  }
+}
+
+.events-form-radio-label {
+  /* Figma 文字樣式 */
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #121212;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* 預先保留底線空間以避免跳動 */
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  
+  /* 選取狀態：顯示底線 */
+  input:checked + & {
+    border-bottom-color: #B0B0B0;
+  }
+}
