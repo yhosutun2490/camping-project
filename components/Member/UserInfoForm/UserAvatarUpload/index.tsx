@@ -93,7 +93,7 @@ export default function UserAvatarUpload({
           onChange={handleFileChange}
         />
         <label
-          className={`label text-base self-end order-last ${
+          className={`label text-sm self-end order-last ${
             error ? "text-red-500" : "text-gray-400"
           }`}
           onClick={handleClickUpload}
@@ -116,8 +116,8 @@ export default function UserAvatarUpload({
           >
             <Image
               src={avatarUrl || "/header/user_image.jpg"}
-              width={35}
-              height={35}
+              width={96}
+              height={96}
               alt="Picture of the author"
               className="cursor-pointer"
             />

@@ -4,6 +4,9 @@
 /* 自訂樣式區塊 */
 @import "../styles/button.css";
 @import "../styles/typography.css";
+@import "../styles/events-form-input.css";
+@import "../styles/events-form-radio.css";
+@import "../styles/events-form-checkbox.css";
 @plugin "daisyui" {
   exclude: rootscrollgutter;
 }
@@ -18,7 +21,12 @@
   --color-primary-300: #A1B4A2;
   --color-primary-100: #E3E9E2;
   --color-primary-50: #F3F6F3;
+  --color-neutral-100: #E7E7E7;
+  --color-neutral-50: #f6f6f6;
+  --color-neutral-100: #e7e7e7;
   --color-neutral-300: #B0B0B0;
+  --color-neutral-500: #6d6d6d;
+  --color-neutral-700: #4f4f4f;
   --color-neutral-900: #3D3D3D;
   --color-neutral-950: #121212;
   --color-neutral-white: #FFFFFF;
@@ -61,6 +69,3 @@ body {
     color: var(--input-text) !important;
   }
 }
-
-
- 

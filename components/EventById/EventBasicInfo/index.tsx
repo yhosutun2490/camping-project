@@ -3,14 +3,16 @@ import AddFavoriteButton from "../AddFavoriteButton";
 import { Icon } from "@iconify/react";
 
 interface EventBasicInfoProps {
-  eventName?: string;
-  startTime?: string;
-  endTime?: string;
-  address?: string;
-  policy?: string;
-  rating?: number;
-  ratingCount?: number;
-  commentCount?: string;
+  data: {
+    eventName?: string;
+    startTime?: string;
+    endTime?: string;
+    address?: string;
+    policy?: string;
+    rating?: number;
+    ratingCount?: number;
+    commentCount?: string;
+  };
 }
 
 export default function EventBasicInfo(props: EventBasicInfoProps) {
@@ -20,10 +22,10 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
     endTime = "2025-06-30",
     address = "台灣・苗栗",
     policy = "15天前可免費取消,現場出示電子憑證",
-    rating = 4.5,
-    ratingCount = 96,
-    commentCount = "已售出 700+",
-  } = props;
+    rating = 0,
+    ratingCount = 0,
+    commentCount = "目前未售出",
+  } = props.data;
 
   return (
     <div className="event_basic_info">

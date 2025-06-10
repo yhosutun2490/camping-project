@@ -32,6 +32,11 @@ export default async function RootLayout({
         <HeaderNavBar 
           username={user?.data?.member?.username ?? ''} 
           userRole={user?.data?.member?.role}
+          userData={
+            user?.data?.member
+              ? user?.data?.member
+              : undefined
+          }
         />
         <LayoutContentWrapper>
            {children}

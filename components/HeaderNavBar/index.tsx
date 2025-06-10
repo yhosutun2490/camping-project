@@ -7,23 +7,27 @@ import MemberMenu from "@/components/HeaderNavBar/MemberMenu";
 import HeaderSearchBarForm from "../HeaderSearchBarForm";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import CreateHostModal from "../CreateHostModal";
 import clsx from "clsx";
 import useClickOutside from "@/hook/useClickOutSide";
 import { useTopIntersectStore } from "@/stores/topIntersectStore";
-import IconWrapper from "@/components/ClientIcon/IconWrapper";
+import { useMemberLogin } from "@/stores/useMemberLogin";
+import ShoppingCartIcon from "./ShoppingCartIcon";
+import type { UserCheckData } from "@/types/api/auth";
 
 interface PropsType {
   username: string;
   isBarOpen?: boolean;
   userRole?: string;
+  userData?: UserCheckData | null; // 登入後會員資料 同步於store使用
 }
 
 export default function HeaderNavBar({
   username,
   userRole,
   isBarOpen,
+  userData,
 }: PropsType) {
   const pathname = usePathname();
   const router = useRouter();
@@ -36,6 +40,15 @@ export default function HeaderNavBar({
   useClickOutside(headerSearchBarRef, () => setIsBarScaleUp(false));
   // 是否進入首頁置頂區塊
   const isTopSectionVisible = useTopIntersectStore((s) => s.isTopVisible);
+  // 會員資料同步於zustand store useEffect避免影響渲染副作用
+
+  useEffect(() => {
+    if (userData) {
+      useMemberLogin.getState().setMember(userData);
+    } else {
+      useMemberLogin.getState().reset();
+    }
+  }, [userData]); 
 
   return (
     <div
@@ -46,7 +59,7 @@ export default function HeaderNavBar({
           "bg-transparent": isHome && !isBarScaleUp,
           "bg-white shadow-md": !isHome || !isTopSectionVisible,
         },
-        isBarScaleUp ? "bg-white" : "",
+        isBarScaleUp ? "bg-white" : ""
       )}
     >
       <div className="flex items-center h-10 z-1">
@@ -63,15 +76,15 @@ export default function HeaderNavBar({
         </Link>
       </div>
       {/* 搜尋列 */}
-      { (
+      {
         <div
           className={clsx(
             "header_search_bar absolute top-[60px] mx-auto lg:pl-[10%]",
-            "left-[5%] sm:left-[20%] md:right-[10%] md:top-[17px] md:left-0 overflow-visible ease-in-out",
+            "left-[5%] sm:left-[20%] md:right-[28%] xl:right-[10%] md:top-[17px] md:left-0 overflow-visible ease-in-out",
             isBarScaleUp
               ? "top-[25px] w-full h-[120px] px-[10%] bg-white duration-300"
               : "w-[calc(100%-4rem)] sm:w-[450px] md:w-[250px] lg:w-[450px] h-12 px-0 transition-[width] duration-200 transition-[top] duration-600",
-            !isTopSectionVisible && isHome || !isHome ?'block':'hidden',
+            (!isTopSectionVisible && isHome) || !isHome ? "block" : "hidden"
           )}
           ref={headerSearchBarRef}
           onClick={() => {
@@ -106,7 +119,7 @@ export default function HeaderNavBar({
             />
           </div>
         </div>
-      )}
+      }
       {/* 半透明遮罩層，點擊可關閉搜尋放大 */}
       {isBarScaleUp && (
         <div
@@ -114,7 +127,7 @@ export default function HeaderNavBar({
           onClick={() => setIsBarScaleUp(false)}
         />
       )}
-      <div className="flex item-center space-x-4 h-10 z-1">
+      <div className="flex item-center space-x-1 md:space-x-4 h-10 z-1">
         <Link href="/event" className="flex items-center">
           <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
             活動列表
@@ -138,20 +151,18 @@ export default function HeaderNavBar({
           )
         ) : null}
 
-        <div className="shopping-cart w-[36px] flex items-center" onClick={()=>router.push('/cart')}>
-          <IconWrapper icon={'mdi:shopping-cart-outline'} className="hover:text-primary-300"/>
-        </div>
+        {/**購物車icon */}
+        <ShoppingCartIcon />
 
         {username ? (
           <MemberMenu user={username} />
         ) : (
-          <div className="flex space-x-3">
+          <div className="flex space-x-1 md:space-x-3">
             <LoginLabelModal />
             <RegisterModal />
           </div>
         )}
       </div>
-     
     </div>
   );
 }

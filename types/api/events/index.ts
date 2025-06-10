@@ -11,8 +11,6 @@ export interface CreateEventRequest {
   cancel_policy: string;
   registration_open_time: string;
   registration_close_time: string;
-  latitude: number;
-  longitude: number;
 }
 
 // 活動建立回應介面

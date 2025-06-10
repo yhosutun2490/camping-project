@@ -7,9 +7,6 @@ export const EventInfoSchema = z
     organizer: z.string().min(1, '請輸入主辦方名稱').max(50, '最多50字'),
     // 更改為 address
     address: z.string().min(1, '請輸入活動地點').max(200, '最多200字'),
-    // 新增經緯度
-    longitude: z.number().refine(lon => lon >= -180 && lon <= 180, '經度範圍應在 -180 到 180 之間'),
-    latitude: z.number().refine(lat => lat >= -90 && lat <= 90, '緯度範圍應在 -90 到 90 之間'),
     startDate: z
       .string()
       .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
@@ -22,9 +19,18 @@ export const EventInfoSchema = z
     endTime: z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
-    // 新增報名時間
-    registration_open_time: z.string(),
-    registration_close_time: z.string(),
+    registration_startDate: z
+      .string()
+      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
+    registration_startTime: z
+      .string()
+      .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
+    registration_endDate: z
+      .string()
+      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
+    registration_endTime: z
+      .string()
+      .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
     // 改為 max_participants
     max_participants: z.number().min(1, '至少1人').max(10000, '最多10000人'),
     // 新增價格

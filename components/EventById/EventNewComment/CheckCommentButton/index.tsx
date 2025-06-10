@@ -11,7 +11,7 @@ export default function CheckCommentButton({className}:Props) {
   border-primary-700 text-primary-700 rounded-2xl 
   hover:cursor-pointer hover:bg-primary-300`,className)}
     >
-      <span>查看全部評論</span>
+      <span className="heading-7">查看全部評論</span>
       <Icon icon="line-md:arrow-right" width={24} height={24} />
     </button>
   );
