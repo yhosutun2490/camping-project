@@ -6,6 +6,7 @@ import type { Order } from "@/components/Cart/CartItem";
 import CheckboxStyle from "@/components/CheckBoxStyle";
 import EmptyCart from "@/components/Cart/EmptyCart";
 
+
 interface Props {
   orders: Order[] | [];
 }
@@ -13,8 +14,7 @@ export default function CartItemList({ orders }: Props) {
   const [selectedOrders, setSelectedOrders] = useState<Order[]>([]);
   const totalPrice = selectedOrders?.reduce((sum, item) => sum + item.total_price, 0);
   const hasOrderList = orders?.length > 0
-
-
+ 
   function handleOnToggleSelect(order:Order):void {
     // 如果訂單已經存在需從清單移除，否則加入清單中
     const hasOrderInSelected = selectedOrders.find(item=>item.id === order.id)
@@ -24,6 +24,7 @@ export default function CartItemList({ orders }: Props) {
       setSelectedOrders([...selectedOrders,order])
     }
   }
+ 
 
   return (
     <div className="bg-white rounded-md p-6 shadow">

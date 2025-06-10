@@ -1,7 +1,4 @@
-import {
-  SuccessResponse,
-  SuccessResponseNoData,
-} from "@/types/api/response";
+import { SuccessResponse, SuccessResponseNoData } from "@/types/api/response";
 
 // 定義 UserLogin 型別
 export interface UserLogin {
@@ -9,15 +6,16 @@ export interface UserLogin {
   password: string;
   email: string;
 }
+export type MemberData = {
+  id: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  role: "member" | "host" | "admin" | "";
+};
 export type UserLoginResponse = SuccessResponse<{
-  member: {
-    id: string;
-    username: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    role: "member" | "host" | "admin";
-  };
+  member: MemberData;
 }>;
 
 export interface UserRegister extends UserLogin {
@@ -33,11 +31,13 @@ export type UserRefreshTokenResponse = SuccessResponseNoData;
 
 export type UserLogoutResponse = SuccessResponseNoData;
 
+
+export type UserCheckData = {
+  id: string;
+  username: string;
+  email: string;
+  role: "member" | "host" | "admin" | "";
+};
 export type UserCheckResponse = SuccessResponse<{
-  member: {
-    id: string;
-    username: string;
-    email: string;
-    role: "member" | "host" | "admin";
-  };
+  member: UserCheckData
 }>;

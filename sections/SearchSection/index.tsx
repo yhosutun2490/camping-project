@@ -11,7 +11,7 @@ export default function SearchSection() {
   return (
     <TopSectionObserver>
       <main className="w-screen h-full relative text-white">
-        <BackgroundSlider slides={slides} >
+        <BackgroundSlider slides={slides} className="h-screen" >
           走進森林 <br/> 享受不息的感動
         </BackgroundSlider>
         <div className="absolute z-1 left-[50%] bottom-[15%] translate-[-50%] w-[95%] sm:w-[80%]">

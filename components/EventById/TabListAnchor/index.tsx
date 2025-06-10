@@ -64,7 +64,7 @@ export default function TabListAnchor({ offset }: Props) {
         <div
           key={tab.id}
           className={clsx(
-            "h-full cursor-pointer flex items-center sm:heading-5 hover:text-primary-700 transition-colors",
+            "h-full cursor-pointer flex items-center sm:heading-5 hover:text-primary-700 transition-colors duration-300",
             activeTab === tab.label
               ? `text-primary-500 font-semibold relative
               after:content-[''] after:rotate-[180deg] after:absolute 
@@ -75,11 +75,11 @@ export default function TabListAnchor({ offset }: Props) {
               lg:after:w-[30px] 
               lg:after:h-[15px] 
               after:rounded-b-full 
-              after:bg-white
+              after:bg-primary-50
               after:border-2
               after:border-primary-500
               after:border-t-transparent
-              after:z-10`
+              after:z-10  `
               : "text-neutral-500 hover:text-primary-700"
           )}
           onClick={() => handleClickTab(tab.label as ActiveTab, offset)}

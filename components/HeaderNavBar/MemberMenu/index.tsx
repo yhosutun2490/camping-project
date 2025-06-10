@@ -7,6 +7,7 @@ import { useState, useRef } from "react";
 import { useUserLogout } from "@/swr/auth/useAuth"
 import { Icon } from "@iconify/react";
 import toast from 'react-hot-toast';
+import { useShoppingCartStore } from "@/stores/useShoppingCartStore"; // 登出需清空購物車store
 
 type OpenState = true | false;
 type PropsType = {
@@ -20,11 +21,13 @@ export default function MemberMenu({user}:PropsType) {
   });
   const router = useRouter()
   const {trigger} = useUserLogout()
+  const resetShoppingCartStore = useShoppingCartStore((state)=>state.reset) 
 
   async function handleLogOut() {
     try {
       await trigger(null)
       toast.success('登出成功')
+      resetShoppingCartStore()
       router.push('/')
       // 重新整理所有 app-router 的 data fetching
       router.refresh();

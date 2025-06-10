@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default function EventPlanSelector({ name, plans }: Props) {
-  const { control, setValue } = useFormContext();
+  const { control} = useFormContext();
   // 使用form hook 包裝封裝好的元件 讓元件解耦
   return (
     <Controller
@@ -23,14 +23,6 @@ export default function EventPlanSelector({ name, plans }: Props) {
               key={plan.id}
               data={plan}
               isSelected={field.value?.event_plan_id === plan.id}
-              onSelect={() => {
-                setValue("plan_addons", []);
-                field.onChange({
-                  event_plan_id: plan.id,
-                  quantity: 1,
-                  event_plan_price: plan.price,
-                });
-              }}
             />
           ))}
         </div>

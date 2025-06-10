@@ -19,10 +19,10 @@ export default function EventNewComment({data}:Props) {
   } = data
   return (
     <div id="event_comment" className="md:mt-20 event_new_comment flex flex-col gap-10">
-      <div className="comment_info flex gap-6 items-center">
-        <p className="heading-2">最新評論</p>
+      <div className="comment_info flex md:gap-6 items-center">
+        <p className="heading-3 md:heading-2">最新評論</p>
         <div className="comment_rating flex items-center space-x-2">
-          <RatingStarIcon width={24} height={24}/>
+          <RatingStarIcon width={24} height={24} className="ml-2"/>
           <span className="heading-5">{rating}</span>
           <span className="text-base text-neutral-700">({counts})</span>
         </div>
