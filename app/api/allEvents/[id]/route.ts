@@ -10,13 +10,13 @@ import { formatAxiosError } from "@/utils/errors";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
-    const { id } = params;
+    const { eventId } = await params;
     // 根據 id 查詢資料
     const data = await axiosInstance.get<GetApiV1EventsEventIdResponse>(
-      `/events/${id}`
+      `/events/${eventId}`
     );
 
     return NextResponse.json({ code: 200, data: data.data });

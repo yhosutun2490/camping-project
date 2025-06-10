@@ -7,10 +7,10 @@ interface Props {
   className?: string;
 }
 
-export default function CartPreviewDropdown ({ className = "" }:Props) {
+export default function CartPreviewDropdown({ className = "" }: Props) {
   const router = useRouter();
   const plans = useShoppingCartStore((state) => state.plans);
-  console.log('目前plan暫存資料',plans)
+  console.log('目前plan暫存資料', plans)
 
   return (
     <div className={`absolute top-[130%] right-0 w-[380px] max-h-[500px] bg-white border rounded shadow-lg z-50 ${className}`}>
@@ -18,7 +18,7 @@ export default function CartPreviewDropdown ({ className = "" }:Props) {
         {plans.map((plan) => (
           <div key={plan.id} className="p-4 flex gap-3">
             <img
-              src={plan.image || "/default.jpg"}
+              src={"/default.jpg"}
               className="w-20 h-20 object-cover rounded"
               alt={plan.title}
             />
@@ -26,9 +26,9 @@ export default function CartPreviewDropdown ({ className = "" }:Props) {
               <div className="font-semibold">{plan.title}</div>
               <div className="font-semibold">{plan.title}</div>
               <div className="text-sm text-neutral-500">
-                {plan.date}｜{plan.type}
+                {plan.deadline}
               </div>
-              <div className="text-sm text-neutral-500">x {plan.quantity}</div>
+              <div className="text-sm text-neutral-500">x 1</div>
               <div className="text-primary-500 mt-1">NT${plan.price}</div>
             </div>
           </div>
