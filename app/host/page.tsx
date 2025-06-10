@@ -1,23 +1,20 @@
 "use client";
 
 import React from "react";
-import HostActivities from "./components/HostActivities";
 import { HostProfile } from "./components/HostProfile";
 
 export default function HostPage() {
   return (
-    <>
-      <h1 className="text-2xl font-bold mb-8 text-neutral-900">主辦</h1>
+    <div className="flex flex-col gap-6 w-full">
+      {/* 主辦方資料標題 */}
+      <h1 className="text-black text-3xl font-semibold font-['Noto Sans TC'] leading-[45px] w-[968px]">
+        主辦方資料
+      </h1>
       
-      {/* 主辦方個人資料區塊 */}
-      <div className="mb-8">
+      {/* 主辦方個人資料卡片 */}
+      <div className="w-full">
         <HostProfile />
       </div>
-      
-      {/* 活動列表區塊 */}
-      <div className="mb-8">
-        <HostActivities />
-      </div>
-    </>
+    </div>
   );
 }

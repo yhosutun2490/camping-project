@@ -13,13 +13,8 @@ const HostSidebar = () => {
   // 側邊欄項目
   const sidebarItems = [
     {
-      name: "主頁",
-      icon: "material-symbols:home",
-      link: "/host",
-    },
-    {
       name: "活動列表",
-      icon: "material-symbols:event",
+      icon: "material-symbols:splitscreen",
       link: "/host/activities",
     },
     {
@@ -29,62 +24,73 @@ const HostSidebar = () => {
     },
     {
       name: "審核待上架活動",
-      icon: "material-symbols:fact-check",
+      icon: "material-symbols:visibility",
       link: "/host/review",
     },
     {
       name: "線上客服",
-      icon: "material-symbols:support-agent",
+      icon: "material-symbols:headset-mic",
       link: "/host/support",
     },
   ];
 
   return (
-    <div className="w-64 min-h-screen bg-white border-r border-neutral-100 shadow-sm">
-      {/* Logo 區域 */}
-      <div className="p-4 border-b border-neutral-100">
-        <Link href="/">
-          <div className="flex items-center">
+    <div className="flex flex-col items-center w-fit min-h-screen gap-6">
+      {/* 用戶資訊卡片 */}
+      <div className="bg-[#E3E9E2] border border-[#A1B4A2] rounded-2xl px-0 py-6 flex flex-col items-center gap-4 w-full">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-20 h-20 rounded-full overflow-hidden">
             <Image
-              src="/header/logo_icon.svg"
-              alt="森森不息 主辦中心"
-              width={40}
-              height={40}
+              src="/event_id/02.jpg"
+              alt="露營探險家"
+              width={80}
+              height={80}
+              className="w-full h-full object-cover"
             />
-            <div className="ml-2 text-primary-700 font-bold">
-              <div className="text-sm">森森不息</div>
-              <div className="text-xs">主辦中心</div>
-            </div>
           </div>
-        </Link>
+          <span className="text-black text-base font-semibold font-['Noto Sans TC']">
+            露營探險家
+          </span>
+        </div>
+        <button className="border-2 border-[#354738] rounded-2xl px-4 py-2 hover:bg-[#354738] hover:text-white transition-colors">
+          <span className="text-[#354738] text-sm font-semibold font-['Noto Sans TC'] hover:text-white">
+            管理主辦方資料
+          </span>
+        </button>
       </div>
 
-      {/* 側邊欄選項列表 */}
-      <nav className="mt-8">
-        <ul>
-          {sidebarItems.map((item, index) => {
-            // 檢查當前路徑是否匹配此項目的連結
-            const isActive = 
-              pathname === item.link || 
-              (pathname === '/host' && item.link === '/host');
-            
-            return (
-              <li key={index}>
-                <Link
-                  href={item.link}
-                  className={`flex items-center px-6 py-4 transition-colors
-                    ${isActive ? 
-                      'bg-primary-50 text-primary-700 font-medium' : 
-                      'text-neutral-700 hover:bg-primary-50 hover:text-primary-700'}`}
-                >
-                  <Icon icon={item.icon} width={24} height={24} className="mr-4" />
-                  <span className="text-sm">{item.name}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      {/* 選單項目 */}
+      <div className="flex flex-col w-full gap-2">
+        {sidebarItems.map((item, index) => {
+          // 檢查當前路徑是否匹配此項目的連結
+          const isActive = pathname === item.link;
+          
+          return (
+            <Link
+              key={index}
+              href={item.link}
+              className={`flex items-center gap-2 px-5 py-3 rounded-2xl transition-colors w-full
+                ${isActive ? 
+                  'bg-[#354738] text-white' : 
+                  'text-[#6D6D6D] hover:bg-gray-100'}`}
+            >
+              <div className="w-5 h-5 flex items-center justify-center">
+                <Icon 
+                  icon={item.icon} 
+                  width={20} 
+                  height={20} 
+                  className={isActive ? 'text-white' : 'text-[#6D6D6D]'}
+                />
+              </div>
+              <span className={`text-sm font-normal font-['Noto Sans TC'] ${
+                isActive ? 'text-white' : 'text-[#6D6D6D]'
+              }`}>
+                {item.name}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
+import FormField from '@/components/form/FormField';
 import {
   useGetHostProfile,
   useUpdateHostProfile,
@@ -11,7 +12,6 @@ import {
   useHostAvatarUpload,
   useHostCoverUpload,
 } from '@/swr/host/useHostProfileImage';
-import FormHookInput from '@/components/FormHookInput';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -134,40 +134,6 @@ export function HostProfile() {
     console.log('設置背景圖片檔案到表單:', file);
   };
 
-  // 取消編輯，重置所有狀態
-  const cancelEditing = () => {
-    // 如果有 hostProfile 資料，使用它來重置表單
-    if (hostProfile) {
-      reset({
-        name: hostProfile.name,
-        description: hostProfile.description,
-        email: hostProfile.email,
-        phone: hostProfile.phone,
-        // 設置圖片欄位，如果已有現有圖片則使用虛擬檔案
-        photo: hostProfile.photo_url
-          ? new File([], 'existing-photo.jpg')
-          : null,
-        photo_background: hostProfile.photo_background_url
-          ? new File([], 'existing-background.jpg')
-          : null,
-      });
-    } else {
-      // 否則只是重置表單
-      reset();
-    }
-
-    // 清除預覽圖片
-    setAvatarPreview(null);
-    setBackgroundPreview(null);
-
-    // 清除檔案
-    setAvatarFile(null);
-    setBackgroundFile(null);
-
-    // 關閉編輯模式
-    setIsEditing(false);
-  };
-
   // 表單提交處理函式
   const saveChanges = async (data: HostProfileFormType) => {
     try {
@@ -234,9 +200,9 @@ export function HostProfile() {
   // 處理載入中狀態
   if (isLoading) {
     return (
-      <div className="bg-neutral-0 rounded-lg shadow-sm overflow-hidden p-6">
+      <div className="bg-white rounded-2xl overflow-hidden p-6">
         <div className="flex justify-center items-center h-48">
-          <div className="loading loading-spinner loading-lg text-primary-500"></div>
+          <div className="loading loading-spinner loading-lg text-[#5C795F]"></div>
         </div>
       </div>
     );
@@ -245,21 +211,23 @@ export function HostProfile() {
   // 處理錯誤或尚未建立主辦方資料的情況
   if (error || !hostProfile) {
     return (
-      <div className="bg-neutral-0 rounded-lg shadow-sm overflow-hidden p-6">
+      <div className="bg-white rounded-2xl overflow-hidden p-6 -mt-12">
         <div className="flex flex-col items-center justify-center h-48">
-          <p className="text-lg font-medium text-neutral-700 mb-4">
+          <p className="text-lg font-semibold text-[#121212] mb-4 font-['Noto_Sans_TC']">
             尚未建立主辦方資料
           </p>
-          <button className="btn btn-primary">建立主辦方資料</button>
+          <button className="bg-[#5C795F] text-white px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC']">
+            建立主辦方資料
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-neutral-0 rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl overflow-hidden">
       {/* 背景圖片區域 */}
-      <div className="relative h-48 w-full">
+      <div className="relative h-[200px] w-full">
         <Image
           src={
             backgroundPreview ||
@@ -280,66 +248,32 @@ export function HostProfile() {
           onChange={handleBackgroundUpload}
         />
 
-        {/* 編輯背景按鈕 - 僅在非編輯模式下顯示 */}
-        {!isEditing && (
-          <button
-            className="absolute right-4 top-4 bg-neutral-0/80 p-2 rounded-full hover:bg-neutral-0 transition"
-            onClick={() => {
-              // 初始化表單數據
-              reset({
-                name: hostProfile.name,
-                description: hostProfile.description,
-                email: hostProfile.email,
-                phone: hostProfile.phone,
-                // 設置初始圖片欄位，如果已有現有圖片則使用虛擬檔案
-                photo: hostProfile.photo_url
-                  ? new File([], 'existing-photo.jpg')
-                  : null,
-                photo_background: hostProfile.photo_background_url
-                  ? new File([], 'existing-background.jpg')
-                  : null,
-              });
-              setIsEditing(true);
-            }}
-          >
-            <Icon
-              icon="material-symbols:edit"
-              className="text-neutral-700"
-              width={20}
-              height={20}
-            />
-          </button>
-        )}
-
         {/* 背景圖片點擊上傳遮罩 - 僅在編輯模式下顯示 */}
         {isEditing && (
-          <div
-            className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer transition-all hover:bg-black/50"
-            onClick={() => backgroundInputRef.current?.click()}
-          >
-            <div className="bg-white rounded-lg px-4 py-2 flex items-center shadow-lg">
-              <Icon
-                icon="material-symbols:upload"
-                className="mr-2 text-gray-700"
-                width={20}
-                height={20}
-              />
-              <span className="text-sm font-medium text-gray-900">
-                點擊上傳背景圖片
-              </span>
-            </div>
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <Icon
+              icon="material-symbols:broken-image-outline"
+              className="text-white"
+              width={32}
+              height={32}
+            />
+            <div
+              className="absolute inset-0 bg-transparent cursor-pointer"
+              onClick={() => backgroundInputRef.current?.click()}
+            />
           </div>
         )}
 
-        {/* 頭像 */}
-        <div className="absolute left-10 top-6 z-10">
-          <div className="avatar relative">
-            <div className="w-24 h-24 mask mask-circle ring-4 ring-neutral-0 shadow-lg">
+        {/* 頭像 - 放在背景圖片區域的底部 */}
+        <div className="absolute left-10 bottom-0 transform translate-y-1/2 z-10">
+          <div className="relative">
+            {/* 頭像容器 */}
+            <div className="w-24 h-24 rounded-full border-2 border-white overflow-hidden relative bg-white">
               <Image
                 src={avatarPreview || hostProfile.photo_url || DEFAULT_AVATAR}
                 alt="主辦方頭像"
-                width={96}
-                height={96}
+                fill
+                className="object-cover"
               />
 
               {/* 頭像點擊上傳遮罩 - 僅在編輯模式下顯示 */}
@@ -358,6 +292,18 @@ export function HostProfile() {
               )}
             </div>
 
+            {/* 驗證徽章 */}
+            {hostProfile.verification_status === 'verified' && (
+              <div className="absolute -bottom-0 -right-0 w-6 h-6 bg-[#5C795F] rounded-full flex items-center justify-center">
+                <Icon
+                  icon="material-symbols:check"
+                  className="text-white"
+                  width={16}
+                  height={16}
+                />
+              </div>
+            )}
+
             {/* 隱藏的頭像檔案上傳輸入框 */}
             <input
               type="file"
@@ -370,8 +316,8 @@ export function HostProfile() {
         </div>
       </div>
 
-      {/* 個人資訊區域 */}
-      <div className="p-6">
+      {/* 內容區域 */}
+      <div className="pt-12 px-10 pb-10">
         {isEditing ? (
           /* 編輯模式：顯示表單 */
           <form
@@ -398,166 +344,190 @@ export function HostProfile() {
             )}
             noValidate
           >
-            <div className="space-y-4">
-              <div className="form-control">
-                <FormHookInput
-                  label="主辦方名稱"
-                  type="text"
-                  placeholder="請輸入主辦方名稱"
-                  register={register('name')}
-                  error={errors.name}
-                />
+            <div className="flex flex-col gap-8">
+              {/* 頭像和名稱區域 */}
+              <div className="flex items-center gap-4">
+                {/* 名稱輸入框 */}
+                <div className="w-[300px]">
+                  <FormField
+                    label="名稱"
+                    name="name"
+                    error={errors.name?.message}
+                  >
+                    <input
+                      {...register('name')}
+                      type="text"
+                      placeholder="露營探險家"
+                      className={`events-form-input input input-bordered w-full ${errors.name ? 'input-error' : ''}`}
+                    />
+                  </FormField>
+                </div>
               </div>
 
-              <div className="form-control">
-                <label className="label text-black mb-1">描述</label>
-                <textarea
-                  {...register('description')}
-                  className="textarea textarea-bordered h-24 w-full"
-                  placeholder="主辦方簡介"
-                ></textarea>
-                {errors.description && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.description.message}
-                  </p>
-                )}
+              {/* 背景簡介 */}
+              <div className="w-[624px]">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[#4F4F4F] text-sm font-normal font-['Noto_Sans_TC'] leading-[1.5em]">
+                    背景簡介
+                  </label>
+                  <div className={`bg-white border rounded-2xl px-4 py-3 h-[132px] ${
+                    errors.description ? 'border-[#AB5F5F]' : 'border-[#B0B0B0]'
+                  }`}>
+                    <textarea
+                      {...register('description')}
+                      placeholder="專業露營體驗策劃團隊，提供完善裝備與獨特自然環境，讓您遠離喧囂，擁抱大自然的美好時光。"
+                      className="w-full h-full text-[#121212] text-base font-normal font-['Noto_Sans_TC'] leading-[1.5em] bg-transparent border-none outline-none resize-none"
+                    />
+                  </div>
+                  {errors.description && (
+                    <span className="label-text-alt text-xs font-normal text-[#AB5F5F] leading-[1.5em] font-[Noto_Sans_TC]">
+                      {errors.description.message}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="form-control">
-                <FormHookInput
-                  label="聯絡電話"
-                  type="tel"
-                  placeholder="請輸入手機號碼"
-                  register={register('phone')}
-                  error={errors.phone}
-                />
+              {/* 電話號碼區域 */}
+              <div className="flex gap-6">
+                {/* 電話號碼 */}
+                <div className="w-[300px]">
+                  <FormField
+                    label="電話號碼"
+                    name="phone"
+                    error={errors.phone?.message}
+                  >
+                    {/* 電話號碼輸入 */}
+                    <input
+                      {...register('phone')}
+                      type="tel"
+                      placeholder="09XXXXXXXX"
+                      className={
+                        `events-form-input input input-bordered w-full ${
+                          errors.phone ? 'input-error' : ''
+                        }`
+                      }
+                    />
+                  </FormField>
+                </div>
               </div>
 
-              <div className="form-control">
-                <FormHookInput
-                  label="電子郵件"
-                  type="email"
-                  placeholder="請輸入電子郵件"
-                  register={register('email')}
-                  error={errors.email}
-                />
+              {/* 電子信箱 */}
+              <div className="w-[300px]">
+                <FormField
+                  label="電子信箱"
+                  name="email"
+                  error={errors.email?.message}
+                >
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder="abc0329@gmail.com"
+                    className={
+                      `events-form-input input input-bordered w-full ${
+                        errors.email ? 'input-error' : ''
+                      }`
+                    }
+                  />
+                </FormField>
               </div>
 
-              {/* 表單操作按鈕 */}
-              <div className="pt-4 flex justify-end gap-2">
+              {/* 按鈕區域 */}
+              <div className="flex justify-start gap-3">
                 <button
-                  className="btn btn-sm btn-outline"
                   type="button"
-                  onClick={cancelEditing}
-                  disabled={isMutating}
+                  onClick={() => setIsEditing(false)}
+                  className="bg-white text-[#4F4F4F] border border-[#B0B0B0] px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight"
                 >
                   取消
                 </button>
                 <button
-                  className="btn btn-sm btn-primary"
                   type="submit"
-                  onClick={(e) => {
-                    console.log('儲存按鈕點擊', e);
-
-                    // 在點擊時確保有現有圖片的情況下通過驗證
-                    if (!avatarFile && hostProfile?.photo_url) {
-                      setValue('photo', new File([], 'existing-photo.jpg'));
-                    }
-
-                    if (!backgroundFile && hostProfile?.photo_background_url) {
-                      setValue(
-                        'photo_background',
-                        new File([], 'existing-background.jpg')
-                      );
-                    }
-
-                    // 不需要呼叫 e.preventDefault()，讓表單自然提交
-                  }}
                   disabled={isMutating}
+                  className="bg-[#5C795F] text-white px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight flex items-center gap-1"
                 >
                   {isMutating ? (
                     <span className="loading loading-spinner loading-xs mr-2"></span>
                   ) : null}
-                  儲存變更
+                  儲存
                 </button>
               </div>
             </div>
           </form>
         ) : (
           /* 檢視模式：顯示靜態資料 */
-          <div>
-            {/* 主辦方名稱和簡介 */}
-            <div>
-              <div className="flex items-center">
-                <h2 className="text-xl font-bold text-neutral-900">
-                  {hostProfile.name}
-                </h2>
+          <div className="flex flex-col gap-6 mt-6">
+            {/* 主辦方名稱區域 - 頭像現在在背景圖片區域 */}
+            <div className="flex flex-col gap-4">
+              {/* 名稱和 */}
+              <h2 className="text-[#121212] text-lg font-bold">
+                {hostProfile.name}
+              </h2>
 
-                {/* 認證狀態 - 移至名稱右邊 */}
-                <div className="flex items-center ml-3">
-                  {hostProfile.verification_status === 'verified' ? (
-                    <>
-                      <Icon
-                        icon="material-symbols:check-circle-rounded"
-                        className="text-primary-500 mr-1"
-                        width={18}
-                        height={18}
-                      />
-                      <div className="bg-primary-50 text-primary-700 text-xs px-2.5 py-0.5 rounded-full">
-                        已認證
-                      </div>
-                    </>
-                  ) : hostProfile.verification_status === 'pending' ? (
-                    <>
-                      <Icon
-                        icon="material-symbols:pending-rounded"
-                        className="text-warning-500 mr-1"
-                        width={18}
-                        height={18}
-                      />
-                      <div className="bg-warning-50 text-warning-700 text-xs px-2.5 py-0.5 rounded-full">
-                        審核中
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <Icon
-                        icon="material-symbols:error-rounded"
-                        className="text-error-500 mr-1"
-                        width={18}
-                        height={18}
-                      />
-                      <div className="bg-error-50 text-error-700 text-xs px-2.5 py-0.5 rounded-full">
-                        未通過
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <p className="text-neutral-700 mt-3">{hostProfile.description}</p>
+              {/* 描述 */}
+              <p className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC'] leading-relaxed">
+                {hostProfile.description}
+              </p>
             </div>
 
-            {/* 聯絡資訊 */}
-            <div className="mt-6 flex flex-col gap-2">
-              <div className="flex items-center text-neutral-700">
+            {/* 聯絡資訊區域 */}
+            <div className="flex gap-11">
+              {/* 電話資訊 */}
+              <div className="flex items-center gap-2">
                 <Icon
-                  icon="material-symbols:phone"
-                  className="mr-2 text-neutral-500"
-                  width={20}
-                  height={20}
+                  icon="material-symbols:call-outline"
+                  className="text-[#5C795F]"
+                  width={24}
+                  height={24}
                 />
-                <span>{hostProfile.phone}</span>
+                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                  +886
+                </span>
+                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                  {hostProfile.phone}
+                </span>
+                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                  #12
+                </span>
               </div>
-              <div className="flex items-center text-neutral-700">
+
+              {/* 電子郵件 */}
+              <div className="flex items-center gap-2">
                 <Icon
-                  icon="material-symbols:email"
-                  className="mr-2 text-neutral-500"
-                  width={20}
-                  height={20}
+                  icon="material-symbols:mail-outline"
+                  className="text-[#5C795F]"
+                  width={24}
+                  height={24}
                 />
-                <span>{hostProfile.email}</span>
+                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                  {hostProfile.email}
+                </span>
               </div>
+            </div>
+
+            {/* 編輯按鈕 */}
+            <div className="flex justify-start">
+              <button
+                className="bg-[#5C795F] text-white px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight"
+                onClick={() => {
+                  // 初始化表單數據
+                  reset({
+                    name: hostProfile.name,
+                    description: hostProfile.description,
+                    email: hostProfile.email,
+                    phone: hostProfile.phone,
+                    // 設置初始圖片欄位，如果已有現有圖片則使用虛擬檔案
+                    photo: hostProfile.photo_url
+                      ? new File([], 'existing-photo.jpg')
+                      : null,
+                    photo_background: hostProfile.photo_background_url
+                      ? new File([], 'existing-background.jpg')
+                      : null,
+                  });
+                  setIsEditing(true);
+                }}
+              >
+                編輯
+              </button>
             </div>
           </div>
         )}
