@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import FileUploader from '../../../components/form/FileUploader';
@@ -18,19 +18,19 @@ interface EventImage {
 }
 
 interface UploadEventImageFormProps {
-  /** 下一步 */
-  onNextStep: () => void;
-  /** 返回上一步 */
-  onPrevStep: () => void;
   /** 活動 ID */
   eventId: string | null;
 }
 
-function UploadEventImageForm({
-  onNextStep,
-  onPrevStep,
+// 定義 ref 類型
+export interface UploadEventImageFormRef {
+  handleSubmit: () => Promise<boolean>;
+  getLoadingState: () => boolean;
+}
+
+const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImageFormProps>(({
   eventId,
-}: UploadEventImageFormProps) {
+}, ref) => {
   const {
     setValue,
     getValues,
@@ -108,19 +108,19 @@ function UploadEventImageForm({
    * 準備上傳資料，將 EventImage 陣列轉換為 API 所需的格式
    * @returns {{ files: File[], descriptions: string[] }} 格式化後的上傳資料
    */
-  const prepareUploadData = () => {
+  const prepareUploadData = useCallback(() => {
     // 分離檔案與描述為兩個獨立陣列
     const files = eventImages.map(image => image.file);
     const descriptions = eventImages.map(image => image.description || '');
     
     return { files, descriptions };
-  };
+  }, [eventImages]);
   
   /**
    * 驗證上傳前的檔案格式與大小
    * @returns {boolean} 是否通過驗證
    */
-  const validateFiles = () => {
+  const validateFiles = useCallback(() => {
     if (eventImages.length === 0) {
       toast.error('請至少上傳一張活動圖片');
       return false;
@@ -145,58 +145,64 @@ function UploadEventImageForm({
     }
     
     return true;
-  };
+  }, [eventImages]);
 
-  // 處理下一步按鈕點擊
-  const handleNextStep = async () => {
-    // 先執行 React Hook Form 驗證
-    const isValid = await trigger('eventImages');
-    
-    if (isValid) {
-      // 自定義檔案驗證
-      if (!validateFiles()) {
-        return;
-      }
-
-      // 如果有活動ID且有檔案要上傳，則執行上傳
-      if (eventId) {
-        try {
-          // 準備上傳資料
-          const { files, descriptions } = prepareUploadData();
-          
-          // 顯示上傳中提示
-          const uploadToastId = toast.loading('正在上傳活動圖片...');
-          
-          // 呼叫上傳API
-          await uploadImages({
-            files,
-            descriptions
-          });
-          
-          // 處理上傳結果 - 如果沒有拋出錯誤，表示上傳成功
-          toast.success('圖片上傳成功', { id: uploadToastId });
-          // 上傳成功後前往下一步
-          onNextStep();
-        } catch (error) {
-          console.error('上傳活動圖片時發生錯誤:', error);
-          toast.error('上傳過程中發生錯誤，請稍後再試');
+  // 暴露給父元件的方法
+  useImperativeHandle(ref, () => ({
+    handleSubmit: async () => {
+      // 先執行 React Hook Form 驗證
+      const isValid = await trigger('eventImages');
+      
+      if (isValid) {
+        // 自定義檔案驗證
+        if (!validateFiles()) {
+          return false;
         }
-      } else {
-        // 如果沒有活動ID，則只是儲存表單資料到狀態，然後前往下一步
-        console.warn('沒有提供活動ID，略過圖片上傳');
-        onNextStep();
+
+        // 如果有活動ID且有檔案要上傳，則執行上傳
+        if (eventId) {
+          try {
+            // 準備上傳資料
+            const { files, descriptions } = prepareUploadData();
+            
+            // 顯示上傳中提示
+            const uploadToastId = toast.loading('正在上傳活動圖片...');
+            
+            // 呼叫上傳API
+            await uploadImages({
+              files,
+              descriptions
+            });
+            
+            // 處理上傳結果 - 如果沒有拋出錯誤，表示上傳成功
+            toast.success('圖片上傳成功', { id: uploadToastId });
+            // 上傳成功後返回 true
+            return true;
+          } catch (error) {
+            console.error('上傳活動圖片時發生錯誤:', error);
+            toast.error('上傳過程中發生錯誤，請稍後再試');
+            return false;
+          }
+        } else {
+          // 如果沒有活動ID，則只是儲存表單資料到狀態
+          console.warn('沒有提供活動ID，略過圖片上傳');
+          return true;
+        }
       }
-    }
-  };
+      return false;
+    },
+    getLoadingState: () => isUploading,
+  }), [eventId, trigger, uploadImages, isUploading, prepareUploadData, validateFiles]);
 
   return (
-    <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 text-center">上傳活動圖片</h2>
+    <div className="flex flex-col gap-8 self-stretch">
+      <h1 className="text-3xl font-semibold">上傳活動圖片</h1>
 
       <div className="space-y-8">
         <FormField
           label="活動圖片"
           name="eventImages"
+          required
           error={errors.eventImages?.message as string}
         >
           <div className="space-y-4">
@@ -213,14 +219,6 @@ function UploadEventImageForm({
                 <p className="text-sm text-warning mt-2">
                   已達到最多 3 張圖片的上傳限制
                 </p>
-              )}
-              {isUploading && (
-                <div className="mt-3 bg-base-200 p-3 rounded-md">
-                  <div className="flex items-center">
-                    <span className="loading loading-spinner loading-sm mr-2"></span>
-                    <p className="text-sm">正在上傳活動圖片，請稍候...</p>
-                  </div>
-                </div>
               )}
             </div>
 
@@ -243,7 +241,7 @@ function UploadEventImageForm({
                 </h3>
                 <div className="flex flex-col gap-6">
                   {eventImages.map((image, index) => (
-                    <div key={index} className="border rounded-lg p-4">
+                    <div key={index}>
                       <div className="flex items-start gap-4">
                         <div className="w-60 shrink-0">
                           <ImagePreview
@@ -253,14 +251,6 @@ function UploadEventImageForm({
                             height={120}
                             onDelete={() => handleDeleteImage(index)}
                           />
-                          <div className="mt-2 text-xs text-base-content/70 flex justify-between items-center">
-                            <span className="truncate max-w-[70%]" title={image.file.name}>
-                              {image.file.name}
-                            </span>
-                            <span className={isFileTooBig(image.file) ? 'text-error' : 'text-success'}>
-                              {formatFileSize(image.file.size)}
-                            </span>
-                          </div>
                         </div>
                         <div className="flex-1">
                           <div className="form-control w-full">
@@ -291,36 +281,11 @@ function UploadEventImageForm({
             )}
           </div>
         </FormField>
-
-        {/* 按鈕區 */}
-        <div className="flex justify-between pt-4">
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={onPrevStep}
-            disabled={isUploading}
-          >
-            返回
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary px-8"
-            onClick={handleNextStep}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <>
-                <span className="loading loading-spinner loading-sm mr-2"></span>
-                上傳中...
-              </>
-            ) : (
-              '繼續填寫，下一步'
-            )}
-          </button>
-        </div>
       </div>
     </div>
   );
-}
+});
+
+UploadEventImageForm.displayName = 'UploadEventImageForm';
 
 export default React.memo(UploadEventImageForm);

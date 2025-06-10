@@ -64,10 +64,10 @@ function PlanAccordionItem({
     <div
       className={`collapse ${
         isExpanded ? 'collapse-open' : 'collapse-close'
-      } bg-base-200 rounded-lg`}
+      } bg-white rounded-lg`}
     >
       <div
-        className="collapse-title text-xl font-medium flex justify-between items-center cursor-pointer"
+        className="collapse-title px-4 text-xl font-medium flex justify-between items-center cursor-pointer"
         onClick={onToggle}
       >
         <div>
@@ -107,11 +107,25 @@ function PlanAccordionItem({
         </div>
       </div>
       <div className="collapse-content">
-        <div className="p-4 space-y-6">
+        <div className="flex flex-col gap-10">
           {/* 方案基本資訊 */}
-          <div className="card bg-base-100 shadow-sm">
-            <div className="card-body">
-              <h3 className="card-title text-lg mb-4">方案基本資訊</h3>
+          <div className="card">
+            <div className="">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="card-title text-lg">方案基本資訊</h3>
+                {/* 方案操作按鈕 */}
+                <div>
+                  {canDelete && (
+                    <button
+                      type="button"
+                      className="flex items-center justify-center gap-1 px-4 py-2 rounded-2xl border-2 border-[#354738] bg-white text-[#354738] hover:bg-[#354738] hover:text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={onDelete}
+                    >
+                      刪除方案
+                    </button>
+                  )}
+                </div>
+              </div>
 
               <div className="space-y-4">
                 {/* 方案標題 */}
@@ -127,8 +141,8 @@ function PlanAccordionItem({
                   />
                 </FormField>
 
-                {/* 方案價格 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between gap-4">
+                  {/* 方案價格 */}
                   <FormField
                     label="方案價格"
                     name={`plans.${index}.price`}
@@ -160,10 +174,18 @@ function PlanAccordionItem({
           </div>
 
           {/* 方案內容 */}
-          <div className="card bg-base-100 shadow-sm">
-            <div className="card-body">
-              <h3 className="card-title text-lg mb-4">方案內容</h3>
-
+          <div className="card">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="card-title text-lg">方案內容</h3>
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-1 px-4 py-2 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] border-none text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleAddContent}
+                >
+                  + 新增方案內容
+                </button>
+              </div>
               <FormField
                 label="內容項目"
                 name={`plans.${index}.content`}
@@ -171,50 +193,57 @@ function PlanAccordionItem({
                 error={planErrors?.content?.message}
               >
                 <div className="space-y-2">
-                  {contentArray.fields.map((field, contentIndex) => (
-                    <div key={field.id} className="flex items-center gap-2">
-                      <FormInput
-                        name={`plans.${index}.content.${contentIndex}.value`}
-                        placeholder="請輸入內容項目"
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-square btn-sm btn-outline btn-error"
-                        onClick={() => contentArray.remove(contentIndex)}
-                        disabled={contentArray.fields.length <= 1}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+                  {contentArray.fields.length === 0 ? (
+                    <div className="text-center py-4 bg-base-200 rounded-lg text-base-content/70">
+                      尚未添加方案內容
                     </div>
-                  ))}
-
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline btn-primary w-full"
-                    onClick={handleAddContent}
-                  >
-                    + 新增內容項目
-                  </button>
+                  ) : (
+                    contentArray.fields.map((field, contentIndex) => (
+                      <div key={field.id} className="flex items-center gap-2">
+                        <FormInput
+                          name={`plans.${index}.content.${contentIndex}.value`}
+                          placeholder="請輸入內容項目"
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-square btn-sm btn-outline btn-error"
+                          onClick={() => contentArray.remove(contentIndex)}
+                          disabled={contentArray.fields.length <= 1}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </FormField>
             </div>
           </div>
 
           {/* 加購商品 */}
-          <div className="card bg-base-100 shadow-sm">
-            <div className="card-body">
-              <h3 className="card-title text-lg mb-4">加購商品（可選）</h3>
+          <div className="card">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="card-title text-lg">加購商品（可選）</h3>
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-1 px-4 py-2 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] border-none text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleAddAddOn}
+                >
+                  + 新增加購商品
+                </button>
+              </div>
 
               <FormField
                 label="加購商品"
@@ -230,7 +259,7 @@ function PlanAccordionItem({
                     addOnsArray.fields.map((field, addOnIndex) => (
                       <div
                         key={field.id}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center p-2 border rounded-md"
+                        className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center"
                       >
                         <div className="md:col-span-2">
                           <FormInput
@@ -243,6 +272,7 @@ function PlanAccordionItem({
                             name={`plans.${index}.addOns.${addOnIndex}.price`}
                             min={0}
                             step={1}
+                            placeholder="商品價格"
                           />
                           <button
                             type="button"
@@ -266,30 +296,9 @@ function PlanAccordionItem({
                       </div>
                     ))
                   )}
-
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline btn-primary w-full"
-                    onClick={handleAddAddOn}
-                  >
-                    + 新增加購商品
-                  </button>
                 </div>
               </FormField>
             </div>
-          </div>
-
-          {/* 方案操作按鈕 */}
-          <div className="flex justify-end mt-4">
-            {canDelete && (
-              <button
-                type="button"
-                className="btn btn-error btn-sm"
-                onClick={onDelete}
-              >
-                刪除方案
-              </button>
-            )}
           </div>
         </div>
       </div>

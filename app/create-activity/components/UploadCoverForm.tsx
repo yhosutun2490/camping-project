@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import FileUploader from '../../../components/form/FileUploader';
@@ -12,13 +12,16 @@ import { EventImageType } from '@/types/api/events';
 interface UploadCoverFormProps {
   /** 下一步 */
   onNextStep: () => void;
-  /** 返回上一步 */
-  onPrevStep: () => void;
   /** 活動 ID */
   eventId: string | null;
 }
 
-function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormProps) {
+export interface UploadCoverFormRef {
+  handleSubmit: () => Promise<boolean>;
+  getLoadingState: () => { isLoading: boolean; loadingText: string };
+}
+
+const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ onNextStep, eventId }, ref) => {
   const {
     setValue,
     getValues,
@@ -33,6 +36,15 @@ function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormPro
     hookParams, 
     'cover' as EventImageType
   );
+
+  // 使用 useImperativeHandle 暴露方法給父元件
+  useImperativeHandle(ref, () => ({
+    handleSubmit: handleNextStep,
+    getLoadingState: () => ({
+      isLoading: isUploading,
+      loadingText: isUploading ? '上傳封面圖片中...' : '',
+    }),
+  }));
 
   // 本地狀態管理上傳的檔案
   const [coverFiles, setCoverFiles] = useState<File[]>(() => {
@@ -75,23 +87,23 @@ function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormPro
   };
 
   // 處理下一步按鈕點擊
-  const handleNextStep = async () => {
+  const handleNextStep = async (): Promise<boolean> => {
     // 先觸發驗證
     const isValid = await trigger('coverImages');
     if (!isValid) {
-      return; // 驗證失敗，不繼續執行
+      return false; // 驗證失敗，不繼續執行
     }
     
     // 檢查是否有圖片
     if (coverFiles.length === 0) {
       toast.error('請至少上傳一張封面圖片');
-      return;
+      return false;
     }
     
     // 檢查 eventId 是否存在
     if (!eventId) {
       toast.error('無法上傳圖片：活動 ID 未設定');
-      return;
+      return false;
     }
     
     try {
@@ -106,16 +118,20 @@ function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormPro
         
         // 上傳成功後進入下一步
         onNextStep();
+        return true;
       }
+      
+      return false;
     } catch (error) {
       console.error('圖片上傳失敗:', error);
       toast.error('圖片上傳失敗，請重試');
+      return false;
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 text-center">上傳活動封面</h2>
+    <div className="flex flex-col gap-8 self-stretch">
+      <h1 className="text-3xl font-semibold">上傳活動封面</h1>
 
       <div className="space-y-8">
         <FormField
@@ -137,12 +153,6 @@ function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormPro
                   multiple={true}
                   maxFiles={Math.max(1, 3 - coverFiles.length)} // 確保至少為 1，避免 0 或負數
                 />
-                {isUploading && (
-                  <div className="flex items-center gap-2 mt-2 text-sm text-primary">
-                    <span className="loading loading-spinner loading-sm"></span>
-                    <span>正在上傳圖片...</span>
-                  </div>
-                )}
               </div>
             )}
 
@@ -176,28 +186,11 @@ function UploadCoverForm({ onNextStep, onPrevStep, eventId }: UploadCoverFormPro
             )}
           </div>
         </FormField>
-
-        {/* 按鈕區 */}
-        <div className="flex justify-between pt-4">
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={onPrevStep}
-          >
-            返回
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary px-8"
-            onClick={handleNextStep}
-            disabled={coverFiles.length === 0 || isUploading} // 沒有圖片或上傳中時禁用
-          >
-            {isUploading ? '上傳中...' : '上傳圖片並繼續下一步'}
-          </button>
-        </div>
       </div>
     </div>
   );
-}
+});
+
+UploadCoverForm.displayName = 'UploadCoverForm';
 
 export default React.memo(UploadCoverForm);
