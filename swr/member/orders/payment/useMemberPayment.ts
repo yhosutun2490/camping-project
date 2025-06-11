@@ -14,7 +14,7 @@ export function usePostMemberOrdersPayment() {
         "/api/member/orders/payment",
         payload
       );
-      return res.data;
+      return res;
     }
   );
 

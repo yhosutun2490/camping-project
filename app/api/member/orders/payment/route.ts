@@ -22,7 +22,7 @@ export async function POST(
   }
   try {
     const body: PostPaymentRequest = await req.json();
-    const res: AxiosResponse<PostPaymentResponse> = await axiosInstance.post('/member/orders/payment', body, {
+    const res: AxiosResponse= await axiosInstance.post<PostPaymentResponse> ('/member/orders/payment', body, {
       headers: {
         Cookie: `access_token=${accessToken}`,
       },

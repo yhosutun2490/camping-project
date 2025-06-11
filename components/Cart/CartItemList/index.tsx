@@ -53,10 +53,9 @@ export default function CartItemList({ orders }: Props) {
     if (selectedOrders.length > 0) {
       const orderIds = selectedOrders.map((order) => order.id);
       try {
-        const response = await postPayment({ orderIds });
-        console.log("ECPay 回傳資料：", response);
-        if (response?.html) {
-          injectAndSubmitECPayForm(response.html);
+        const {data} = await postPayment({ orderIds });
+        if (data.html) {
+          injectAndSubmitECPayForm(data.html);
         }
       } catch (error) {
         console.error("支付失敗：", error);
