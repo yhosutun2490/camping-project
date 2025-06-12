@@ -4,6 +4,7 @@ import Image, { ImageProps } from "next/image";
 import { useState } from "react";
 import clsx from "clsx";
 
+
 /** next image 元件type */
 interface Props extends Omit<ImageProps, "src"> {
   src: string;
@@ -14,7 +15,7 @@ interface Props extends Omit<ImageProps, "src"> {
 export default function ImageSkeleton({
   src,
   fallbackSrc = "/fallback.jpg",
-  skeletonClassName = "bg-gray-200 animate-pulse",
+   skeletonClassName = "bg-[linear-gradient(90deg,#e0e0e0_25%,#f0f0f0_50%,#e0e0e0_75%)] bg-[length:200%_100%] animate-shimmer",
   className,
   ...rest
 }: Props) {
@@ -26,7 +27,7 @@ export default function ImageSkeleton({
       {/*圖片載入中*/}
       {!isLoaded && (
         <div
-          className={clsx("absolute inset-0 rounded-lg skeleton", skeletonClassName)}
+          className={clsx("absolute inset-0 rounded-lg", skeletonClassName)}
         />
       )}
       {/*圖片來源失敗會觸發onError換成預設圖*/}

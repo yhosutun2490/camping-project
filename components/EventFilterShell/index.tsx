@@ -120,7 +120,7 @@ export default function EventFilterShell({
       >
         {rowItems.map((item) => (
           <div
-            className="min-w-[340px] w-[80%] md:w-full mx-auto"
+            className="w-[85%] sm:w-[450px] md:w-full mx-auto"
             key={item.id}
           >
             <EventCard

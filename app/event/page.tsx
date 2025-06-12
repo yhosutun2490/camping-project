@@ -54,7 +54,7 @@ export default async function EventPage({
     <div className="min-h-screen bg-primary-50">
       <div
         className="search_condition flex flex-col gap-2 md:flex-row items-center heading-3 text-center text-neutral-950 
-      pt-6 pb-3 md:py-6 px-4 lg:py-2"
+      pt-6 md:py-6 xl:px-4"
       >
         {isAllEmpty ? (
           <span className="heading-3">以下是所有露營活動</span>

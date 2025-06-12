@@ -11,7 +11,7 @@ export default function RestButton() {
   }
   return (
     <div
-      className="text-base px-4 py-1 h-full 
+      className="text-base px-4 py-1 h-full bg-primary-300 text-white
               ml-5 border-1 border-primary-300 rounded-full hover:bg-gray-300 hover:cursor-pointer"
       onClick={handleReset}
     >

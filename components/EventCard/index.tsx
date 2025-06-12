@@ -61,7 +61,7 @@ export default function EventCard({
           alt="event"
           fill
           priority
-          fallbackSrc="/main/main_bg_top_1.jpg" // 提前準備一張小圖
+          fallbackSrc="/event/event_1.png" // 提前準備一張小圖
           className="rounded-xl w-full object-cover hover:scale-115 transition-transform duration-300"
         />
         <div
