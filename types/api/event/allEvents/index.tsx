@@ -1,15 +1,23 @@
 import { SuccessResponse } from "@/types/api/response";
 
-export interface Event {
-    id: string,
-    title: string,
-    start_time: string,
-    end_time: string,
-    address: string,
-    price: string,
-    photos: string[],
-    tags: string[],
-}
+export type EventPlan = {
+  title: string;
+  price: number;
+  people_capacity: number;
+};
+
+export type Event = {
+  id: string;
+  title: string;
+  start_time: string; // ISO string
+  end_time: string;   // ISO string
+  address: string;
+  plans: EventPlan[];
+  photos: string[];
+  tags: string[];
+  levels: ("easy" | "medium" | "hard")[]; // 可依實際情況擴充
+};
+
 
 export interface Pagination {
     page: number,

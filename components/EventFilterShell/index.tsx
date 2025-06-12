@@ -113,20 +113,28 @@ export default function EventFilterShell({
         </div>
       );
     }
-
     return (
       <div
         style={style}
-        className="grid grid-cols-1 justify-center md:grid-cols-2 lg:grid-cols-3 gap-4 px-4"
+        className="grid grid-cols-1 justify-center lg:grid-cols-2 xl:grid-cols-3 gap-10 px-4"
       >
         {rowItems.map((item) => (
-          <div className="min-w-[300px] max-w-[400px] mx-auto" key={item.id}>
+          <div
+            className="min-w-[340px] w-[80%] md:w-full mx-auto"
+            key={item.id}
+          >
             <EventCard
               id={item.id}
               title={item.title}
               date={{ start: item.start_time, end: item.end_time }}
-              price={item.price}
+              price={
+                item.plans && item.plans.length > 0
+                  ? String(Math.min(...item.plans.map((plan) => plan.price)))
+                  : undefined
+              }
               tags={item.tags}
+              image={item.photos || []}
+              address={item.address.slice(0, 3)}
             />
           </div>
         ))}
@@ -160,9 +168,9 @@ export default function EventFilterShell({
 
         {/* 右側列表 */}
         {/*Loading -> No Data -> Actual Data */}
-        <div className="flex-1 min-h-screen p-6 bg-primary-50">
+        <div className="flex-1 min-h-screen py-6 md:p-6 bg-primary-50">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+            <div className="grid grid-cols-1 justify-center lg:grid-cols-2 xl:grid-cols-3 gap-10 px-4">
               {Array.from({ length: 6 }).map((_, idx) => (
                 <SkeletonCard key={idx} />
               ))}

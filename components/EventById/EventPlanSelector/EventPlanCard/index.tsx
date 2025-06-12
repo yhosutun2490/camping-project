@@ -50,6 +50,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const { id, title, deadline, features, price, originalPrice } = data;
   const { watch } = useFormContext(); // 設定表單選取資料
   const modalRef = useRef<HTMLInputElement>(null);
+  const modalId = `login-reminder-${data.id}`; // modal id
   const memberData = useMemberLogin((state) => state.member);
   const isMemberLogin = !!memberData?.id; // 是否登入
 
@@ -220,14 +221,14 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       </div>
 
       <DialogModal
-        id="login-reminder"
+        id={modalId}
         modalRef={modalRef}
         modalWidth="max-w-md"
       >
         <h3 className="font-bold heading-3 text-primary-500">請先登入</h3>
         <p className="py-4 heading-5 text-black">登入後才能執行此操作</p>
         <div className="modal-action">
-          <label htmlFor="login-reminder" className="btn-primary">
+          <label htmlFor={modalId} className="btn-primary">
             關閉
           </label>
         </div>
