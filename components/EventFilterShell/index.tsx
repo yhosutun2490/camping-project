@@ -61,16 +61,16 @@ export default function EventFilterShell({
       people: initialFilter.people,
       minPrice: initialFilter.minPrice,
       maxPrice: initialFilter.maxPrice,
-      start_Time: initialFilter.startTime,
-      end_Time: initialFilter.endTime,
+      start_Time: initialFilter.start_time,
+      end_Time: initialFilter.end_time,
     });
   }, [
     initialFilter.location,
     initialFilter.people,
     initialFilter.minPrice,
     initialFilter.maxPrice,
-    initialFilter.startTime,
-    initialFilter.endTime,
+    initialFilter.start_time,
+    initialFilter.end_time,
     setFilter,
     setTags,
   ]);
@@ -120,7 +120,7 @@ export default function EventFilterShell({
       >
         {rowItems.map((item) => (
           <div
-            className="w-[85%] sm:w-[450px] md:w-full mx-auto"
+            className="w-[85%] mb-5 sm:w-[450px] md:w-full mx-auto"
             key={item.id}
           >
             <EventCard

@@ -36,8 +36,8 @@ export type EventListResponse = SuccessResponse<{
  * GET /events
  */
 export interface GetEventsParams {
-  startTime?: string;
-  endTime?: string;
+  start_time?: string;
+  end_time?: string;
   location?: string;
   minPrice?: number;
   maxPrice?: number;

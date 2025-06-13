@@ -12,13 +12,13 @@ export function useEvents(params?: GetEventsParams) {
   const queryParams = new URLSearchParams();
 
   if (params) {
-    if (params.startTime) queryParams.append('startTime', params.startTime);
-    if (params.endTime) queryParams.append('endTime', params.endTime);
+    if (params.start_time) queryParams.append('start_time', params.start_time);
+    if (params.end_time) queryParams.append('end_time', params.end_time);
     if (params.location) queryParams.append('location', params.location);
     if (params.minPrice !== undefined)
-      queryParams.append('minPrice', params.minPrice.toString());
+      queryParams.append('min_price', params.minPrice.toString());
     if (params.maxPrice !== undefined)
-      queryParams.append('maxPrice', params.maxPrice.toString());
+      queryParams.append('max_price', params.maxPrice.toString());
     if (params.page !== undefined)
       queryParams.append('page', params.page.toString());
     if (params.per !== undefined)
