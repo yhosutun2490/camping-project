@@ -11,11 +11,13 @@ import {
   usePostMemberOrders,
   usePatchMemberOrders,
 } from "@/swr/member/orders/useMemberOrders"; // 創建/修改會員訂單SWR
+import { usePostMemberOrdersPayment } from "@/swr/member/orders/payment/useMemberPayment"; // 會員付款SWR
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams } from "next/navigation";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import DialogModal from "@/components/DialogModal";
+import { injectAndSubmitECPayForm } from "@/utils/ecPayForm";
 
 export type PlanFeatureItem = {
   id: string;
@@ -47,8 +49,6 @@ export type EventPlanCardProps = {
   unit?: string; // 單位（如每人、每組等）
 };
 
-
-
 export default function EventPlanCard(props: EventPlanCardProps) {
   const {
     event,
@@ -69,10 +69,18 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const orderId = searchParams.get("orderId");
   const isEditing = Boolean(orderId && eventId);
 
+  // 區分直接報名流程
+  const [isBookingDirect, setIsBookingDirect] = useState<boolean>(false);
+
   // 創建會員訂單API
-  const { trigger, isMutating } = usePostMemberOrders();
-  const { trigger: triggerPatch, isMutating: isMutatingPatch } =
+  const { trigger: postOrder, isMutating } = usePostMemberOrders();
+
+  // 修改會員訂單API
+  const { trigger: patchOrder, isMutating: isMutatingPatch } =
     usePatchMemberOrders();
+
+  // 會員付款API
+  const { trigger: postPayment } = usePostMemberOrdersPayment();
 
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
@@ -100,7 +108,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       try {
         if (isEditing) {
           // 修改訂單
-          await triggerPatch({
+          await patchOrder({
             id: orderId ?? "",
             body: {
               event_plan_id: plan.id,
@@ -111,14 +119,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
           toast.success("修改購物車品項成功");
         } else {
           // 新增訂單
-          await trigger({
+          await postOrder({
             event_plan_id: plan.id,
             quantity: 1,
             event_addons: currentPlanAddonItems,
           });
           toast.success("新增購物車品項成功");
         }
-
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const message = err.response?.data?.message;
@@ -127,27 +134,58 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         }
       }
     } else {
-      // modalRef.current?.click(); // ✅ 開啟 modal
+      // modalRef.current?.click();
       // 未登入 暫存於store
       addStorePlan({
-         ...plan,
-         addonBox: currentPlanAddonItems,
-         event: event
+        ...plan,
+        addonBox: currentPlanAddonItems,
+        event: event,
       });
+      toast.success("新增購物車品項成功");
     }
   }
 
   // 直接報名
-  function handleOnClickSignupEvent() {
+  async function handleOnClickSignupEvent() {
     if (isMemberLogin) {
-      console.log(
-        "目前直接報名資料",
-        plan,
-        "addonBoxItems",
-        currentPlanAddonItems
-      );
+      setIsBookingDirect(true);
+      try {
+        /*1. 建立訂單（狀態：Unpaid） */
+        const orderRes = await postOrder({
+          event_plan_id: plan.id,
+          quantity: 1,
+          event_addons: currentPlanAddonItems,
+        });
+        // 可能需要解開 data
+        // 防呆 + 正確取值
+        const orderId = orderRes?.orderid;
+
+        if (!orderId) {
+          throw new Error("order_info 不存在");
+          return;
+        }
+
+        const newOrderId = [orderId];
+        console.log('報名取得新建id',newOrderId)
+
+        /* 2. 取得付款 HTML 表單 */
+        const { data: paymentRes } = await postPayment({
+          orderIds: newOrderId,
+        });
+
+        if (!paymentRes?.html) {
+          throw new Error("未取得付款表單");
+        }
+        /* 3. 動態插入 & 自動 submit*/
+        injectAndSubmitECPayForm(paymentRes.html);
+      } catch (err) {
+        console.error(err);
+        toast.error(`報名失敗，請稍後再試，${err}`);
+      } finally {
+        setIsBookingDirect(false);
+      }
     } else {
-      modalRef.current?.click(); // ✅ 開啟 modal
+      modalRef.current?.click(); // 未登入提醒modal
     }
   }
 
@@ -206,7 +244,11 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               handleOnClickSignupEvent();
             }}
           >
-            直接報名
+            {isBookingDirect ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              "直接報名"
+            )}
           </button>
           <button
             className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
@@ -215,7 +257,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               handleOnClickAddCart();
             }}
           >
-            {isMutating || isMutatingPatch ? (
+            {(isMutating && !isBookingDirect) || isMutatingPatch ? (
               <span className="loading loading-spinner"></span>
             ) : (
               "加入購物車"
@@ -224,11 +266,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         </div>
       </div>
 
-      <DialogModal
-        id={modalId}
-        modalRef={modalRef}
-        modalWidth="max-w-md"
-      >
+      <DialogModal id={modalId} modalRef={modalRef} modalWidth="max-w-md">
         <h3 className="font-bold heading-3 text-primary-500">請先登入</h3>
         <p className="py-4 heading-5 text-black">登入後才能執行此操作</p>
         <div className="modal-action">

@@ -13,11 +13,11 @@ export function usePostMemberOrders() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/member/orders/post",
     async (_key: string, { arg: payload }: { arg: PostMemberOrderRequest }) => {
-      const data = await axios.post<PostMemberOrderResponse>(
+      const res = await axios.post<PostMemberOrderResponse>(
         "/api/member/orders",
         payload
       );
-      return data;
+      return res.data.data.order_info;
     }
   );
 

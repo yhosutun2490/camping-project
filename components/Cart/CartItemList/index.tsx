@@ -7,6 +7,7 @@ import CheckboxStyle from "@/components/CheckBoxStyle";
 import EmptyCart from "@/components/Cart/EmptyCart";
 import DeleteCartItemModal from "../DeleteCartItemModal";
 import { usePostMemberOrdersPayment } from "@/swr/member/orders/payment/useMemberPayment";
+import { injectAndSubmitECPayForm } from "@/utils/ecPayForm"
 
 interface Props {
   orders: Order[] | [];
@@ -37,24 +38,7 @@ export default function CartItemList({ orders }: Props) {
       setSelectedOrders([...selectedOrders, order]);
     }
   }
-  /**開啟綠界付款表單頁 */
-  function injectAndSubmitECPayForm(html: string) {
-    document.getElementById("__ecpayFormWrapper")?.remove(); // 移除先前殘留表單
-    const container = document.createElement("div");
-    container.id = "__ecpayFormWrapper";
-    container.innerHTML = html;
-    document.body.appendChild(container);
-
-    setTimeout(() => {
-      const form = document.getElementById("_form_aiochk");
-      if (form instanceof HTMLFormElement) {
-        form.submit();
-      } else {
-        console.error("ECPay 表單無法正確載入。");
-      }
-    }, 10);
-  }
-
+ 
   /**購物車付款 */
   async function handleOnClickPayment() {
     if (selectedOrders.length > 0) {

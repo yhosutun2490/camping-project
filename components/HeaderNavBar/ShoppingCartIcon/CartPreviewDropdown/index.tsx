@@ -4,6 +4,7 @@ import type { CartPlanItem } from "@/stores/useShoppingCartStore";
 import ImageSkeleton from "@/components/ImageSkeleton";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
 import { useShoppingCartStore } from "@/stores/useShoppingCartStore"; // 匯入 zustand store
+import toast from "react-hot-toast";
 
 interface Props {
   plans: CartPlanItem[];
@@ -25,6 +26,7 @@ export default function CartPreviewDropdown({
   }
   function handleDeleteCartItem(planId: string) {
     removeCartItem(planId);
+    toast.success("刪除購物車品項成功");
   }
 
   /** 計算單一方案（含加購品）的總價  */
