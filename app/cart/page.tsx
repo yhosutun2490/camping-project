@@ -1,5 +1,5 @@
 
-import CartItemList from '@/components/Cart/CartItemList';
+import CartItemCombineWrapper from '@/components/Cart/CartItemCombineWrapper';
 import { memberGetOrders } from '@/api/server-components/member/orders'
 
 export default async function CartPage() {
@@ -8,7 +8,7 @@ export default async function CartPage() {
 
   return (
     <div className="py-6 bg-primary-50">
-      <CartItemList orders={orderData?.orders ?? []}/>
+      <CartItemCombineWrapper serverOrders={orderData?.orders ?? []}/>
     </div>
   );
 }

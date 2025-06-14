@@ -132,7 +132,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       addStorePlan({
          ...plan,
          addonBox: currentPlanAddonItems,
-         ...event
+         event: event
       });
     }
   }

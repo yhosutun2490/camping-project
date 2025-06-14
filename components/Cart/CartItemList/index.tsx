@@ -17,8 +17,8 @@ export default function CartItemList({ orders }: Props) {
     0
   );
   const hasOrderList = orders?.length > 0;
-
   const { trigger: postPayment, isMutating } = usePostMemberOrdersPayment();
+
 
   function handleOnToggleSelect(order: Order): void {
     // 如果訂單已經存在需從清單移除，否則加入清單中
@@ -62,6 +62,7 @@ export default function CartItemList({ orders }: Props) {
       }
     }
   }
+
 
   return (
     <div className="bg-white rounded-md p-6 shadow">
