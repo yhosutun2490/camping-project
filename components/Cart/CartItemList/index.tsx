@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import CartItem from "@/components/Cart/CartItem";
 import type { Order } from "@/components/Cart/CartItem";
 import CheckboxStyle from "@/components/CheckBoxStyle";
 import EmptyCart from "@/components/Cart/EmptyCart";
+import DeleteCartItemModal from "../DeleteCartItemModal";
 import { usePostMemberOrdersPayment } from "@/swr/member/orders/payment/useMemberPayment";
 
 interface Props {
@@ -18,6 +19,9 @@ export default function CartItemList({ orders }: Props) {
   );
   const hasOrderList = orders?.length > 0;
   const { trigger: postPayment, isMutating } = usePostMemberOrdersPayment();
+
+  // 批次刪除彈窗ref
+  const deleteModalRef =  useRef<HTMLInputElement>(null)
 
 
   function handleOnToggleSelect(order: Order): void {
@@ -33,6 +37,7 @@ export default function CartItemList({ orders }: Props) {
       setSelectedOrders([...selectedOrders, order]);
     }
   }
+  /**開啟綠界付款表單頁 */
   function injectAndSubmitECPayForm(html: string) {
     document.getElementById("__ecpayFormWrapper")?.remove(); // 移除先前殘留表單
     const container = document.createElement("div");
@@ -49,6 +54,8 @@ export default function CartItemList({ orders }: Props) {
       }
     }, 10);
   }
+
+  /**購物車付款 */
   async function handleOnClickPayment() {
     if (selectedOrders.length > 0) {
       const orderIds = selectedOrders.map((order) => order.id);
@@ -62,6 +69,13 @@ export default function CartItemList({ orders }: Props) {
       }
     }
   }
+
+  /**批次刪除確定彈窗 */
+  function handleClickDeleteSelectItems () {
+    deleteModalRef.current?.click()
+  }
+
+
 
 
   return (
@@ -98,9 +112,18 @@ export default function CartItemList({ orders }: Props) {
                   }
                 }}
               />
-              <button className="text-gray-400 hover:text-red-500">
+              <button 
+                className="text-gray-400 hover:text-red-500"
+                onClick={handleClickDeleteSelectItems}
+              >
                 刪除已選項目
               </button>
+              <DeleteCartItemModal 
+                modalId="batch-delete-cart" 
+                modalRef={deleteModalRef}
+                itemCounts={selectedOrders.length}
+                orderIds={selectedOrders.map(order=>order.id)}
+              />
             </div>
 
             <div className="text-right mr-4 md:ml-auto">
