@@ -35,22 +35,30 @@ export type PlanData = {
   originalPrice?: number;
   addonBox: AddonItem[];
 };
-
+export type EventDetail = {
+  event_info_id: string;
+  event_photo_url: string;
+  event_name: string;
+};
 export type EventPlanCardProps = {
-  data: PlanData;
+  event: EventDetail;
+  plan: PlanData;
   isSelected?: boolean; // 是否選中
   unit?: string; // 單位（如每人、每組等）
 };
 
+
+
 export default function EventPlanCard(props: EventPlanCardProps) {
   const {
-    data,
+    event,
+    plan,
     unit = "NT$", // 預設單位為NT$
   } = props;
-  const { id, title, deadline, features, price, originalPrice } = data;
+  const { id, title, deadline, features, price, originalPrice } = plan;
   const { watch } = useFormContext(); // 設定表單選取資料
   const modalRef = useRef<HTMLInputElement>(null);
-  const modalId = `login-reminder-${data.id}`; // modal id
+  const modalId = `login-reminder-${plan.id}`; // modal id
   const memberData = useMemberLogin((state) => state.member);
   const isMemberLogin = !!memberData?.id; // 是否登入
 
@@ -95,7 +103,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
           await triggerPatch({
             id: orderId ?? "",
             body: {
-              event_plan_id: data.id,
+              event_plan_id: plan.id,
               quantity: 1,
               event_addons: currentPlanAddonItems,
             },
@@ -104,18 +112,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         } else {
           // 新增訂單
           await trigger({
-            event_plan_id: data.id,
+            event_plan_id: plan.id,
             quantity: 1,
             event_addons: currentPlanAddonItems,
           });
           toast.success("新增購物車品項成功");
         }
 
-        // 同步store購物車狀態
-        addStorePlan({
-          ...data,
-          addonBox: currentPlanAddonItems,
-        });
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const message = err.response?.data?.message;
@@ -124,12 +127,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         }
       }
     } else {
-      modalRef.current?.click(); // ✅ 開啟 modal
+      // modalRef.current?.click(); // ✅ 開啟 modal
       // 未登入 暫存於store
-      // addStorePlan({
-      //   ...data,
-      //   addonBox: currentPlanAddonItems,
-      // });
+      addStorePlan({
+         ...plan,
+         addonBox: currentPlanAddonItems,
+         ...event
+      });
     }
   }
 
@@ -138,7 +142,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     if (isMemberLogin) {
       console.log(
         "目前直接報名資料",
-        data,
+        plan,
         "addonBoxItems",
         currentPlanAddonItems
       );
@@ -151,7 +155,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     <div
       className={clsx(
         "event_plan_card p-4 md:p-6 rounded-2xl grid gap-4 grid-cols-1 bg-neutral-50",
-        selectPlanId === data.id && "border-2 border-primary-500 bg-zinc-100"
+        selectPlanId === plan.id && "border-2 border-primary-500 bg-zinc-100"
       )}
     >
       {/*方案詳細資訊*/}
@@ -167,13 +171,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
           <p className="text-base">報名截止日期: {deadline}</p>
         </div>
         <div className="plan_feature pl-4">
-          {features?.map((item) => (
+          {features?.map((item: PlanFeatureItem) => (
             <li key={item.id}>{item.content}</li>
           ))}
         </div>
       </div>
       {/*加購選擇區*/}
-      <EventAddonCheckbox name="plan_addons" options={data.addonBox} />
+      <EventAddonCheckbox name="plan_addons" options={plan.addonBox} />
 
       {/*方案價格區*/}
       <div
