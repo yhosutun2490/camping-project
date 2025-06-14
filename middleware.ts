@@ -95,6 +95,7 @@ export const config = {
     "/member/:path*",
     "/host/:path*",
     "/create-event/:path*",
+    "/orders/payment-success/:path*",
     "/edit-event/:path*",
     "/cart/:path*",
     "/api/:path*",

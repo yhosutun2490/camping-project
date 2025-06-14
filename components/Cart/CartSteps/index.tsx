@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 const steps = [
   { label: '購物車', path: '/cart' },
   { label: '填寫資料與付款', path: '/cart/checkout' },
-  { label: '報名完成', path: '/cart/complete' },
+  { label: '報名完成', path: '/payment-success' },
 ];
 
 export default function CartSteps() {
@@ -15,7 +15,7 @@ export default function CartSteps() {
     <nav className="w-full bg-white px-[5%] md:px-[15%] py-4 border-b border-gray-200">
       <ol className="flex items-center justify-center md:justify-start space-x-2 text-sm text-gray-500">
         {steps.map((step, index) => {
-          const isActive = pathname === step.path;
+          const isActive = pathname.includes(step.path);
 
           return (
             <li key={step.path} className="flex items-center">
