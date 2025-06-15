@@ -11,21 +11,9 @@ export default async function MemberLayout({
   const menuLists = [
     {
       id: "0",
-      link: "/member",
-      title: "管理個人資料",
+      link: "/admin/activity",
+      title: "審核活動",
       icon: "mingcute:ticket-line",
-    },
-    {
-      id: "1",
-      link: "/member/tickets",
-      title: "我的活動票卷",
-      icon: "mingcute:ticket-line",
-    },
-    {
-      id: "3",
-      link: "/member/favorite",
-      title: "收藏活動清單",
-      icon: "ic:outline-favorite",
     },
   ];
 
