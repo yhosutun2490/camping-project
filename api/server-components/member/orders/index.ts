@@ -4,17 +4,20 @@ import { formatAxiosError } from "@/utils/errors";
 import { cookies } from "next/headers";
 import { ErrorResponse } from "@/types/api/response";
 
-const endpoint = "/member/orders";
-
+const buildEndpoint = (status?: OrderStatus) =>
+  status ? `/member/orders/status/${status}` : "/member/orders";
+export type OrderStatus = "Unpaid" | "Paid" | "Refund";   // ← 和後端保持一致
 /**
- * 會員取得自己的訂單
+ * 會員取得自己的購物車訂單(未付款、已付款、退款、取消等)
  */
-export const memberGetOrders = async (): Promise<GetMemberOrdersResponse['data'] | null> => {
+export const memberGetOrders = async ( 
+  status?: OrderStatus
+): Promise<GetMemberOrdersResponse['data'] | null> => {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("access_token")?.value;
     const response = await axiosInstance.get<GetMemberOrdersResponse>(
-      endpoint,
+       buildEndpoint(status),
       {
         headers: {
           Cookie: `access_token=${token}`,
