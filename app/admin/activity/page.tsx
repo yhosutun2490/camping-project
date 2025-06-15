@@ -397,11 +397,11 @@ export default function ActivityAuditPage() {
       </div>
 
       {/* 表頭 */}
-      <div className="grid grid-cols-[70px_2fr_50px_50px_80px_100px] items-center gap-4 border-b py-2 text-sm font-semibold text-neutral-500">
+      <div className="grid grid-cols-[70px_2fr_50px_70px_80px_100px] items-center gap-4 border-b py-2 text-sm font-semibold text-neutral-500">
         <span>活動日期</span>
         <span>活動內容</span>
         <span className="text-center">名額</span>
-        <span className="text-center">單價</span>
+        <span className="text-center">單價(最高)</span>
         <span className="text-center">狀態</span>
         <span className="text-center">操作</span>
       </div>
