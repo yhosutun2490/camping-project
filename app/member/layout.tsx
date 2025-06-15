@@ -13,7 +13,7 @@ export default async function MemberLayout({
       id: "0",
       link: "/member",
       title: "管理個人資料",
-      icon: "mingcute:ticket-line",
+      icon: "tdesign:user",
     },
     {
       id: "1",

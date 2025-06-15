@@ -1,11 +1,14 @@
 "use client";
 import ImageSkeleton from "@/components/ImageSkeleton";
 import clsx from "clsx";
+import { usePostMemberOrdersQRcode } from "@/swr/member/orders/qrCode/useCreateQRcode";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export type TicketStatus = "incoming" | "finished" | "refund";
 export type EventTicket = {
   imageUrl: string;
-  status: TicketStatus
+  status: TicketStatus;
   title: string;
   planName: string;
   orderNumber: string;
@@ -33,10 +36,31 @@ export default function EventTicketCard({
       finished: "text-green-600",
       refund: "text-red-600",
     };
+  // 產生QR code API
+  const { trigger: postOrderQRcode, isMutating: isMutatingQRcode } =
+    usePostMemberOrdersQRcode();
+
+  async function handleOnClickApplyQRcode(orderId: string) {
+    try {
+      const res = await postOrderQRcode({ orderId });
+      console.log("QR CDOE res",res.qr_image_url);
+      toast.success("申請QR code成功");
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        toast.error("申請QR code失敗");
+      } else {
+        toast.error("申請QR code失敗");
+      }
+      
+    }
+  }
+
   return (
     <>
-      <div className="flex gap-4 flex-wrap md:flex-no-wrap
-       items-center justify-between border border-gray-200 rounded-lg p-4 mb-4 shadow-sm bg-white">
+      <div
+        className="flex gap-4 flex-wrap md:flex-no-wrap
+       items-center justify-between border border-gray-200 rounded-lg p-4 mb-4 shadow-sm bg-white"
+      >
         {/* 圖片 + 左側內容 */}
         <div className="flex items-center gap-4">
           <ImageSkeleton
@@ -67,14 +91,24 @@ export default function EventTicketCard({
 
         {/* 右側內容 */}
         <div className="text-right">
-          <div className="ticket_date_price w-fit flex space-x-4 justify-between lg:space-x-0 lg:flex-col">
-            <div className="text-gray-400 text-sm mb-1">{date.slice(0,10)}</div>
+          <div className="ticket_date_price w-fit flex space-x-4 items-start justify-between lg:space-x-0 lg:flex-col">
+            <div className="text-gray-400 text-sm mb-1">
+              活動日期: {date.slice(0, 10)}
+            </div>
             <div className="text-primary-500 font-bold mb-2">NT${price}</div>
           </div>
           <div className="hidden md:block flex space-x-2 justify-end">
             {status !== "refund" && (
-              <button className="cursor-pointer text-sm text-white bg-primary-500 px-3 py-1 rounded hover:bg-primary-600">
-                顯示 QRCode
+              <button
+                className="cursor-pointer text-sm text-white bg-primary-500 px-3 py-1 
+              rounded hover:bg-primary-600"
+                onClick={() => handleOnClickApplyQRcode(orderNumber)}
+              >
+                {isMutatingQRcode ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  "申請QR code"
+                )}
               </button>
             )}
 
@@ -92,9 +126,17 @@ export default function EventTicketCard({
         </div>
         {/* 手機按鈕區 */}
         <div className="mobile_btn_wrap flex-grow-1 flex gap-4 justify-end md:hidden">
-          {status !== "refund" && (
-            <button className="cursor-pointer text-sm text-white bg-primary-500 px-3 py-1 rounded hover:bg-primary-600">
-              顯示 QRCode
+          {(status !== "refund" || "finished") && (
+            <button
+              className="cursor-pointer text-sm text-white bg-primary-500 
+            px-3 py-1 rounded hover:bg-primary-600"
+              onClick={() => handleOnClickApplyQRcode(orderNumber)}
+            >
+              {isMutatingQRcode ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                "申請QR code"
+              )}
             </button>
           )}
 
