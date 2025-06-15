@@ -1,12 +1,12 @@
 import axiosInstance from "@/api/axiosIntance";
-import type { GetMemberOrdersResponse } from "@/types/api/member/orders";
+import type { GetMemberOrdersResponse, OrderStatus } from "@/types/api/member/orders";
 import { formatAxiosError } from "@/utils/errors";
 import { cookies } from "next/headers";
 import { ErrorResponse } from "@/types/api/response";
 
 const buildEndpoint = (status?: OrderStatus) =>
   status ? `/member/orders/status/${status}` : "/member/orders";
-export type OrderStatus = "Unpaid" | "Paid" | "Refund";   // ← 和後端保持一致
+
 /**
  * 會員取得自己的購物車訂單(未付款、已付款、退款、取消等)
  */

@@ -3,10 +3,9 @@ import ImageSkeleton from "@/components/ImageSkeleton";
 import clsx from "clsx";
 
 export type TicketStatus = "incoming" | "finished" | "refund";
-
 export type EventTicket = {
   imageUrl: string;
-  status: TicketStatus;
+  status: TicketStatus
   title: string;
   planName: string;
   orderNumber: string;
@@ -45,11 +44,11 @@ export default function EventTicketCard({
             alt="活動封面"
             width={50}
             height={50}
-            className="w-20 h-20 rounded object-cover bg-gray-100"
+            className="min-w-20 h-20 rounded object-cover bg-gray-100"
             fallbackSrc="/main/main_bg_top_3.jpg"
           />
 
-          <div className="ticket-left-info">
+          <div className="ticket-left-info max-w-[300px]">
             <div
               className={clsx(
                 "text-smfont-semibold mb-1",
@@ -68,8 +67,8 @@ export default function EventTicketCard({
 
         {/* 右側內容 */}
         <div className="text-right">
-          <div className="ticket_date_price flex space-x-4 justify-between lg:space-x-0 lg:flex-col">
-            <div className="text-gray-400 text-sm mb-1">{date}</div>
+          <div className="ticket_date_price w-fit flex space-x-4 justify-between lg:space-x-0 lg:flex-col">
+            <div className="text-gray-400 text-sm mb-1">{date.slice(0,10)}</div>
             <div className="text-primary-500 font-bold mb-2">NT${price}</div>
           </div>
           <div className="hidden md:block flex space-x-2 justify-end">
