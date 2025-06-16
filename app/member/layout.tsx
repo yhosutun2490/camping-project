@@ -21,12 +21,12 @@ export default async function MemberLayout({
       title: "我的活動票卷",
       icon: "mingcute:ticket-line",
     },
-    {
-      id: "3",
-      link: "/member/favorite",
-      title: "收藏活動清單",
-      icon: "ic:outline-favorite",
-    },
+    // {
+    //   id: "3",
+    //   link: "/member/favorite",
+    //   title: "收藏活動清單",
+    //   icon: "ic:outline-favorite",
+    // },
   ];
 
   return (
