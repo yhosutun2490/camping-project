@@ -1,14 +1,13 @@
 "use client";
-import { useState, useRef } from "react"
+import { useState, useRef } from "react";
 import ImageSkeleton from "@/components/ImageSkeleton";
 import clsx from "clsx";
 import { usePostMemberOrdersQRcode } from "@/swr/member/orders/qrCode/useCreateQRcode";
-import { useRefundMemberOrders } from "@/swr/member/orders/useMemberOrders"
+import { useRefundMemberOrders } from "@/swr/member/orders/useMemberOrders";
 import axios from "axios";
 import toast from "react-hot-toast";
 import DialogModal from "@/components/DialogModal";
-import { useRouter } from "next/navigation"
-
+import { useRouter } from "next/navigation";
 
 export type TicketStatus = "incoming" | "finished" | "refunded";
 export type EventTicket = {
@@ -30,25 +29,28 @@ export default function EventTicketCard({
   date,
   price,
 }: EventTicket) {
-  const ticketStatusMap: Record<"incoming" | "finished" | "refunded", string> = {
-    incoming: "即將到來",
-    finished: "已完成",
-    refunded: "已取消／退款中",
-  };
-  const ticketStatusColor: Record<"incoming" | "finished" | "refunded", string> =
-  {
+  const ticketStatusMap: Record<"incoming" | "finished" | "refunded", string> =
+    {
+      incoming: "即將到來",
+      finished: "已完成",
+      refunded: "已退款",
+    };
+  const ticketStatusColor: Record<
+    "incoming" | "finished" | "refunded",
+    string
+  > = {
     incoming: "text-blue-600",
     finished: "text-green-600",
     refunded: "text-red-600",
   };
-  const router = useRouter()
-  const eventDate = date.slice(0, 10)
+  const router = useRouter();
+  const eventDate = date.slice(0, 10);
 
   // 退款彈窗提示
   const refundModalRef = useRef<HTMLInputElement>(null);
 
   // QR code 票卷image url
-  const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>('')
+  const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>("");
   const qrCodeModalRef = useRef<HTMLInputElement>(null);
 
   // 產生QR code API
@@ -56,18 +58,19 @@ export default function EventTicketCard({
     usePostMemberOrdersQRcode();
 
   // 訂單退款 API
-  const { trigger: postOrderRefund, isMutating: isMutatingRefund } = useRefundMemberOrders()
+  const { trigger: postOrderRefund, isMutating: isMutatingRefund } =
+    useRefundMemberOrders();
 
   async function handleOnClickApplyQRcode(orderId: string) {
     try {
       const res = await postOrderQRcode({ orderId });
       console.log("QR CDOE res", res);
 
-      if (!res.qr_image_url) throw new Error('沒有拿到 URL');
+      if (!res.qr_image_url) throw new Error("沒有拿到 URL");
 
-      setQrCodeImageUrl(res.qr_image_url)
+      setQrCodeImageUrl(res.qr_image_url);
       if (qrCodeModalRef.current) {
-        setTimeout(() => qrCodeModalRef.current?.click(), 0)
+        setTimeout(() => qrCodeModalRef.current?.click(), 0);
       }
       toast.success("申請QR code成功");
     } catch (err) {
@@ -76,18 +79,18 @@ export default function EventTicketCard({
       } else {
         toast.error("申請QR code失敗");
       }
-
     }
   }
+
   function handleClickRefundButton() {
-    if (refundModalRef.current) refundModalRef.current.click()
+    if (refundModalRef.current) refundModalRef.current.click();
   }
   async function handleOnOrderRefund(orderId: string) {
     try {
-      await postOrderRefund({ id: orderId })
+      await postOrderRefund({ id: orderId });
       toast.success("申請退款成功");
-      if (refundModalRef.current) refundModalRef.current.checked = false
-      router.refresh()
+      if (refundModalRef.current) refundModalRef.current.checked = false;
+      router.refresh();
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error("申請退款失敗");
@@ -96,7 +99,6 @@ export default function EventTicketCard({
       }
     }
   }
-
 
   return (
     <>
@@ -143,7 +145,7 @@ export default function EventTicketCard({
           <div className="hidden md:block flex space-x-2 justify-end">
             {status !== "refunded" && (
               <button
-                className="cursor-pointer text-sm text-white bg-primary-500 px-3 py-1 
+                className="cursor-pointer w-[110px] text-sm text-white bg-primary-500 px-3 py-1 
               rounded hover:bg-primary-600"
                 onClick={() => handleOnClickApplyQRcode(orderNumber)}
               >
@@ -161,7 +163,8 @@ export default function EventTicketCard({
               </button>
             )}
             {status === "incoming" && (
-              <button className="cursor-pointer text-sm text-gray-700 border 
+              <button
+                className="cursor-pointer text-sm text-gray-700 border 
               border-gray-300 px-3 py-1 rounded hover:bg-gray-100"
                 onClick={handleClickRefundButton}
               >
@@ -174,7 +177,7 @@ export default function EventTicketCard({
         <div className="mobile_btn_wrap flex-grow-1 flex gap-4 justify-end md:hidden">
           {(status !== "refunded" || "finished") && (
             <button
-              className="cursor-pointer text-sm text-white bg-primary-500 
+              className="cursor-pointer w-[110px] text-sm text-white bg-primary-500 
             px-3 py-1 rounded hover:bg-primary-600"
               onClick={() => handleOnClickApplyQRcode(orderNumber)}
             >
@@ -192,7 +195,8 @@ export default function EventTicketCard({
             </button>
           )}
           {status === "incoming" && (
-            <button className="cursor-pointer text-sm text-gray-700 border 
+            <button
+              className="cursor-pointer text-sm text-gray-700 border 
             border-gray-300 px-3 py-1 rounded hover:bg-gray-100"
               onClick={handleClickRefundButton}
             >
@@ -200,18 +204,20 @@ export default function EventTicketCard({
             </button>
           )}
         </div>
-        <DialogModal id={orderNumber} modalRef={qrCodeModalRef} >
+        <DialogModal id={orderNumber} modalRef={qrCodeModalRef}>
           <div className="download_qr_code flex space-y-2 flex-col items-center">
             <ImageSkeleton
-              src={qrCodeImageUrl || '/main/main_bg_top_3.jpg'}
+              src={qrCodeImageUrl || "/main/main_bg_top_3.jpg"}
               alt="QR code"
               width={300}
               height={300}
             />
             <a
-              href={qrCodeImageUrl}
+              href={`/api/member/orders/qrcode?url=${encodeURIComponent(
+                qrCodeImageUrl
+              )}`}
               download={`${title}-${eventDate}-${orderNumber}_qr.png`}
-              rel="noopener noreferrer"
+              target="_self"
               className="btn-primary mt-4 block text-center text-white py-2 rounded-lg bg-primary-500 hover:bg-primary-600"
             >
               下載 QR code
@@ -220,11 +226,20 @@ export default function EventTicketCard({
         </DialogModal>
 
         <DialogModal id={`${orderNumber}-refunded`} modalRef={refundModalRef}>
-          <div className="refunf_info flex flex-col items-end space-y-4">
+          <div className="refund_info flex flex-col items-end space-y-4">
             <p className="heading-5 text-primary-500">
               退款申請成功後， 系統會在約 1 分鐘後自動為您退款，請稍後
             </p>
-            <button className="btn-primary" onClick={() => handleOnOrderRefund(orderNumber)}>確定</button>
+            <button
+              className="btn-primary"
+              onClick={() => handleOnOrderRefund(orderNumber)}
+            >
+              {isMutatingRefund ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                "確定"
+              )}
+            </button>
           </div>
         </DialogModal>
       </div>
