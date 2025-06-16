@@ -1,62 +1,69 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Icon } from "@iconify/react";
-import { usePathname } from "next/navigation";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Icon } from '@iconify/react';
+import { usePathname } from 'next/navigation';
+import { useGetHostProfile } from '@/swr/host/useHostProfile';
 
 const HostSidebar = () => {
   // 取得當前路徑以標記活動項目
   const pathname = usePathname();
+  const { hostProfile, isLoading } = useGetHostProfile();
 
   // 側邊欄項目
   const sidebarItems = [
     {
-      name: "活動列表",
-      icon: "material-symbols:splitscreen",
-      link: "/host/activities",
+      name: '活動列表',
+      icon: 'material-symbols:splitscreen',
+      link: '/host/activities',
     },
     {
-      name: "查詢已發起活動",
-      icon: "material-symbols:search",
-      link: "/host/search",
+      name: '查詢已發起活動',
+      icon: 'material-symbols:search',
+      link: '/host/search',
     },
     {
-      name: "審核待上架活動",
-      icon: "material-symbols:visibility",
-      link: "/host/review",
+      name: '審核待上架活動',
+      icon: 'material-symbols:visibility',
+      link: '/host/review',
     },
     {
-      name: "線上客服",
-      icon: "material-symbols:headset-mic",
-      link: "/host/support",
+      name: '線上客服',
+      icon: 'material-symbols:headset-mic',
+      link: '/host/support',
     },
   ];
 
   return (
-    <div className="flex flex-col items-center w-fit min-h-screen gap-6">
+    <div className="flex flex-col items-center min-h-screen gap-6">
       {/* 用戶資訊卡片 */}
       <div className="bg-[#E3E9E2] border border-[#A1B4A2] rounded-2xl px-0 py-6 flex flex-col items-center gap-4 w-full">
         <div className="flex flex-col items-center gap-2">
           <div className="w-20 h-20 rounded-full overflow-hidden">
-            <Image
-              src="/event_id/02.jpg"
-              alt="露營探險家"
-              width={80}
-              height={80}
-              className="w-full h-full object-cover"
-            />
+            {isLoading ? (
+              <div className="flex items-center justify-center w-full h-full">
+                <span className="loading loading-spinner"></span>
+              </div>
+            ) : (
+              <Image
+                src={hostProfile?.photo_url || ''}
+                alt="露營探險家"
+                width={80}
+                height={80}
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
-          <span className="text-black text-base font-semibold font-['Noto Sans TC']">
-            露營探險家
-          </span>
+          <span className="text-black text-base font-semibold">露營探險家</span>
         </div>
-        <button className="border-2 border-[#354738] rounded-2xl px-4 py-2 hover:bg-[#354738] hover:text-white transition-colors">
-          <span className="text-[#354738] text-sm font-semibold font-['Noto Sans TC'] hover:text-white">
-            管理主辦方資料
-          </span>
-        </button>
+        <Link
+          href="/host"
+          className="text-sm border-2 border-[#354738] rounded-2xl px-4 py-2 hover:bg-[#354738] hover:text-white transition-colors cursor-pointer"
+        >
+          管理主辦方資料
+        </Link>
       </div>
 
       {/* 選單項目 */}
@@ -64,29 +71,22 @@ const HostSidebar = () => {
         {sidebarItems.map((item, index) => {
           // 檢查當前路徑是否匹配此項目的連結
           const isActive = pathname === item.link;
-          
+
           return (
             <Link
               key={index}
               href={item.link}
               className={`flex items-center gap-2 px-5 py-3 rounded-2xl transition-colors w-full
-                ${isActive ? 
-                  'bg-[#354738] text-white' : 
-                  'text-[#6D6D6D] hover:bg-gray-100'}`}
+                ${
+                  isActive
+                    ? 'bg-[#E3E9E2] text-[#354738]'
+                    : 'text-[#6D6D6D] hover:bg-gray-100'
+                }`}
             >
               <div className="w-5 h-5 flex items-center justify-center">
-                <Icon 
-                  icon={item.icon} 
-                  width={20} 
-                  height={20} 
-                  className={isActive ? 'text-white' : 'text-[#6D6D6D]'}
-                />
+                <Icon icon={item.icon} width={20} height={20} />
               </div>
-              <span className={`text-sm font-normal font-['Noto Sans TC'] ${
-                isActive ? 'text-white' : 'text-[#6D6D6D]'
-              }`}>
-                {item.name}
-              </span>
+              <span className="text-sm font-normal">{item.name}</span>
             </Link>
           );
         })}
