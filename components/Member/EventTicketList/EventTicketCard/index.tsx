@@ -1,9 +1,12 @@
 "use client";
+import { useState, useRef } from "react"
 import ImageSkeleton from "@/components/ImageSkeleton";
 import clsx from "clsx";
 import { usePostMemberOrdersQRcode } from "@/swr/member/orders/qrCode/useCreateQRcode";
 import axios from "axios";
 import toast from "react-hot-toast";
+import DialogModal from "@/components/DialogModal";
+
 
 export type TicketStatus = "incoming" | "finished" | "refund";
 export type EventTicket = {
@@ -31,11 +34,18 @@ export default function EventTicketCard({
     refund: "已取消／退款中",
   };
   const ticketStatusColor: Record<"incoming" | "finished" | "refund", string> =
-    {
-      incoming: "text-blue-600",
-      finished: "text-green-600",
-      refund: "text-red-600",
-    };
+  {
+    incoming: "text-blue-600",
+    finished: "text-green-600",
+    refund: "text-red-600",
+  };
+
+  const eventDate = date.slice(0, 10)
+
+  // QR code 票卷image url
+  const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>('')
+  const qrCodeModalRef = useRef<HTMLInputElement>(null);
+
   // 產生QR code API
   const { trigger: postOrderQRcode, isMutating: isMutatingQRcode } =
     usePostMemberOrdersQRcode();
@@ -43,7 +53,14 @@ export default function EventTicketCard({
   async function handleOnClickApplyQRcode(orderId: string) {
     try {
       const res = await postOrderQRcode({ orderId });
-      console.log("QR CDOE res",res.qr_image_url);
+      console.log("QR CDOE res", res);
+
+      if (!res.qr_image_url) throw new Error('沒有拿到 URL');
+
+      setQrCodeImageUrl(res.qr_image_url)
+      if (qrCodeModalRef.current) {
+        setTimeout(() => qrCodeModalRef.current?.click(), 0)
+      }
       toast.success("申請QR code成功");
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -51,9 +68,10 @@ export default function EventTicketCard({
       } else {
         toast.error("申請QR code失敗");
       }
-      
+
     }
   }
+
 
   return (
     <>
@@ -93,7 +111,7 @@ export default function EventTicketCard({
         <div className="text-right">
           <div className="ticket_date_price w-fit flex space-x-4 items-start justify-between lg:space-x-0 lg:flex-col">
             <div className="text-gray-400 text-sm mb-1">
-              活動日期: {date.slice(0, 10)}
+              活動日期: {eventDate}
             </div>
             <div className="text-primary-500 font-bold mb-2">NT${price}</div>
           </div>
@@ -151,6 +169,24 @@ export default function EventTicketCard({
             </button>
           )}
         </div>
+        <DialogModal id={orderNumber} modalRef={qrCodeModalRef} >
+          <div className="download_qr_code flex space-y-2 flex-col items-center">
+            <ImageSkeleton
+              src={qrCodeImageUrl || '/main/main_bg_top_3.jpg'}
+              alt="QR code"
+              width={300}
+              height={300}
+            />
+            <a
+              href={qrCodeImageUrl}
+              download={`${title}-${eventDate}-${orderNumber}_qr.png`}
+              rel="noopener noreferrer"
+              className="btn-primary mt-4 block text-center text-white py-2 rounded-lg bg-primary-500 hover:bg-primary-600"
+            >
+              下載 QR code
+            </a>
+          </div>
+        </DialogModal>
       </div>
     </>
   );

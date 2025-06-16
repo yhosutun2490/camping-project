@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 
 
@@ -15,12 +15,16 @@ interface Props extends Omit<ImageProps, "src"> {
 export default function ImageSkeleton({
   src,
   fallbackSrc = "/fallback.jpg",
-   skeletonClassName = "bg-[linear-gradient(90deg,#e0e0e0_25%,#f0f0f0_50%,#e0e0e0_75%)] bg-[length:200%_100%] animate-shimmer",
+  skeletonClassName = "bg-[linear-gradient(90deg,#e0e0e0_25%,#f0f0f0_50%,#e0e0e0_75%)] bg-[length:200%_100%] animate-shimmer",
   className,
   ...rest
 }: Props) {
   const [imgSrc, setImgSrc] = useState<string>(src);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  useEffect(() => {
+    setImgSrc(src);
+    setIsLoaded(false);
+  }, [src]);
 
   return (
     <div className={clsx("relative", rest.fill && "w-full h-full")}>
