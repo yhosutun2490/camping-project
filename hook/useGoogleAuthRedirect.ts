@@ -12,7 +12,7 @@ export function useGoogleAuthRedirect() {
       const url = new URL(window.location.href);
       const accessToken = url.searchParams.get("accessToken");
       const refreshToken = url.searchParams.get("refreshToken");
-
+  
       if (accessToken && refreshToken) {
         try {
           await axios.post(
@@ -27,7 +27,6 @@ export function useGoogleAuthRedirect() {
           );
           const cleanUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
-
           router.refresh();
         } catch (error) {
           console.error("登入失敗：無法寫入 cookie", error);

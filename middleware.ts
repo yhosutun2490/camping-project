@@ -11,6 +11,7 @@ const excludeApiList = [
   "/api/auth/forgot-password",
   "/api/event/((?!.*/.+$).*)",
   "/api/auth/oauth/google",
+  "/api/auth/set-cookies"
 ];
 
 export async function middleware(request: NextRequest) {
