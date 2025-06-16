@@ -99,5 +99,6 @@ export const config = {
     "/edit-event/:path*",
     "/cart/:path*",
     "/api/:path*",
+    "/admin/activity"
   ],
 };
