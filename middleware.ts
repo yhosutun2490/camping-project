@@ -9,7 +9,7 @@ const excludeApiList = [
   "/api/auth/register",
   "/api/auth/check",
   "/api/auth/forgot-password",
-  "/api/event",
+  "/api/event/((?!.*/.+$).*)",
   "/api/auth/oauth/google",
 ];
 

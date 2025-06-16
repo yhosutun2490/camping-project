@@ -18,6 +18,7 @@ import {
 import toast from 'react-hot-toast';
 import DatePicker from '@/components/DateTimePicker/DatePicker';
 import TimePicker from '@/components/DateTimePicker/TimePicker';
+import FormNumberInput from '@/components/form/FormNumberInput';
 
 interface EventInfoFormProps {
   /** 活動建立後的回調函式，提供活動 ID */
@@ -354,7 +355,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(({ onEven
             required
             error={errors.eventInfo?.max_participants?.message}
           >
-            <FormInput name="eventInfo.max_participants" placeholder="50" />
+            <FormNumberInput name="eventInfo.max_participants" placeholder="50" />
           </FormField>
         </div>
 
