@@ -13,12 +13,14 @@ type CartItemProps = {
   order: Order;
   isSelected: boolean;
   onToggleSelect: (order: Order) => void;
+  setSelectedOrders?: React.Dispatch<React.SetStateAction<Order[]>>
 };
 
 export default function CartItem({
   order,
   isSelected,
   onToggleSelect,
+  setSelectedOrders
 }: CartItemProps) {
 
   const deleteModalRef = useRef<HTMLInputElement>(null)
@@ -106,11 +108,12 @@ export default function CartItem({
             <IconWrapper icon="material-symbols:delete-outline-rounded" />
           </div>
         </div>
-        <DeleteCartItemModal 
-          modalId={order.id} 
-          modalRef={deleteModalRef} 
+        <DeleteCartItemModal
+          modalId={order.id}
+          modalRef={deleteModalRef}
           itemCounts={1}
           orderIds={[order.id]}
+          setSelectedOrders={setSelectedOrders}
         />
       </div>
     </div>

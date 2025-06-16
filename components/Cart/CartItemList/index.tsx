@@ -22,7 +22,7 @@ export default function CartItemList({ orders }: Props) {
   const { trigger: postPayment, isMutating } = usePostMemberOrdersPayment();
 
   // 批次刪除彈窗ref
-  const deleteModalRef =  useRef<HTMLInputElement>(null)
+  const deleteModalRef = useRef<HTMLInputElement>(null)
 
 
   function handleOnToggleSelect(order: Order): void {
@@ -38,13 +38,13 @@ export default function CartItemList({ orders }: Props) {
       setSelectedOrders([...selectedOrders, order]);
     }
   }
- 
+
   /**購物車付款 */
   async function handleOnClickPayment() {
     if (selectedOrders.length > 0) {
       const orderIds = selectedOrders.map((order) => order.id);
       try {
-        const {data} = await postPayment({ orderIds });
+        const { data } = await postPayment({ orderIds });
         if (data.html) {
           injectAndSubmitECPayForm(data.html);
         }
@@ -55,7 +55,7 @@ export default function CartItemList({ orders }: Props) {
   }
 
   /**批次刪除確定彈窗 */
-  function handleClickDeleteSelectItems () {
+  function handleClickDeleteSelectItems() {
     deleteModalRef.current?.click()
   }
 
@@ -77,6 +77,7 @@ export default function CartItemList({ orders }: Props) {
                 (selected) => selected.id === item.id
               )}
               onToggleSelect={(order) => handleOnToggleSelect(order)}
+              setSelectedOrders={setSelectedOrders}
             />
           ))}
 
@@ -96,17 +97,18 @@ export default function CartItemList({ orders }: Props) {
                   }
                 }}
               />
-              <button 
+              <button
                 className="text-gray-400 hover:text-red-500"
                 onClick={handleClickDeleteSelectItems}
               >
                 刪除已選項目
               </button>
-              <DeleteCartItemModal 
-                modalId="batch-delete-cart" 
+              <DeleteCartItemModal
+                modalId="batch-delete-cart"
                 modalRef={deleteModalRef}
                 itemCounts={selectedOrders.length}
-                orderIds={selectedOrders.map(order=>order.id)}
+                orderIds={selectedOrders.map(order => order.id)}
+                setSelectedOrders={setSelectedOrders}
               />
             </div>
 
