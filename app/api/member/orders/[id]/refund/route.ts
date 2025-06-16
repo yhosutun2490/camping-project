@@ -8,9 +8,9 @@ import { ErrorResponse } from "@/types/api/response";
 /** 依據訂單order id 取得QR code */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<OrderRefundResponse | ErrorResponse>> {
-  const { id } = params;
+  const { id } = await params;
 
   /* 1. 取 access_token（可改成 Authorization Bearer） */
   const token =
