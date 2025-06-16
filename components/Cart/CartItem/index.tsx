@@ -27,7 +27,6 @@ export default function CartItem({
   const router = useRouter()
 
   function handleOnClickOrderEventInfo(order: Order) {
-    console.log("點選的訂單", order);
     const eventId = order.event_info.id;
     const orderId = order.id;
     const planId = order.event_plan.id;
