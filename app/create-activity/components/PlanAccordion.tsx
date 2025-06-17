@@ -34,10 +34,9 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       name: 'plans',
     });
 
-    // 整合 useCreateEventPlans hook - 只有當 eventId 存在時才使用
-    const { createEventPlans, isCreating } = useCreateEventPlans(
-      eventId || 'temp'
-    ); // 提供一個暫時的值
+    // 整合 useCreateEventPlans hook
+    // 新版本不需要 eventId 參數
+    const { createEventPlans, isCreating } = useCreateEventPlans();
 
     /**
      * 將表單資料轉換為 API 請求格式
@@ -78,7 +77,8 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
                 const submitToastId = toast.loading('正在建立方案...');
 
                 // 呼叫建立方案 API
-                await createEventPlans(apiData);
+                // 新版本的 createEventPlans 需要兩個參數：payload, eventId
+                await createEventPlans(apiData, eventId);
 
                 // 處理建立結果 - 如果沒有拋出錯誤，表示建立成功
                 toast.success('方案建立成功', { id: submitToastId });
