@@ -30,6 +30,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased h-screen flex flex-col`}
       >
         <HeaderNavBar 
+          userId={user?.data?.member?.id?? ''}
           username={user?.data?.member?.username ?? ''} 
           userRole={user?.data?.member?.role}
           userData={
