@@ -37,7 +37,7 @@ const HostSidebar = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center min-h-screen gap-6">
+    <div className="flex flex-col items-center gap-6">
       {/* 用戶資訊卡片 */}
       <div className="bg-[#E3E9E2] border border-[#A1B4A2] rounded-2xl px-0 py-6 flex flex-col items-center gap-4 w-full">
         <div className="flex flex-col items-center gap-2">

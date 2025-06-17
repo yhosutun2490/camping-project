@@ -265,10 +265,10 @@ export function HostProfile() {
         )}
 
         {/* 頭像 - 放在背景圖片區域的底部 */}
-        <div className="absolute left-10 bottom-0 transform translate-y-1/2 z-10">
+        <div className="absolute left-4 md:left-10 bottom-0 transform translate-y-1/2 z-10">
           <div className="relative">
             {/* 頭像容器 */}
-            <div className="w-24 h-24 rounded-full border-2 border-white overflow-hidden relative bg-white">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-white overflow-hidden relative bg-white">
               <Image
                 src={avatarPreview || hostProfile.photo_url || DEFAULT_AVATAR}
                 alt="主辦方頭像"
@@ -317,7 +317,7 @@ export function HostProfile() {
       </div>
 
       {/* 內容區域 */}
-      <div className="pt-12 px-10 pb-10">
+      <div className="pt-8 md:pt-12 px-4 md:px-10 pb-6 md:pb-10">
         {isEditing ? (
           /* 編輯模式：顯示表單 */
           <form
@@ -344,11 +344,11 @@ export function HostProfile() {
             )}
             noValidate
           >
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6 md:gap-8">
               {/* 頭像和名稱區域 */}
               <div className="flex items-center gap-4">
                 {/* 名稱輸入框 */}
-                <div className="w-[300px]">
+                <div className="w-full max-w-[300px]">
                   <FormField
                     label="名稱"
                     name="name"
@@ -365,18 +365,18 @@ export function HostProfile() {
               </div>
 
               {/* 背景簡介 */}
-              <div className="w-[624px]">
+              <div className="w-full max-w-[624px]">
                 <div className="flex flex-col gap-1">
                   <label className="text-[#4F4F4F] text-sm font-normal font-['Noto_Sans_TC'] leading-[1.5em]">
                     背景簡介
                   </label>
-                  <div className={`bg-white border rounded-2xl px-4 py-3 h-[132px] ${
+                  <div className={`bg-white border rounded-2xl px-4 py-3 h-[120px] md:h-[132px] ${
                     errors.description ? 'border-[#AB5F5F]' : 'border-[#B0B0B0]'
                   }`}>
                     <textarea
                       {...register('description')}
                       placeholder="專業露營體驗策劃團隊，提供完善裝備與獨特自然環境，讓您遠離喧囂，擁抱大自然的美好時光。"
-                      className="w-full h-full text-[#121212] text-base font-normal font-['Noto_Sans_TC'] leading-[1.5em] bg-transparent border-none outline-none resize-none"
+                      className="w-full h-full text-[#121212] text-sm md:text-base font-normal font-['Noto_Sans_TC'] leading-[1.5em] bg-transparent border-none outline-none resize-none"
                     />
                   </div>
                   {errors.description && (
@@ -388,9 +388,9 @@ export function HostProfile() {
               </div>
 
               {/* 電話號碼區域 */}
-              <div className="flex gap-6">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                 {/* 電話號碼 */}
-                <div className="w-[300px]">
+                <div className="w-full max-w-[300px]">
                   <FormField
                     label="電話號碼"
                     name="phone"
@@ -412,7 +412,7 @@ export function HostProfile() {
               </div>
 
               {/* 電子信箱 */}
-              <div className="w-[300px]">
+              <div className="w-full max-w-[300px]">
                 <FormField
                   label="電子信箱"
                   name="email"
@@ -432,18 +432,18 @@ export function HostProfile() {
               </div>
 
               {/* 按鈕區域 */}
-              <div className="flex justify-start gap-3">
+              <div className="flex flex-col sm:flex-row justify-start gap-3">
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="bg-white text-[#4F4F4F] border border-[#B0B0B0] px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight"
+                  className="bg-white text-[#4F4F4F] border border-[#B0B0B0] px-4 md:px-6 py-3 md:py-4 rounded-2xl text-sm md:text-base font-semibold font-['Noto_Sans_TC'] leading-tight w-full sm:w-auto"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={isMutating}
-                  className="bg-[#5C795F] text-white px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight flex items-center gap-1"
+                  className="bg-[#5C795F] text-white px-4 md:px-6 py-3 md:py-4 rounded-2xl text-sm md:text-base font-semibold font-['Noto_Sans_TC'] leading-tight flex items-center justify-center gap-1 w-full sm:w-auto"
                 >
                   {isMutating ? (
                     <span className="loading loading-spinner loading-xs mr-2"></span>
@@ -455,37 +455,37 @@ export function HostProfile() {
           </form>
         ) : (
           /* 檢視模式：顯示靜態資料 */
-          <div className="flex flex-col gap-6 mt-6">
+          <div className="flex flex-col gap-4 md:gap-6 mt-4 md:mt-6">
             {/* 主辦方名稱區域 - 頭像現在在背景圖片區域 */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 md:gap-4">
               {/* 名稱和 */}
-              <h2 className="text-[#121212] text-lg font-bold">
+              <h2 className="text-[#121212] text-base md:text-lg font-bold">
                 {hostProfile.name}
               </h2>
 
               {/* 描述 */}
-              <p className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC'] leading-relaxed">
+              <p className="text-[#4F4F4F] text-sm md:text-base font-normal font-['Noto_Sans_TC'] leading-relaxed">
                 {hostProfile.description}
               </p>
             </div>
 
             {/* 聯絡資訊區域 */}
-            <div className="flex gap-11">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-11">
               {/* 電話資訊 */}
               <div className="flex items-center gap-2">
                 <Icon
                   icon="material-symbols:call-outline"
                   className="text-[#5C795F]"
-                  width={24}
-                  height={24}
+                  width={20}
+                  height={20}
                 />
-                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                <span className="text-[#4F4F4F] text-sm md:text-base font-normal font-['Noto_Sans_TC']">
                   +886
                 </span>
-                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                <span className="text-[#4F4F4F] text-sm md:text-base font-normal font-['Noto_Sans_TC']">
                   {hostProfile.phone}
                 </span>
-                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                <span className="text-[#4F4F4F] text-sm md:text-base font-normal font-['Noto_Sans_TC']">
                   #12
                 </span>
               </div>
@@ -495,10 +495,10 @@ export function HostProfile() {
                 <Icon
                   icon="material-symbols:mail-outline"
                   className="text-[#5C795F]"
-                  width={24}
-                  height={24}
+                  width={20}
+                  height={20}
                 />
-                <span className="text-[#4F4F4F] text-base font-normal font-['Noto_Sans_TC']">
+                <span className="text-[#4F4F4F] text-sm md:text-base font-normal font-['Noto_Sans_TC'] break-all">
                   {hostProfile.email}
                 </span>
               </div>
@@ -507,7 +507,7 @@ export function HostProfile() {
             {/* 編輯按鈕 */}
             <div className="flex justify-start">
               <button
-                className="bg-[#5C795F] text-white px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight"
+                className="bg-[#5C795F] text-white px-4 md:px-6 py-3 md:py-4 rounded-2xl text-sm md:text-base font-semibold font-['Noto_Sans_TC'] leading-tight w-full sm:w-auto"
                 onClick={() => {
                   // 初始化表單數據
                   reset({

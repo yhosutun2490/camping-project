@@ -5,9 +5,9 @@ import { HostProfile } from "./components/HostProfile";
 
 export default function HostPage() {
   return (
-    <div className="flex flex-col gap-6 w-full">
+    <div className="flex flex-col gap-4 md:gap-6 w-full">
       {/* 主辦方資料標題 */}
-      <h1 className="text-black text-3xl font-semibold font-['Noto Sans TC'] leading-[45px] w-[968px]">
+      <h1 className="text-black text-xl md:text-2xl lg:text-3xl font-semibold font-['Noto Sans TC'] leading-tight w-full">
         主辦方資料
       </h1>
       
