@@ -32,7 +32,7 @@ export default function DeleteCartItemModal({
     try {
       // 單筆或批次刪除
       for (const orderId of orderIds) {
-        await deleteOrders({ id: orderId }); // 依你的 hook 參數自行調整
+        await deleteOrders({ orderId }); // 依你的 hook 參數自行調整
       }
       toast.success("成功刪除購物車品項");
       // 關閉 modal（checkbox 失焦）

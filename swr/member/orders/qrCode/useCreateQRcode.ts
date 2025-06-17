@@ -8,9 +8,8 @@ export function usePostMemberOrdersQRcode() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/member/orders/${orderId}/ticket",
     async (_key: string, { arg }: { arg: { orderId: string } }) => {
-      const { orderId } = arg;  
       const res = await axios.post<PostMemberTicketsQrCodeResponse>(
-        `/api/member/orders/${orderId}/ticket`,
+        `/api/member/orders/ticket`,
         arg
       );
       return res.data.ticket;

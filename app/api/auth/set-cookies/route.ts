@@ -8,8 +8,7 @@ export async function POST(req: NextRequest) {
   if (!accessToken || !refreshToken) {
     return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
   }
-
-
+ 
   const res = NextResponse.json({ success: true });
 
   res.cookies.set({

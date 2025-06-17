@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export function useGoogleAuthRedirect() {
   const router = useRouter();
@@ -10,8 +11,8 @@ export function useGoogleAuthRedirect() {
   useEffect(() => {
     const handleAuthRedirect = async () => {
       const url = new URL(window.location.href);
-      const accessToken = url.searchParams.get("accessToken");
-      const refreshToken = url.searchParams.get("refreshToken");
+      const accessToken = url.searchParams.get("access_token");
+      const refreshToken = url.searchParams.get("refresh_token");
   
       if (accessToken && refreshToken) {
         try {
@@ -27,10 +28,11 @@ export function useGoogleAuthRedirect() {
           );
           const cleanUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
-          router.refresh();
+          toast.success('登入成功')      // 先開 Toast
+          setTimeout(()=>window.location.href = '/',500)
         } catch (error) {
           console.error("登入失敗：無法寫入 cookie", error);
-          router.refresh();
+          toast.success('登入失敗，請稍後再試')
         }
       }
     };

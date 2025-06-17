@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { loginSchema } from "@/schema/AuthForm";
+import GoogleAuthButton from "../GoogleAuthButton";
 
 // zod schema 轉換為typescript
 type FormType = z.infer<typeof loginSchema>;
@@ -114,6 +115,7 @@ export default function LoginForm({ ref, close }: Props) {
           "登入"
         )}
       </button>
+      <GoogleAuthButton isLogin={true} className="mt-4 mx-auto"/>
     </form>
   ) : (
     <ForgetPassWordForm setStep={setStep}/>
