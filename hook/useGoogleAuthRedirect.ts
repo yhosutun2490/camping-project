@@ -28,12 +28,11 @@ export function useGoogleAuthRedirect() {
           );
           const cleanUrl = window.location.origin + window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
-          toast.success('登入成功')
-          router.refresh();
+          toast.success('登入成功')      // 先開 Toast
+          setTimeout(()=>window.location.href = '/',500)
         } catch (error) {
           console.error("登入失敗：無法寫入 cookie", error);
           toast.success('登入失敗，請稍後再試')
-          router.refresh();
         }
       }
     };
