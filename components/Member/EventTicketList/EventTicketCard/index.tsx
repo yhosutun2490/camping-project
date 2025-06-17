@@ -64,10 +64,7 @@ export default function EventTicketCard({
   async function handleOnClickApplyQRcode(orderId: string) {
     try {
       const res = await postOrderQRcode({ orderId });
-      console.log("QR CDOE res", res);
-
       if (!res.qr_image_url) throw new Error("沒有拿到 URL");
-
       setQrCodeImageUrl(res.qr_image_url);
       if (qrCodeModalRef.current) {
         setTimeout(() => qrCodeModalRef.current?.click(), 0);
@@ -87,7 +84,7 @@ export default function EventTicketCard({
   }
   async function handleOnOrderRefund(orderId: string) {
     try {
-      await postOrderRefund({ id: orderId });
+      await postOrderRefund({ orderId });
       toast.success("申請退款成功");
       if (refundModalRef.current) refundModalRef.current.checked = false;
       router.refresh();

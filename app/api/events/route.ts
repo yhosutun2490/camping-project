@@ -42,7 +42,6 @@ export async function GET(req: NextRequest) {
     const data = await axiosInstance.get<GetApiV1Events200Data>('/events', {
       params: cleanedParams,
     });
-
     return NextResponse.json({ code: 200, data: data.data });
   } catch (err: unknown) {
     const apiErr = formatAxiosError(err);

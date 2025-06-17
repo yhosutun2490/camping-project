@@ -106,17 +106,18 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     // 需登入才有member id 進行訂單創建
     if (isMemberLogin) {
       try {
-        if (isEditing) {
+        if (isEditing && orderId) {
           // 修改訂單
           await patchOrder({
-            id: orderId ?? "",
-            body: {
+              orderId: orderId,
               event_plan_id: plan.id,
               quantity: 1,
               event_addons: currentPlanAddonItems,
-            },
-          });
+            }
+          );
           toast.success("修改購物車品項成功");
+        } else if (isEditing && !orderId) {
+          toast.error("無效的訂單 ID，無法修改購物車品項");
         } else {
           // 新增訂單
           await postOrder({
@@ -260,7 +261,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             {(isMutating && !isBookingDirect) || isMutatingPatch ? (
               <span className="loading loading-spinner"></span>
             ) : (
-              "加入購物車"
+              isEditing?"修改購物車":"加入購物車"
             )}
           </button>
         </div>

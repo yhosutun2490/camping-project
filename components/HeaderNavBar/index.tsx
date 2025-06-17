@@ -18,6 +18,7 @@ import type { UserCheckData } from "@/types/api/auth";
 import { useGoogleAuthRedirect } from "@/hook/useGoogleAuthRedirect"; 
 
 interface PropsType {
+  userId: string;
   username: string;
   isBarOpen?: boolean;
   userRole?: string;
@@ -25,6 +26,7 @@ interface PropsType {
 }
 
 export default function HeaderNavBar({
+  userId,
   username,
   userRole,
   isBarOpen,
@@ -137,7 +139,7 @@ export default function HeaderNavBar({
           </p>
         </Link>
 
-        {username ? (
+        {userId ? (
           isHost ? (
             <Link href="/create-activity" className="flex items-center">
               <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
@@ -157,7 +159,7 @@ export default function HeaderNavBar({
         {/**購物車icon */}
         <ShoppingCartIcon />
 
-        {username ? (
+        {userId ? (
           <MemberMenu user={username} />
         ) : (
           <div className="flex space-x-1 md:space-x-3">
