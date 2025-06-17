@@ -261,7 +261,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             {(isMutating && !isBookingDirect) || isMutatingPatch ? (
               <span className="loading loading-spinner"></span>
             ) : (
-              "加入購物車"
+              isEditing?"修改購物車":"加入購物車"
             )}
           </button>
         </div>

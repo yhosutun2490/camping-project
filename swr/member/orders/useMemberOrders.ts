@@ -83,7 +83,7 @@ export function useDeleteMemberOrders() {
 
 /** 會員已付款訂單退款 */
 type RefundOrderParams = {
-  id: string;
+  orderId: string;
 };
 export function useRefundMemberOrders() {
   const { isMutating, trigger, error, data } = useSWRMutation(
@@ -91,7 +91,7 @@ export function useRefundMemberOrders() {
     async (_key: string, { arg: payload }: { arg: RefundOrderParams }) => {
       const data = await axios.post<RefundOrderParams>(
         `/api/member/orders/refund`,
-        { data: payload }
+        payload
       );
       return data;
     }
