@@ -2,9 +2,12 @@
 import DialogModal from "@/components/DialogModal";
 import LoginForm from "@/components/LoginLabelModal/LoginForm";
 import type { FormHandle } from "@/components/LoginLabelModal/CreateUserForm";
-import { useRef, useEffect, } from "react";
+import { useRef, useEffect } from "react";
 
-export default function LoginLabelModal() {
+interface Props {
+  loginLabel?: string;
+}
+export default function LoginLabelModal({loginLabel = '登入'}:Props) {
   const modalRef = useRef<HTMLInputElement>(null);
   const loginFromRef = useRef<FormHandle>(null);
 
@@ -31,11 +34,11 @@ export default function LoginLabelModal() {
   return (
     <>
       <label htmlFor='login' className="btn-primary btn-outline">
-         登入
+         {loginLabel}
       </label>
       <DialogModal id='login' modalRef={modalRef}>
          <LoginForm ref={loginFromRef} close={closeModal}/>
       </DialogModal>
     </>
-  );
+  )
 }

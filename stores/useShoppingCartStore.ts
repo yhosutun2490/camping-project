@@ -1,28 +1,61 @@
-import {create} from "zustand";
-import type {PlanData} from "@/components/EventById/EventPlanSelector/EventPlanCard"
+// stores/useShoppingCartStore.ts
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import type { PlanData } from "@/components/EventById/EventPlanSelector/EventPlanCard";
 
-export type CartPlan = PlanData[]
+// 1. 先定義一個擴充型別
+export interface CartPlanItem extends PlanData {
+  // 購物車擴充活動id和photo url
+  event: {
+    event_info_id: string;
+    event_name: string;
+    event_photo_url: string;
+  };
+}
+// 2. 故物車資料陣列型別改掉
+export type CartPlan = CartPlanItem[];
 
 interface ShoppingCartState {
-  plans: PlanData[];
-  addPlan: (plan: PlanData) => void; // 增加一筆訂單
-  updatePlan: (id: string, partial: Partial<PlanData>) => void; // 更新某筆訂單
-  removePlan: (id: string) => void; // 移除某筆訂單
-  reset: () => void; // 重置
+  plans: CartPlan;
+  addPlan: (plan: CartPlanItem) => void;
+  updatePlan: (id: string, partial: Partial<CartPlanItem>) => void;
+  removePlan: (id: string) => void;
+  reset: () => void;
 }
 
-export const useShoppingCartStore = create<ShoppingCartState>((set) => ({
-  plans: [],
-  addPlan: (plan) => set((state) => ({ plans: [...state.plans, plan] })),
-  updatePlan: (id, partial) =>
-    set((state) => ({
-      plans: state.plans.map((p) =>
-        p.id === id ? { ...p, ...partial } : p
-      ),
-    })),
-  removePlan: (id) =>
-    set((state) => ({
-      plans: state.plans.filter((p) => p.id !== id),
-    })),
-  reset: () => set({ plans: [] }),
-}));
+export const useShoppingCartStore = create<ShoppingCartState>()(
+  persist(
+    (set, get) => ({
+      plans: [],
+
+      addPlan: (plan) => set({ plans: [...get().plans, plan] }),
+
+      updatePlan: (id, partial) =>
+        set({
+          plans: get().plans.map((p) =>
+            p.id === id ? { ...p, ...partial } : p
+          ),
+        }),
+
+      removePlan: (id) =>
+        set({
+          plans: get().plans.filter((p) => p.id !== id),
+        }),
+
+      reset: () => set({ plans: [] }),
+    }),
+    {
+      /** localStorage 的 key */
+      name: "shopping-cart",
+
+      /** 使用 JSON 儲存；若要改用 sessionStorage 也行 */
+      storage: createJSONStorage(() => localStorage),
+
+      /** 只持久化 plans，其餘函式不需要存 */
+      partialize: (state) => ({ plans: state.plans }),
+
+      /** 初始化時需要自行重新將local stroage資料同步 */
+      skipHydration: true,
+    }
+  )
+);

@@ -26,8 +26,8 @@ export type CreateEventResponse = SuccessResponse<{
 
 // 活動查詢參數介面
 export interface GetEventsParams {
-  startTime?: string;
-  endTime?: string;
+  start_time?: string;
+  end_time?: string;
   location?: string;
   minPrice?: number;
   maxPrice?: number;

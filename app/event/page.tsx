@@ -17,8 +17,8 @@ export default async function EventPage({
   const filter: GetEventsParams = {
     location: params?.location,
     people: params?.person !== undefined ? Number(params.person) : undefined,
-    startTime: params?.from,
-    endTime: params?.to,
+    start_time: params?.start_time,
+    end_time: params?.end_time,
     minPrice:
       params?.minPrice !== undefined && params.minPrice !== ""
         ? Number(params.minPrice)
@@ -54,7 +54,7 @@ export default async function EventPage({
     <div className="min-h-screen bg-primary-50">
       <div
         className="search_condition flex flex-col gap-2 md:flex-row items-center heading-3 text-center text-neutral-950 
-      pt-6 pb-3 md:py-6 px-4 lg:py-2"
+      pt-6 md:py-6 px-4"
       >
         {isAllEmpty ? (
           <span className="heading-3">以下是所有露營活動</span>

@@ -1,11 +1,10 @@
 "use client";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
 import CheckboxStyle from "@/components/CheckBoxStyle";
+import DeleteCartItemModal from "../DeleteCartItemModal";
 import type { MemberOrder } from "@/types/api/member/orders";
 import ImageSkeleton from "@/components/ImageSkeleton";
-import { useDeleteMemberOrders } from "@/swr/member/orders/useMemberOrders";
-import toast from "react-hot-toast";
-import axios from "axios";
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
 
 export type Order = MemberOrder;
@@ -14,19 +13,20 @@ type CartItemProps = {
   order: Order;
   isSelected: boolean;
   onToggleSelect: (order: Order) => void;
+  setSelectedOrders?: React.Dispatch<React.SetStateAction<Order[]>>
 };
 
 export default function CartItem({
   order,
   isSelected,
   onToggleSelect,
+  setSelectedOrders
 }: CartItemProps) {
-  // SWR 刪除會員訂單API
-  const { trigger } = useDeleteMemberOrders();
-  const router = useRouter();
+
+  const deleteModalRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
 
   function handleOnClickOrderEventInfo(order: Order) {
-    console.log("點選的訂單", order);
     const eventId = order.event_info.id;
     const orderId = order.id;
     const planId = order.event_plan.id;
@@ -42,17 +42,7 @@ export default function CartItem({
 
   async function handleOnClickDeleteIcon(orderId: string) {
     if (!orderId) return;
-    try {
-      await trigger({ id: orderId });
-      toast.success("刪除購物車選項成功");
-      router.refresh();
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const message = err.response?.data?.message;
-        console.log("api有誤", message);
-        toast.error(message);
-      }
-    }
+    deleteModalRef.current?.click()
   }
   return (
     <div className="relative w-full flex flex-col gap-4 md:flex-row justify-between border-b py-4">
@@ -82,7 +72,7 @@ export default function CartItem({
             <div>
               <p
                 className="font-bold text-base 
-              text-neutral-800 underline"
+              text-neutral-800 underline cursor-pointer hover:text-blue-500"
                 onClick={() => handleOnClickOrderEventInfo(order)}
               >
                 {order.event_info.name}
@@ -117,6 +107,13 @@ export default function CartItem({
             <IconWrapper icon="material-symbols:delete-outline-rounded" />
           </div>
         </div>
+        <DeleteCartItemModal
+          modalId={order.id}
+          modalRef={deleteModalRef}
+          itemCounts={1}
+          orderIds={[order.id]}
+          setSelectedOrders={setSelectedOrders}
+        />
       </div>
     </div>
   );

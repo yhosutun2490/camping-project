@@ -9,10 +9,15 @@ import { ErrorResponse } from "@/types/api/response";
 import axiosInstance from "@/api/axiosIntance";
 import { AxiosResponse } from "axios";
 
+export type OrderStatus = "Unpaid" | "Paid" | "Refund";   // ← 和後端保持一致
+
 // member order GET 取得個人訂單資料
 export async function GET(
   req: NextRequest
 ): Promise<NextResponse<GetMemberOrdersResponse | ErrorResponse>> {
+  
+  // 新增訂單狀態
+  const status = (req.nextUrl.searchParams.get("status") as OrderStatus | null) ?? "Unpaid";
 
   const accessToken = req.headers.get("access_token");
   if (!accessToken) {
@@ -22,7 +27,7 @@ export async function GET(
     );
   }
   try {
-    const res: AxiosResponse<GetMemberOrdersResponse> = await axiosInstance.get('/member/orders', {
+    const res: AxiosResponse<GetMemberOrdersResponse> = await axiosInstance.get(`/member/orders/status/${status}`, {
       headers: {
         Cookie: `access_token=${accessToken}`,
       },

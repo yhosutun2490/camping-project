@@ -54,9 +54,8 @@ export default function HeaderSearchBarForm({
 
   const { setValue, reset } = form;
 
-  const { location, people, start_Time, end_Time } =
-    useFilterStore();
- 
+  const { location, people, start_Time, end_Time } = useFilterStore();
+
   useEffect(() => {
     const isEmpty =
       !location &&
@@ -114,6 +113,26 @@ export default function HeaderSearchBarForm({
       label: "屏東",
       value: "屏東",
     },
+    {
+      id: "8",
+      label: "桃園",
+      value: "桃園",
+    },
+    {
+      id: "9",
+      label: "宜蘭",
+      value: "宜蘭",
+    },
+    {
+      id: "10",
+      label: "花蓮",
+      value: "花蓮",
+    },
+    {
+      id: "11",
+      label: "台東",
+      value: "台東",
+    },
   ];
 
   const onError: SubmitErrorHandler<FormType> = (errors) => {
@@ -136,10 +155,10 @@ export default function HeaderSearchBarForm({
       }
 
       if (data.dateRange.from) {
-        params.set("from", data.dateRange.from);
+        params.set("start_time", data.dateRange.from);
       }
       if (data.dateRange.to) {
-        params.set("to", data.dateRange.to);
+        params.set("end_time", data.dateRange.to);
       }
       // form.reset()
       // 2. 用 router.push 帶參數跳頁

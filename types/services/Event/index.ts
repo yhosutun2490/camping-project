@@ -76,11 +76,11 @@ export type GetApiV1EventsParams = {
 /**
  * 活動開始時間（ISO 格式）
  */
-startTime?: string;
+start_time?: string;
 /**
  * 活動結束時間（ISO 格式）
  */
-endTime?: string;
+end_time?: string;
 /**
  * 活動地點關鍵字（模糊搜尋）
  */
@@ -88,11 +88,11 @@ location?: string;
 /**
  * 最低價格
  */
-minPrice?: number;
+min_price?: number;
 /**
  * 最高價格
  */
-maxPrice?: number;
+max_price?: number;
 /**
  * 人數關鍵字
  */

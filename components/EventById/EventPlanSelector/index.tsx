@@ -3,13 +3,15 @@
 import { useFormContext, Controller } from "react-hook-form";
 import EventPlanCard from "@/components/EventById/EventPlanSelector/EventPlanCard";
 import type { PlanData } from "@/components/EventById/EventPlanSelector/EventPlanCard";
+import type { EventDetail } from "@/components/EventById/EventPlanSelector/EventPlanCard"
 
 type Props = {
+  event: EventDetail
   name: string;
   plans: PlanData[];
 };
 
-export default function EventPlanSelector({ name, plans }: Props) {
+export default function EventPlanSelector({ name, plans, event }: Props) {
   const { control} = useFormContext();
   // 使用form hook 包裝封裝好的元件 讓元件解耦
   return (
@@ -21,7 +23,8 @@ export default function EventPlanSelector({ name, plans }: Props) {
           {plans.map((plan) => (
             <EventPlanCard
               key={plan.id}
-              data={plan}
+              event={event}
+              plan={plan}
               isSelected={field.value?.event_plan_id === plan.id}
             />
           ))}

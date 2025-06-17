@@ -13,11 +13,11 @@ export function usePostMemberOrders() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/member/orders/post",
     async (_key: string, { arg: payload }: { arg: PostMemberOrderRequest }) => {
-      const data = await axios.post<PostMemberOrderResponse>(
+      const res = await axios.post<PostMemberOrderResponse>(
         "/api/member/orders",
         payload
       );
-      return data;
+      return res.data.data.order_info;
     }
   );
 
@@ -37,7 +37,7 @@ export function usePatchMemberOrders() {
     "/api/member/orders/patch",
     async (
       _key: string,
-      { arg: payload }: { arg: { id:string, body:PatchMemberOrderRequest} }
+      { arg: payload }: { arg: { id: string, body: PatchMemberOrderRequest } }
     ) => {
       const { id, ...body } = payload;
       const data = await axios.patch<PatchMemberOrderResponse>(
@@ -68,6 +68,32 @@ export function useDeleteMemberOrders() {
       const { id, ...body } = payload;
       const data = await axios.delete<DeleteMemberOrderResponse>(
         `/api/member/orders/${id}`,
+        { data: body }
+      );
+      return data;
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+  };
+}
+
+
+/** 會員已付款訂單退款 */
+type RefundOrderParams = {
+  id: string;
+};
+export function useRefundMemberOrders() {
+  const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/member/orders/refund",
+    async (_key: string, { arg: payload }: { arg: RefundOrderParams }) => {
+      const { id, ...body } = payload;
+      const data = await axios.post<RefundOrderParams>(
+        `/api/member/orders/${id}/refund`,
         { data: body }
       );
       return data;

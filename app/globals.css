@@ -7,6 +7,7 @@
 @import "../styles/events-form-input.css";
 @import "../styles/events-form-radio.css";
 @import "../styles/events-form-checkbox.css";
+@import "../styles/animation.css";
 @plugin "daisyui" {
   exclude: rootscrollgutter;
 }
