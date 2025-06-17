@@ -37,7 +37,7 @@ export function usePatchMemberOrders() {
     "/api/member/orders/patch",
     async (
       _key: string,
-      { arg: payload }: { arg: { id: string, body: PatchMemberOrderRequest } }
+      { arg: payload }: { arg: PatchMemberOrderRequest  }
     ) => {
       const data = await axios.patch<PatchMemberOrderResponse>(
         `/api/member/orders`,

@@ -99,10 +99,9 @@ export async function PATCH(
       { status: 401 }
     );
   }
-  // const pathname = req.nextUrl.pathname;
-  // const id = pathname.split("/").pop(); // 取得最後一段，訂單 id
-
-  const { orderId, ...updateOrder } = await req.json() as PatchMemberOrderRequest & { orderId?: string };
+ 
+  const body = await req.json() as PatchMemberOrderRequest;
+  const { orderId, ...updateOrder } = body
 
   if (!orderId) {
     return NextResponse.json(
