@@ -39,12 +39,8 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
   } = useFormContext<FormData>();
   
   // 整合 useUploadEventImages hook
-  // 使用空字符串作為預設值，避免條件式呼叫 Hook
-  const hookParams = eventId || '';
-  const { trigger: uploadImages, isMutating: isUploading } = useUploadEventImages(
-    hookParams, 
-    'detail' as EventImageType
-  );
+  // 新版本只需要圖片類型參數
+  const { trigger: uploadImages, isMutating: isUploading } = useUploadEventImages('detail' as EventImageType);
 
   // 本地狀態管理上傳的檔案
   const [eventImages, setEventImages] = useState<EventImage[]>(() => {
@@ -169,10 +165,12 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
             const uploadToastId = toast.loading('正在上傳活動圖片...');
             
             // 呼叫上傳API
-            await uploadImages({
-              files,
-              descriptions
-            });
+            // 新版本的 trigger 需要三個參數：files, eventId, descriptions
+            await uploadImages(
+              files,        // files
+              eventId,      // eventId
+              descriptions  // descriptions
+            );
             
             // 處理上傳結果 - 如果沒有拋出錯誤，表示上傳成功
             toast.success('圖片上傳成功', { id: uploadToastId });
