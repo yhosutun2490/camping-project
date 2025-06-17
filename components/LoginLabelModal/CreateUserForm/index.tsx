@@ -164,7 +164,7 @@ export default function CreateUserForm({ ref, close }: Props) {
         </button>
       </form>
       <div className="w-full flex justify-center h-[40px] mt-2">
-        <GoogleAuthButton />
+        <GoogleAuthButton isLogin={true}/>
       </div>
     </>
   );

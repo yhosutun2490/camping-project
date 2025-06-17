@@ -115,7 +115,7 @@ export default function LoginForm({ ref, close }: Props) {
           "登入"
         )}
       </button>
-      <GoogleAuthButton isLogin className="mt-4 mx-auto"/>
+      <GoogleAuthButton isLogin={true} className="mt-4 mx-auto"/>
     </form>
   ) : (
     <ForgetPassWordForm setStep={setStep}/>
