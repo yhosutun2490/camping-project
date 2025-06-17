@@ -55,22 +55,22 @@ export default function TabList({ initialTagsList }: Props) {
         {eventTabLists?.map((item) => (
           <div
             className={clsx(
-              `p-4 badge badge-outline flex items-center gap-2 cursor-pointer 
-          text-sm text-neutral-950 hover:scale-110`,
+              `p-4 badge badge-outline rounded-2xl flex items-center gap-2 cursor-pointer 
+          text-sm text-neutral-500 hover:scale-110`,
               tags.includes(item.name ?? "")
-                ? "text-white bg-primary-500"
-                : "bg-transparent border-primary-300"
+                ? "text-primary-500 bg-primary-50 border-primary-500 border-2"
+                : "bg-transparent border-none bg-white"
             )}
             key={item.name}
             onClick={() => handleClickTab(item.name as string)}
           >
-            {item?.name}
+            <span className="select-none">{item?.name}</span>
             {(tags.includes(item.name ?? "")) && (
               <Icon
                 icon="maki:cross"
-                className="text-neutral-950"
-                width={20}
-                height={20}
+                className="text-primary-500"
+                width={18}
+                height={18}
               />
             )}
           </div>

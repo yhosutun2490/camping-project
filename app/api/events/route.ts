@@ -25,10 +25,10 @@ export async function GET(req: NextRequest) {
       people: searchParams.get('person')
         ? parseInt(searchParams.get('person')!, 10)
         : undefined,
-      startTime: searchParams.get('from') ?? undefined,
-      endTime: searchParams.get('to') ?? undefined,
-      minPrice: getOptionalNumber(searchParams.get('minPrice')),
-      maxPrice: getOptionalNumber(searchParams.get('maxPrice')),
+      start_time: searchParams.get('start_time') ?? undefined,
+      end_time: searchParams.get('end_time') ?? undefined,
+      min_price: getOptionalNumber(searchParams.get('minPrice')),
+      max_price: getOptionalNumber(searchParams.get('maxPrice')),
       page: Number(searchParams.get('page')) ?? 1,
       per: Number(searchParams.get('per')) ?? 10,
       sort: searchParams.get('sort') as 'asc' | 'desc',

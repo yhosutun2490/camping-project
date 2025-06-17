@@ -2,62 +2,51 @@
 import EventTicketCard from "./EventTicketCard";
 import EventTicketStatusTab from "@/components/Member/EventTicketStatusTab";
 import type { TabList } from "@/components/Member/EventTicketStatusTab"
-import type { EventTicket } from "@/components/Member/EventTicketList/EventTicketCard"
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import type { GetMemberOrdersResponse } from "@/types/api/member/orders";
+import type { TicketStatus } from "@/components/Member/EventTicketList/EventTicketCard"
 
+/* ---------- 1. Tab 設定 ---------- */
 const tabList = [
-  {
-    label: "即將到來",
-    value: "incoming",
-  },
-  {
-    label: "已完成",
-    value: "finished",
-  },
-  {
-    label: "已取消(退款)",
-    value: "refund",
-  },
+  { label: "即將到來", value: "incoming" },
+  { label: "已完成", value: "finished" },
+  { label: "已取消 (退款)",value: "refunded" },  
 ];
+type TabValue = (typeof tabList)[number]["value"];
 
-const groupedTickets: { [key: string]: EventTicket[] } = {
-  incoming: [
-    {
-      imageUrl: "/images/camp1.jpg",
-      status: "incoming",
-      title: "台中露營｜森林小屋體驗營",
-      planName: "兩天一夜・附早餐",
-      orderNumber: "#ORD12345678",
-      date: "2025-07-15",
-      price: 1800,
-    },
-  ],
-  finished: [
-    {
-      imageUrl: "/images/camp2.jpg",
-      status: "finished",
-      title: "苗栗露營｜自然圈免裝備露營",
-      planName: "一泊二食＆包團專案",
-      orderNumber: "#ORD87654321",
-      date: "2025-03-20",
-      price: 2000,
-    },
-  ],
-  refund: [
-    {
-      imageUrl: "/images/camp3.jpg",
-      status: "refund",
-      title: "宜蘭星空營地｜取消預約",
-      planName: "三天兩夜豪華帳篷",
-      orderNumber: "#ORD55558888",
-      date: "2025-06-01",
-      price: 3200,
-    },
-  ],
-};
-export default function EventTicketList() {
+
+interface Props {
+  ordersPaid: GetMemberOrdersResponse['data']['orders']
+  ordersRefund: GetMemberOrdersResponse['data']['orders']
+}
+export default function EventTicketList({ordersPaid, ordersRefund}:Props) {
   const [activeTab, setActiveTab] = useState<TabList>(tabList[0])
-  const activeTicketLists = groupedTickets[activeTab.value]
+   /* ---------- 3. 訂單分組 ---------- */
+  const { incoming, finished, refunded } = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);   
+
+    const incoming = ordersPaid.filter(o =>
+      new Date(o.event_info.date) >= today
+    );
+
+    const finished = ordersPaid.filter(o =>
+      new Date(o.event_info.date) < today
+    );
+
+    return { incoming, finished, refunded: ordersRefund };
+  }, [ordersPaid, ordersRefund]);
+
+  /* ---------- 4. 依 Tab 取出對應清單 ---------- */
+  const groupedTickets: Record<TabValue, typeof incoming> = {
+    incoming,
+    finished,
+    refunded,
+  };
+  // 目前查看訂單種類
+  const activeTicketList = groupedTickets[activeTab.value as TabValue];
+  
+
   return (
     <div className="member_tickets_list space-y-6 md:space-y-8">
       <EventTicketStatusTab
@@ -65,16 +54,16 @@ export default function EventTicketList() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-      {activeTicketLists.map(ticket => (
+      {activeTicketList.map((ticket: (typeof incoming)[number]) => (
         <EventTicketCard
-          key={ticket.orderNumber}
-          imageUrl={ticket.imageUrl}
-          status={ticket.status}
-          title={ticket.title}
-          planName={ticket.planName}
-          orderNumber={ticket.orderNumber}
-          date={ticket.date}
-          price={ticket.price}
+          key={ticket.id}
+          imageUrl={ticket.event_info.image ?? ""}
+          status={activeTab.value as TicketStatus}
+          title={ticket.event_info.name}
+          planName={ticket.event_plan.title}
+          orderNumber={ticket.id}
+          date={ticket.event_info.date}
+          price={ticket.total_price}
         />
       ))}
     </div>

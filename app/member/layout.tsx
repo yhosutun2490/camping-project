@@ -13,7 +13,7 @@ export default async function MemberLayout({
       id: "0",
       link: "/member",
       title: "管理個人資料",
-      icon: "mingcute:ticket-line",
+      icon: "tdesign:user",
     },
     {
       id: "1",
@@ -21,36 +21,12 @@ export default async function MemberLayout({
       title: "我的活動票卷",
       icon: "mingcute:ticket-line",
     },
-    {
-      id: "2",
-      link: "/member/calendar",
-      title: "活動行事曆",
-      icon: "icon-park-outline:calendar",
-    },
-    {
-      id: "3",
-      link: "/member/favorite",
-      title: "收藏清單",
-      icon: "ic:outline-favorite",
-    },
-    {
-      id: "4",
-      link: "/host/event",
-      title: "個人發起活動",
-      icon: "fluent-mdl2:user-event",
-    },
-    {
-      id: "5",
-      link: "/member/payment",
-      title: "付款方式",
-      icon: "hugeicons:payment-02",
-    },
-    {
-      id: "6",
-      link: "/member/account",
-      title: "帳戶管理",
-      icon: "mdi:account-multiple-outline",
-    },
+    // {
+    //   id: "3",
+    //   link: "/member/favorite",
+    //   title: "收藏活動清單",
+    //   icon: "ic:outline-favorite",
+    // },
   ];
 
   return (

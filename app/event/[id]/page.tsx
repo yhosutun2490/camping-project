@@ -144,6 +144,12 @@ export default async function EventByIdPage({
   // 行前提醒notice
   const event_notices = eventIdData.notices;
 
+  // 購物車用eventDetail
+  const shopCartEventDetail = {
+    event_info_id: eventIdData.id,
+    event_photo_url: eventIdData.photos[0]?.photo_url,
+    event_name: eventIdData.title
+  }
   return (
     <div className="relative bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
@@ -173,6 +179,7 @@ export default async function EventByIdPage({
               <EventHost host={event_host_info} />
               <EventInfoDescription description={event_description} />
               <EventPlansSection
+                event={shopCartEventDetail}
                 data={event_plans}
                 close_Time={event_register_end}
               />
