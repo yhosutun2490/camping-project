@@ -55,6 +55,7 @@ export type PostMemberOrderResponse = SuccessResponse<{
 }>;
 
 export interface PatchMemberOrderRequest {
+  orderId: string;
   event_plan_id: string;
   quantity: number;
   event_addons: {
@@ -82,6 +83,7 @@ export type PatchMemberOrderResponse = SuccessResponse<{
 }>;
 
 export interface DeleteMemberOrderRequest {
+  orderId: string,
   reason?: string; // 取消原因（選填）
 }
 

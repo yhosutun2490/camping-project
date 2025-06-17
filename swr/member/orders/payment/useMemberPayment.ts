@@ -5,7 +5,7 @@ import {
 } from "@/types/api/member/orders/payment";
 import useSWRMutation from "swr/mutation";
 
-/** 創建會員訂單 */
+/** 訂單付款 */
 export function usePostMemberOrdersPayment() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/member/orders/payment",

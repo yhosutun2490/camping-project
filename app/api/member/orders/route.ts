@@ -145,7 +145,8 @@ export async function DELETE(
   }
   // const pathname = req.nextUrl.pathname;
   // const id = pathname.split("/").pop(); // 取得最後一段，訂單 id
-  const { orderId } = await req.json()  
+  const body: DeleteMemberOrderRequest = await req.json();
+  const { orderId } = body;
 
   if (!orderId) {
     return NextResponse.json(
@@ -155,10 +156,9 @@ export async function DELETE(
   }
 
   try {
-    const body: DeleteMemberOrderRequest = await req.json();
     const res: AxiosResponse<DeleteMemberOrderResponse> =
       await axiosInstance.delete(`/member/orders/${orderId}`, {
-        data: body,
+        data:body,
         headers: {
           Cookie: `access_token=${accessToken}`,
         },

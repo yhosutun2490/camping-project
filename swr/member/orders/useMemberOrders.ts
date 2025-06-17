@@ -39,10 +39,9 @@ export function usePatchMemberOrders() {
       _key: string,
       { arg: payload }: { arg: { id: string, body: PatchMemberOrderRequest } }
     ) => {
-      const { id, ...body } = payload;
       const data = await axios.patch<PatchMemberOrderResponse>(
-        `/api/member/orders/${id}`,
-        body
+        `/api/member/orders`,
+        payload
       );
       return data;
     }
@@ -58,17 +57,16 @@ export function usePatchMemberOrders() {
 
 /** 刪除會員訂單 */
 type DeleteOrderParams = {
-  id: string;
+  orderId: string;
   reason?: string;
 };
 export function useDeleteMemberOrders() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/member/orders/delete",
     async (_key: string, { arg: payload }: { arg: DeleteOrderParams }) => {
-      const { id, ...body } = payload;
       const data = await axios.delete<DeleteMemberOrderResponse>(
-        `/api/member/orders/${id}`,
-        { data: body }
+        `/api/member/orders`,
+        { data: payload }
       );
       return data;
     }
@@ -91,10 +89,9 @@ export function useRefundMemberOrders() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/member/orders/refund",
     async (_key: string, { arg: payload }: { arg: RefundOrderParams }) => {
-      const { id, ...body } = payload;
       const data = await axios.post<RefundOrderParams>(
-        `/api/member/orders/${id}/refund`,
-        { data: body }
+        `/api/member/orders/refund`,
+        { data: payload }
       );
       return data;
     }
