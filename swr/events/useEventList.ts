@@ -36,7 +36,7 @@ export function useEventList(filters: GetEventsParams) {
         return acc;
       }, {})
     );
-    return `/api/events?${queryString.toString()}`;
+    return `/api/allEvents?${queryString.toString()}`;
   };
 
   // SWR infinite 主體

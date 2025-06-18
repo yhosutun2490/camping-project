@@ -43,22 +43,22 @@ export default function CartPreviewDropdown({
       className={`absolute top-[135%] -right-50 w-[400px] max-h-[500px] bg-white border rounded shadow-lg z-50 ${className}`}
     >
       <div className="max-h-[400px] overflow-y-auto divide-y">
-        {plans.map((plan,index) => (
+        {plans.map((plan, index) => (
           <div key={plan.id + index} className="p-4 flex gap-3">
             <div className="flex-1">
               <div className="event_plan_info flex space-x-6">
-                <div className="cart_item_img w-25 max-h-15 aspect-[5/3]">
+                <div className="cart_item_img w-[100px] h-15">
                   <ImageSkeleton
                     src={plan.event.event_photo_url}
                     alt={plan.event.event_name}
-                    width={64}
+                    width={100}
                     height={64}
                     sizes="100%"
                     fallbackSrc="/main/main_bg_top_3.jpg"
-                    className="w-full object-cover rounded"
+                    className="w-full object-cover rounded aspect-[5/3]"
                   />
                 </div>
-                <div className="heading-6 text-primary-500 space-y-1">
+                <div className="heading-6 text-primary-500 space-y-1 flex-1">
                   <p>{plan.event.event_name}</p>
                   <p className="heading-7 text-neutral-950">{plan.title}</p>
                   {plan.addonBox.map((addon) => (
