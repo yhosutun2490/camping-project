@@ -287,7 +287,6 @@ const CreateActivityForm: React.FC = () => {
               (eventId ? (
                 <ActivityCreationSuccess
                   eventId={eventId}
-                  onPrevStep={handlePrevStep}
                 />
               ) : (
                 <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm text-center">

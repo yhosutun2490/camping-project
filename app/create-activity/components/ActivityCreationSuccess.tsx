@@ -3,21 +3,24 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import { useRouter } from 'next/navigation';
+import { Icon } from '@iconify/react';
+import { useEventTags } from '@/swr/meta/useEventTags';
 
 interface ActivityCreationSuccessProps {
   /** 活動 ID */
   eventId: string;
-  /** 返回上一步 */
-  onPrevStep: () => void;
 }
 
 /**
  * 活動建立成功結果頁面
  * 顯示建立成功的活動摘要資訊和後續動作選項
  */
-function ActivityCreationSuccess({ eventId, onPrevStep }: ActivityCreationSuccessProps) {
+function ActivityCreationSuccess({ eventId }: ActivityCreationSuccessProps) {
   const router = useRouter();
   const { getValues } = useFormContext<FormData>();
+  
+  // 獲取活動標籤資料
+  const { data: eventTagsData } = useEventTags();
   
   // 獲取表單資料以顯示活動摘要
   const formData = getValues();
@@ -28,6 +31,20 @@ function ActivityCreationSuccess({ eventId, onPrevStep }: ActivityCreationSucces
    */
   const handleCreateNewEvent = () => {
     router.push('/create-activity');
+  };
+
+  /**
+   * 查看活動詳情
+   */
+  const handleViewEventDetail = () => {
+    router.push(`/event/${eventId}`);
+  };
+
+  /**
+   * 前往管理頁面
+   */
+  const handleManageEvents = () => {
+    router.push('/host/activities');
   };
 
   /**
@@ -44,175 +61,202 @@ function ActivityCreationSuccess({ eventId, onPrevStep }: ActivityCreationSucces
     return `NT$ ${price.toLocaleString()}`;
   };
 
+  /**
+   * 根據標籤 ID 取得標籤名稱
+   */
+  const getTagName = (tagId: string) => {
+    const tag = eventTagsData?.data?.eventTags?.find(tag => tag.id === tagId);
+    return tag?.name || tagId;
+  };
+
   return (
-    <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm">
-      {/* 成功標題區域 */}
-      <div className="text-center mb-8">
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center">
-            <svg 
-              className="w-8 h-8 text-white" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M5 13l4 4L19 7" 
+    <div className="min-h-screen bg-[#f9faf9] py-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:px-6 md:py-8">
+        {/* 成功標題區域 */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-[#5C795F] rounded-full flex items-center justify-center shadow-lg">
+              <Icon 
+                icon="material-symbols:check" 
+                className="w-8 h-8 text-white" 
               />
-            </svg>
+            </div>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#121212] mb-3">
+            活動建立成功！
+          </h1>
+          <p className="text-base text-[#4F4F4F] mb-4">
+            恭喜您成功建立了一個全新的露營活動
+          </p>
+          <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-[#e7e7e7]">
+            <Icon icon="material-symbols:event-available" className="w-4 h-4 text-[#5C795F]" />
+            <span className="text-sm font-medium text-[#4F4F4F]">活動 ID：</span>
+            <span className="font-mono text-sm text-[#121212]">
+              {eventId}
+            </span>
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-success mb-2">活動建立成功！</h2>
-        <p className="text-base-content/70">
-          您的活動已成功建立，活動 ID：<span className="font-mono text-sm">{eventId}</span>
-        </p>
-      </div>
 
-      {/* 活動摘要卡片 */}
-      <div className="bg-base-200 rounded-lg p-6 mb-8">
-        <h3 className="text-xl font-semibold mb-4">活動摘要</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 基本資訊 */}
-          <div className="space-y-3">
+        {/* 活動摘要資訊 */}
+        <div className="bg-white rounded-lg shadow-sm border border-[#e7e7e7] p-6 mb-8">
+          <h2 className="text-lg font-semibold text-[#121212] mb-4 flex items-center gap-2">
+            <Icon icon="material-symbols:info" className="w-5 h-5 text-[#5C795F]" />
+            活動摘要
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 基本資訊 */}
             <div>
-              <span className="font-medium text-base-content/70">活動名稱：</span>
-              <span className="font-semibold">{eventInfo.title}</span>
+              <h3 className="font-semibold text-[#354738] text-lg mb-3">
+                {eventInfo.title}
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Icon icon="material-symbols:location-on" className="w-4 h-4 text-[#4F4F4F]" />
+                  <span className="text-[#4F4F4F]">{eventInfo.address}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Icon icon="material-symbols:event" className="w-4 h-4 text-[#4F4F4F]" />
+                  <span className="text-[#4F4F4F]">
+                   活動日期：{formatDateTime(eventInfo.startDate, eventInfo.startTime)} - {formatDateTime(eventInfo.endDate, eventInfo.endTime)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Icon icon="material-symbols:how-to-reg" className="w-4 h-4 text-[#4F4F4F]" />
+                  <span className="text-[#4F4F4F]">
+                    報名時間：{formatDateTime(eventInfo.registration_startDate, eventInfo.registration_startTime)} ~ {formatDateTime(eventInfo.registration_endDate, eventInfo.registration_endTime)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Icon icon="material-symbols:group" className="w-4 h-4 text-[#4F4F4F]" />
+                  <span className="text-[#4F4F4F]">
+                    名額：{eventInfo.max_participants} 人
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
-              <span className="font-medium text-base-content/70">主辦方：</span>
-              <span>{eventInfo.organizer}</span>
-            </div>
-            <div>
-              <span className="font-medium text-base-content/70">活動地點：</span>
-              <span>{eventInfo.address}</span>
-            </div>
-            <div>
-              <span className="font-medium text-base-content/70">參與人數上限：</span>
-              <span>{eventInfo.max_participants} 人</span>
-            </div>
-          </div>
 
-          {/* 時間資訊 */}
-          <div className="space-y-3">
+            {/* 標籤和說明 */}
             <div>
-              <span className="font-medium text-base-content/70">活動開始：</span>
-              <span>{formatDateTime(eventInfo.startDate, eventInfo.startTime)}</span>
-            </div>
-            <div>
-              <span className="font-medium text-base-content/70">活動結束：</span>
-              <span>{formatDateTime(eventInfo.endDate, eventInfo.endTime)}</span>
-            </div>
-            <div>
-              <span className="font-medium text-base-content/70">基本價格：</span>
-              <span className="font-semibold text-primary">{formatPrice(eventInfo.price)}</span>
-            </div>
-            <div>
-              <span className="font-medium text-base-content/70">活動標籤：</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {eventInfo.tags.map((tag, index) => (
-                  <span key={index} className="badge badge-outline badge-sm">
-                    {tag}
+              <h4 className="font-medium text-[#354738] mb-2">活動標籤</h4>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {eventInfo.tags.map((tagId, index) => (
+                  <span 
+                    key={index}
+                    className="px-2 py-1 bg-[#f3f6f3] text-[#354738] text-xs rounded-full border border-[#d1ddd1]"
+                  >
+                    {getTagName(tagId)}
                   </span>
                 ))}
               </div>
+              
+              <h4 className="font-medium text-[#354738] mb-2">活動說明</h4>
+              <p className="text-sm text-[#4F4F4F] leading-relaxed">
+                {eventInfo.description}
+              </p>
             </div>
           </div>
         </div>
 
         {/* 方案資訊 */}
-        <div className="mt-6">
-          <h4 className="font-medium text-base-content/70 mb-2">
-            建立的方案 ({plans.length} 個)：
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {plans.map((plan, index) => (
-              <div key={index} className="bg-base-100 rounded-lg p-3 border">
-                <div className="font-medium">{plan.title}</div>
-                <div className="text-sm text-base-content/70 mt-1">
-                  {formatPrice(plan.price)}
-                  {plan.discountPrice && (
-                    <span className="ml-2 text-success">
-                      優惠價 {formatPrice(plan.discountPrice)}
-                    </span>
+        {plans && plans.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-[#e7e7e7] p-6 mb-8">
+            <h2 className="text-lg font-semibold text-[#121212] mb-4 flex items-center gap-2">
+              <Icon icon="material-symbols:receipt-long" className="w-5 h-5 text-[#5C795F]" />
+              活動方案
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {plans.map((plan, index) => (
+                <div 
+                  key={index}
+                  className="border border-[#e7e7e7] rounded-lg p-4 hover:border-[#5C795F] transition-colors"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-medium text-[#354738]">
+                      方案 {index + 1}：{plan.title}
+                    </h3>
+                    <div className="text-right">
+                      {plan.discountPrice ? (
+                        <div className="flex items-center gap-1">
+                          <div className="text-[#5C795F] font-semibold">
+                            {formatPrice(plan.price - plan.discountPrice)}
+                          </div>
+                          <div className="text-xs text-[#888] line-through">
+                            {formatPrice(plan.price)}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-[#5C795F] font-semibold">
+                          {formatPrice(plan.price)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-sm text-[#4F4F4F] mb-2">
+                    {plan.content && plan.content.length > 0 && (
+                      <ul className="list-disc list-inside space-y-1">
+                        {plan.content.map((item, idx) => (
+                          <li key={idx}>{item.value}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  {plan.addOns && plan.addOns.length > 0 && (
+                    <div className="text-xs text-[#4F4F4F]">
+                      <div className="font-medium mb-1">加購項目：</div>
+                      <ul className="list-disc list-inside space-y-1">
+                        {plan.addOns.map((addon, idx) => (
+                          <li key={idx}>{addon.name} (+{formatPrice(addon.price)})</li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* 動作按鈕區 */}
-      <div className="space-y-4">
-        {/* 主要動作 */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        {/* 操作按鈕 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
-            type="button"
-            className="btn btn-primary flex-1"
+            onClick={handleViewEventDetail}
+            className="flex items-center justify-center gap-2 bg-[#5C795F] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#354738] transition-colors shadow-sm"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <Icon icon="material-symbols:visibility" className="w-5 h-5" />
             查看活動詳情
           </button>
+          
           <button
-            type="button"
-            className="btn btn-outline btn-primary flex-1"
+            onClick={handleManageEvents}
+            className="flex items-center justify-center gap-2 bg-white text-[#354738] px-6 py-3 rounded-lg font-medium border border-[#354738] hover:bg-[#f3f6f3] transition-colors"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <Icon icon="material-symbols:settings" className="w-5 h-5" />
             管理我的活動
           </button>
-        </div>
-
-        {/* 次要動作 */}
-        <div className="flex flex-col sm:flex-row gap-3">
+          
           <button
-            type="button"
-            className="btn btn-outline flex-1"
             onClick={handleCreateNewEvent}
+            className="flex items-center justify-center gap-2 bg-[#f3f6f3] text-[#354738] px-6 py-3 rounded-lg font-medium hover:bg-[#e7f0e7] transition-colors border border-[#d1ddd1]"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Icon icon="material-symbols:add-circle" className="w-5 h-5" />
             建立新活動
           </button>
-          <button
-            type="button"
-            className="btn btn-ghost flex-1"
-            onClick={onPrevStep}
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            返回上一步
-          </button>
         </div>
-      </div>
 
-      {/* 提示資訊 */}
-      <div className="mt-8 p-4 bg-info/10 rounded-lg border border-info/20">
-        <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0">
-            <svg className="w-5 h-5 text-info mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <h4 className="font-medium text-info mb-1">接下來您可以：</h4>
-            <ul className="text-sm text-base-content/70 space-y-1">
-              <li>• 在活動管理頁面查看和編輯活動詳情</li>
-              <li>• 追蹤報名狀況和參與者資訊</li>
-              <li>• 與參與者溝通活動相關事宜</li>
-              <li>• 分享活動連結給潛在參與者</li>
-            </ul>
+        {/* 提示資訊 */}
+        <div className="mt-8 bg-[#f8f9f8] border border-[#d1ddd1] rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Icon icon="material-symbols:lightbulb" className="w-5 h-5 text-[#5C795F] mt-0.5" />
+            <div>
+              <h4 className="font-medium text-[#354738] mb-1">接下來您可以：</h4>
+              <ul className="text-sm text-[#4F4F4F] space-y-1">
+                <li>• 分享活動連結給朋友們</li>
+                <li>• 在活動管理頁面查看報名狀況</li>
+                <li>• 隨時編輯活動資訊</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -220,4 +264,4 @@ function ActivityCreationSuccess({ eventId, onPrevStep }: ActivityCreationSucces
   );
 }
 
-export default React.memo(ActivityCreationSuccess);
+export default ActivityCreationSuccess;

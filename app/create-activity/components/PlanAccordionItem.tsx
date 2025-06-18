@@ -5,6 +5,7 @@ import { FormData } from '../schema/formDataSchema';
 import FormField from '../../../components/form/FormField';
 import FormInput from '../../../components/form/FormInput';
 import FormNumberInput from '../../../components/form/FormNumberInput';
+import { Icon } from '@iconify/react';
 
 interface PlanAccordionItemProps {
   /** 方案索引 */
@@ -61,129 +62,129 @@ function PlanAccordionItem({
   };
 
   return (
-    <div
-      className={`collapse ${
-        isExpanded ? 'collapse-open' : 'collapse-close'
-      } bg-white rounded-lg`}
-    >
+    <div className="border border-[#E0E6E0] rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
       <div
-        className="collapse-title px-4 text-xl font-medium flex justify-between items-center cursor-pointer"
+        className="flex justify-between items-center p-4 md:p-6 cursor-pointer hover:bg-gradient-to-r hover:from-[#F5F7F5] hover:to-transparent transition-all duration-200"
         onClick={onToggle}
       >
-        <div>
-          方案 {index + 1}:
-          <span className="ml-2 font-normal text-base">{planTitle}</span>
-        </div>
-        <div className="flex items-center">
-          {planErrors && (
-            <span className="text-error text-sm mr-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#5C795F] flex items-center justify-center text-white text-sm font-bold">
+              {index + 1}
+            </div>
+            <span className="text-base font-semibold text-[#121212] hidden md:inline">
+              方案 {index + 1}:
             </span>
-          )}
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={isExpanded ? 'M19 9l-7 7-7-7' : 'M9 5l7 7-7 7'}
+          </div>
+          <span className="text-sm md:text-base text-[#4F4F4F] truncate flex-1 min-w-0">
+            {planTitle}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 ml-3">
+          {planErrors && (
+            <Icon 
+              icon="material-symbols:error" 
+              className="w-5 h-5 text-[#AB5F5F] animate-pulse" 
             />
-          </svg>
+          )}
+          <Icon 
+            icon="material-symbols:keyboard-arrow-down" 
+            className={`w-5 h-5 text-[#5C795F] transition-transform duration-300 ease-in-out ${isExpanded ? 'rotate-180' : 'rotate-0'}`} 
+          />
         </div>
       </div>
-      <div className="collapse-content">
-        <div className="flex flex-col gap-10">
-          {/* 方案基本資訊 */}
-          <div className="card">
-            <div className="">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="card-title text-lg">方案基本資訊</h3>
-                {/* 方案操作按鈕 */}
-                <div>
+      
+      {isExpanded && (
+        <div className="border-t border-[#E0E6E0] bg-gradient-to-b from-white to-[#FAFBFA]">
+          <div className="p-4 md:p-6">
+            <div className="flex flex-col gap-8">
+              {/* 方案基本資訊 */}
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-start">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-6 bg-[#5C795F] rounded-full"></div>
+                    <h3 className="text-lg font-semibold text-[#121212]">方案基本資訊</h3>
+                  </div>
+                  {/* 方案操作按鈕 */}
                   {canDelete && (
                     <button
                       type="button"
-                      className="flex items-center justify-center gap-1 px-4 py-2 rounded-2xl border-2 border-[#354738] bg-white text-[#354738] hover:bg-[#354738] hover:text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full md:w-auto px-6 py-3 rounded-2xl border-2 border-[#AB5F5F] bg-white text-[#AB5F5F] hover:bg-[#AB5F5F] hover:text-white font-semibold text-sm transition-all duration-200 hover:scale-105"
                       onClick={onDelete}
                     >
-                      刪除方案
+                      <span className="flex items-center justify-center gap-2">
+                        <Icon icon="material-symbols:delete-outline" className="w-4 h-4" />
+                        刪除方案
+                      </span>
                     </button>
                   )}
                 </div>
-              </div>
 
-              <div className="space-y-4">
-                {/* 方案標題 */}
-                <FormField
-                  label="方案標題"
-                  name={`plans.${index}.title`}
-                  required
-                  error={planErrors?.title?.message}
-                >
-                  <FormInput
+                <div className="flex flex-col gap-4">
+                  {/* 方案標題 */}
+                  <FormField
+                    label="方案標題"
                     name={`plans.${index}.title`}
-                    placeholder="請輸入方案標題（最多100字）"
-                  />
-                </FormField>
-
-                <div className="flex items-center justify-between gap-4">
-                  {/* 方案價格 */}
-                  <FormField
-                    label="方案價格"
-                    name={`plans.${index}.price`}
                     required
-                    error={planErrors?.price?.message}
+                    error={planErrors?.title?.message}
                   >
-                    <FormNumberInput
-                      name={`plans.${index}.price`}
-                      min={0}
-                      step={1}
+                    <FormInput
+                      name={`plans.${index}.title`}
+                      placeholder="請輸入方案標題（最多100字）"
                     />
                   </FormField>
 
-                  {/* 折扣價格 */}
-                  <FormField
-                    label="折扣價格（可選）"
-                    name={`plans.${index}.discountPrice`}
-                    error={planErrors?.discountPrice?.message}
-                  >
-                    <FormNumberInput
-                      name={`plans.${index}.discountPrice`}
-                      min={0}
-                      step={1}
-                    />
-                  </FormField>
+                  <div className="flex flex-col gap-4 lg:flex-row lg:gap-6">
+                    {/* 方案價格 */}
+                    <div className="flex-1">
+                      <FormField
+                        label="方案價格"
+                        name={`plans.${index}.price`}
+                        required
+                        error={planErrors?.price?.message}
+                      >
+                        <FormNumberInput
+                          name={`plans.${index}.price`}
+                          min={0}
+                          step={1}
+                        />
+                      </FormField>
+                    </div>
+
+                    {/* 折扣價格 */}
+                    <div className="flex-1">
+                      <FormField
+                        label="折扣價格（可選）"
+                        name={`plans.${index}.discountPrice`}
+                        error={planErrors?.discountPrice?.message}
+                      >
+                        <FormNumberInput
+                          name={`plans.${index}.discountPrice`}
+                          min={0}
+                          step={1}
+                        />
+                      </FormField>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* 方案內容 */}
-          <div className="card">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="card-title text-lg">方案內容</h3>
+            {/* 方案內容 */}
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-6 bg-[#5C795F] rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-[#121212]">方案內容</h3>
+                </div>
                 <button
                   type="button"
-                  className="flex items-center justify-center gap-1 px-4 py-2 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] border-none text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full md:w-auto px-6 py-3 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] text-white font-semibold text-sm transition-all duration-200 hover:scale-105"
                   onClick={handleAddContent}
                 >
-                  + 新增方案內容
+                  <span className="flex items-center justify-center gap-2">
+                    <Icon icon="material-symbols:add" className="w-4 h-4" />
+                    新增方案內容
+                  </span>
                 </button>
               </div>
               <FormField
@@ -192,36 +193,30 @@ function PlanAccordionItem({
                 required
                 error={planErrors?.content?.message}
               >
-                <div className="space-y-2">
+                <div className="flex flex-col gap-4">
                   {contentArray.fields.length === 0 ? (
-                    <div className="text-center py-4 bg-base-200 rounded-lg text-base-content/70">
-                      尚未添加方案內容
+                    <div className="text-center py-8 bg-gradient-to-br from-[#F5F7F5] to-[#E8F0E8] rounded-xl border border-dashed border-[#5C795F]/30">
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#5C795F]/10 flex items-center justify-center">
+                        <Icon icon="material-symbols:description-outline" className="w-6 h-6 text-[#5C795F]" />
+                      </div>
+                      <p className="text-[#4F4F4F] text-sm">尚未新增方案內容</p>
                     </div>
                   ) : (
                     contentArray.fields.map((field, contentIndex) => (
-                      <div key={field.id} className="flex items-center gap-2">
-                        <FormInput
-                          name={`plans.${index}.content.${contentIndex}.value`}
-                          placeholder="請輸入內容項目"
-                        />
+                      <div key={field.id} className="flex gap-3 items-start">
+                        <div className="flex-1">
+                          <FormInput
+                            name={`plans.${index}.content.${contentIndex}.value`}
+                            placeholder="請輸入內容項目"
+                          />
+                        </div>
                         <button
                           type="button"
-                          className="btn btn-square btn-sm btn-outline btn-error"
+                          className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-[#AB5F5F] text-[#AB5F5F] hover:bg-[#AB5F5F] hover:text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
                           onClick={() => contentArray.remove(contentIndex)}
                           disabled={contentArray.fields.length <= 1}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                          <Icon icon="material-symbols:delete-outline" className="h-4 w-4" />
                         </button>
                       </div>
                     ))
@@ -229,19 +224,23 @@ function PlanAccordionItem({
                 </div>
               </FormField>
             </div>
-          </div>
 
-          {/* 加購商品 */}
-          <div className="card">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="card-title text-lg">加購商品（可選）</h3>
+            {/* 加購商品 */}
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-6 bg-[#5C795F] rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-[#121212]">加購商品（可選）</h3>
+                </div>
                 <button
                   type="button"
-                  className="flex items-center justify-center gap-1 px-4 py-2 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] border-none text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full md:w-auto px-6 py-3 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] text-white font-semibold text-sm transition-all duration-200 hover:scale-105"
                   onClick={handleAddAddOn}
                 >
-                  + 新增加購商品
+                  <span className="flex items-center justify-center gap-2">
+                    <Icon icon="material-symbols:add" className="w-4 h-4" />
+                    新增加購商品
+                  </span>
                 </button>
               </div>
 
@@ -250,47 +249,41 @@ function PlanAccordionItem({
                 name={`plans.${index}.addOns`}
                 error={planErrors?.addOns?.message}
               >
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {addOnsArray.fields.length === 0 ? (
-                    <div className="text-center py-4 bg-base-200 rounded-lg text-base-content/70">
-                      尚未添加加購商品
+                    <div className="text-center py-8 bg-gradient-to-br from-[#F5F7F5] to-[#E8F0E8] rounded-xl border border-dashed border-[#5C795F]/30">
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#5C795F]/10 flex items-center justify-center">
+                        <Icon icon="material-symbols:shopping-bag-outline" className="w-6 h-6 text-[#5C795F]" />
+                      </div>
+                      <p className="text-[#4F4F4F] text-sm">尚未新增加購商品</p>
                     </div>
                   ) : (
                     addOnsArray.fields.map((field, addOnIndex) => (
                       <div
                         key={field.id}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center"
+                        className="flex flex-col gap-4 lg:flex-row lg:items-end p-4 bg-white rounded-xl border border-[#E0E6E0]"
                       >
-                        <div className="md:col-span-2">
+                        <div className="flex-1">
                           <FormInput
                             name={`plans.${index}.addOns.${addOnIndex}.name`}
                             placeholder="商品名稱"
                           />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <FormNumberInput
-                            name={`plans.${index}.addOns.${addOnIndex}.price`}
-                            min={0}
-                            step={1}
-                            placeholder="商品價格"
-                          />
+                        <div className="flex gap-3 items-end">
+                          <div className="w-32">
+                            <FormNumberInput
+                              name={`plans.${index}.addOns.${addOnIndex}.price`}
+                              min={0}
+                              step={1}
+                              placeholder="商品價格"
+                            />
+                          </div>
                           <button
                             type="button"
-                            className="btn btn-square btn-sm btn-outline btn-error"
+                            className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-[#AB5F5F] text-[#AB5F5F] hover:bg-[#AB5F5F] hover:text-white transition-all duration-200 hover:scale-105"
                             onClick={() => addOnsArray.remove(addOnIndex)}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <Icon icon="material-symbols:delete-outline" className="h-4 w-4" />
                           </button>
                         </div>
                       </div>
@@ -301,7 +294,8 @@ function PlanAccordionItem({
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
