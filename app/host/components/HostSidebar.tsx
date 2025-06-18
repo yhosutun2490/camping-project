@@ -18,22 +18,23 @@ const HostSidebar = () => {
       name: '活動列表',
       icon: 'material-symbols:splitscreen',
       link: '/host/activities',
-    },
-    {
-      name: '查詢已發起活動',
-      icon: 'material-symbols:search',
-      link: '/host/search',
-    },
-    {
-      name: '審核待上架活動',
-      icon: 'material-symbols:visibility',
-      link: '/host/review',
-    },
-    {
-      name: '線上客服',
-      icon: 'material-symbols:headset-mic',
-      link: '/host/support',
-    },
+    }
+    // ,
+    // {
+    //   name: '查詢已發起活動',
+    //   icon: 'material-symbols:search',
+    //   link: '/host/search',
+    // },
+    // {
+    //   name: '審核待上架活動',
+    //   icon: 'material-symbols:visibility',
+    //   link: '/host/review',
+    // },
+    // {
+    //   name: '線上客服',
+    //   icon: 'material-symbols:headset-mic',
+    //   link: '/host/support',
+    // },
   ];
 
   return (

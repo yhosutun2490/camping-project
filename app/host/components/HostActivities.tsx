@@ -26,6 +26,7 @@ const formatDate = (dateString: string) => {
 
 function HostActivities() {
   const [activeTag, setActiveTag] = useState<string>("");
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
   
   // 使用 API hook 取得主辦方活動資料和活動標籤
   const { events, error, isLoading } = useHostEvents();
@@ -68,13 +69,13 @@ function HostActivities() {
   const eventTags = tagsData?.data?.eventTags || [];
 
   return (
-    <div className="rounded-lg">
+    <div>
       {/* 標籤篩選 */}
-      <div className="flex flex-wrap gap-4 mb-8">
+      <div className="flex flex-wrap gap-3 mb-8">
         {/* 全部選項 */}
         <button
           onClick={() => setActiveTag("")}
-          className={`flex items-center gap-1 px-3 py-2 rounded-2xl border text-sm font-normal transition-colors ${
+          className={`flex items-center gap-1 px-2 py-1 rounded-2xl border text-sm font-normal transition-colors ${
             activeTag === ""
               ? "bg-[#F3F6F3] border-[#5C795F] text-[#5C795F]"
               : "bg-white border-transparent text-[#6D6D6D]"
@@ -88,7 +89,7 @@ function HostActivities() {
           <button
             key={tag.id}
             onClick={() => setActiveTag(tag.id)}
-            className={`flex items-center gap-1 px-3 py-2 rounded-2xl border text-sm font-normal transition-colors ${
+            className={`flex items-center gap-1 px-2 py-1 rounded-2xl border text-sm font-normal transition-colors ${
               activeTag === tag.id
                 ? "bg-[#F3F6F3] border-[#5C795F] text-[#5C795F]"
                 : "bg-white border-transparent text-[#6D6D6D]"
@@ -99,8 +100,128 @@ function HostActivities() {
         ))}
       </div>
 
-      {/* 表格容器 */}
-      <div className="overflow-x-auto">
+      {/* 活動列表 - 手機版卡片式佈局 */}
+      <div className="block md:hidden space-y-0">
+        {events.map((activity) => (
+          <div key={activity.event_id} className="border-b border-[#A1B4A2] last:border-b-0">
+            {/* 卡片主要內容 */}
+            <div className="py-5 space-y-3">
+              {/* 圖片和基本資訊 */}
+              <div className="flex items-center gap-3">
+                {/* 活動圖片 */}
+                {activity.photos && activity.photos.length > 0 ? (
+                  <div className="relative w-[68px] h-[68px] rounded-lg overflow-hidden flex-shrink-0">
+                    <Image
+                      src={activity.photos[0].url}
+                      alt={activity.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-[68px] h-[68px] rounded-lg bg-gray-200 flex-shrink-0 flex items-center justify-center">
+                    <Icon icon="solar:image-outline" width={24} height={24} className="text-gray-400" />
+                  </div>
+                )}
+                
+                {/* 標題和狀態 */}
+                <div className="flex-1 space-y-1">
+                  <div className="flex justify-between items-start gap-2">
+                    <h3 className="text-sm font-normal text-[#121212] leading-[1.5]">
+                      {activity.title}
+                    </h3>
+                    <div className="flex items-center gap-1">
+                      <span className={`px-2 py-1 rounded-full text-xs font-normal ${statusStyles[activity.active]}`}>
+                        {activity.active}
+                      </span>
+                      <button
+                        onClick={() => setExpandedCard(expandedCard === activity.event_id ? null : activity.event_id)}
+                        className="p-1"
+                      >
+                        <Icon 
+                          icon={expandedCard === activity.event_id ? "solar:alt-arrow-up-outline" : "solar:alt-arrow-down-outline"} 
+                          width={24} 
+                          height={24} 
+                          className="text-[#4F4F4F]" 
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* 描述 */}
+              <p className="text-xs text-[#4F4F4F] leading-[1.5] line-clamp-2">
+                {activity.description}
+              </p>
+            </div>
+
+            {/* 展開的詳細資訊 */}
+            {expandedCard === activity.event_id && (
+              <div className="pb-5">
+                <div className="bg-[#F6F6F6] border border-[#E7E7E7] rounded-lg p-3 space-y-3 mb-3">
+                  {/* 活動日期 */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-[#6D6D6D]">活動日期</span>
+                    <div className="flex items-center gap-1 text-xs text-[#121212]">
+                      <span>{formatDate(activity.start_time)}</span>
+                      <span>~</span>
+                      <span>{formatDate(activity.end_time)}</span>
+                    </div>
+                  </div>
+                  
+                  {/* 已付款/已報名 */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-[#6D6D6D]">已付款/已報名</span>
+                    <span className="text-xs text-[#121212]">- / -</span>
+                  </div>
+                  
+                  {/* 人數上限 */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-[#6D6D6D]">人數上限</span>
+                    <span className="text-xs text-[#121212]">{activity.max_participants}</span>
+                  </div>
+                  
+                  {/* 報名期間 */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-[#6D6D6D]">報名期間</span>
+                    <div className="flex items-center gap-1 text-xs text-[#121212]">
+                      <span>-</span>
+                      <span>~</span>
+                      <span>-</span>
+                    </div>
+                  </div>
+                  
+                  {/* 標籤 */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-[#6D6D6D]">標籤</span>
+                    <div className="flex flex-wrap gap-1">
+                      {activity.tags.map((tag, i) => (
+                        <span key={i} className="text-xs text-[#121212]">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 編輯按鈕 */}
+                <button 
+                  className={`w-full py-2 px-4 rounded-2xl text-sm font-semibold transition-colors ${
+                    activity.active === "已結束"
+                      ? "bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed"
+                      : "bg-white text-[#121212] hover:bg-gray-50 border border-gray-200"
+                  }`}
+                  disabled={activity.active === "已結束"}
+                >
+                  編輯
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* 桌面版表格佈局 */}
+      <div className="hidden md:block overflow-x-auto">
         {/* 表頭 */}
         <div className="grid grid-cols-[66px_284px_80px_80px_80px_66px_84px_auto] gap-6 pb-4 border-b border-[#A1B4A2] items-center">
           <div className="text-xs text-[#6D6D6D]">活動日期</div>
@@ -129,7 +250,6 @@ function HostActivities() {
 
               {/* 活動名稱與圖片 */}
               <div className="flex items-center gap-4">
-                {/* 只有當 photos 陣列有內容時才顯示圖片 */}
                 {activity.photos && activity.photos.length > 0 ? (
                   <div className="relative w-[68px] h-[68px] rounded-lg overflow-hidden flex-shrink-0">
                     <Image
@@ -156,7 +276,6 @@ function HostActivities() {
 
               {/* 已付款/已報名 */}
               <div className="text-sm text-[#121212] text-center">
-                {/* API 沒有提供付款/報名資訊，暫時顯示 - */}
                 - / -
               </div>
 
@@ -174,7 +293,6 @@ function HostActivities() {
 
               {/* 報名期間 */}
               <div className="flex flex-col items-center text-sm text-[#121212]">
-                {/* API 沒有提供報名期間資訊，暫時顯示 - */}
                 <span>-</span>
                 <span className="text-center">~</span>
                 <span>-</span>
