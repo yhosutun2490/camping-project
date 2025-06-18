@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Resizer from 'react-image-file-resizer';
+import { Icon } from '@iconify/react';
 
 interface ImagePreviewProps {
   /** 圖片來源 */
@@ -64,10 +65,13 @@ function ImagePreview({
       {/* 圖片載入中顯示 */}
       {isLoading && (
         <div
-          className="w-full h-full flex items-center justify-center bg-base-200 rounded-lg"
+          className="w-full h-full flex items-center justify-center bg-gray-100 rounded-2xl border border-[#B0B0B0]"
           style={{ width, height }}
         >
-          <div className="loading loading-spinner text-primary"></div>
+          <div className="flex flex-col items-center gap-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#5C795F] border-t-transparent"></div>
+            <span className="text-xs text-[#4F4F4F]">載入中...</span>
+          </div>
         </div>
       )}
 
@@ -75,34 +79,35 @@ function ImagePreview({
       {!isLoading && preview && (
         <>
           <div
-            className="relative overflow-hidden rounded-lg"
+            className="relative overflow-hidden rounded-2xl border border-[#B0B0B0] bg-white shadow-sm hover:shadow-md transition-shadow duration-200"
             style={{ width, height }}
           >
-            <Image src={preview} alt={alt} fill className="object-cover" />
-          </div>
-
-          {/* 刪除按鈕 */}
-          <button
-            type="button"
-            onClick={onDelete}
-            className="absolute -top-2 -right-2 bg-error hover:bg-error-focus text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md opacity-80 hover:opacity-100 transition-opacity"
-            aria-label="刪除圖片"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            <Image 
+              src={preview} 
+              alt={alt} 
+              fill 
+              className="object-cover" 
+              sizes={`${width}px`}
+            />
+            
+            {/* 圖片遮罩效果 */}
+            {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200"></div> */}
+            
+            {/* 刪除按鈕 - 位於圖片右上角內部 */}
+            <button
+              type="button"
+              onClick={onDelete}
+              className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg transform hover:scale-110 transition-all duration-200 opacity-90 hover:opacity-100"
+              aria-label="刪除圖片"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+              <Icon
+                icon="material-symbols:close"
+                className="text-white"
+                width={16}
+                height={16}
               />
-            </svg>
-          </button>
+            </button>
+          </div>
         </>
       )}
     </div>
