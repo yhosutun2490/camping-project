@@ -129,20 +129,20 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
   };
 
   return (
-    <div className="flex flex-col gap-8 self-stretch">
-      <h1 className="text-3xl font-semibold">上傳活動封面</h1>
+    <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
+      <h1 className="text-2xl font-semibold text-[#121212]">上傳活動封面</h1>
 
-      <div className="space-y-8">
+      <div className="flex flex-col gap-6">
         <FormField
           label="封面圖片"
           name="coverImages"
           required
           error={errors.coverImages?.message as string}
         >
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {/* 上傳區域（僅在少於3張圖片時顯示） */}
             {coverFiles.length < 3 && (
-              <div className="mb-6">
+              <div>
                 <FileUploader
                   accept="image/jpeg, image/png, image/webp"
                   maxSize={4 * 1024 * 1024} // 4MB
@@ -156,29 +156,40 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
             )}
 
             {/* 上傳提示 */}
-            <div className="text-sm text-base-content/70 mb-6">
-              <p>
+            <div className="flex flex-col gap-2 text-sm text-[#4F4F4F]">
+              <p className="text-[#121212]">
                 最多新增3張活動封面，至少需要上傳1張
-                {coverFiles.length > 0 && ` (目前已選擇 ${coverFiles.length} 張，還可選擇 ${3 - coverFiles.length} 張)`}
+                {coverFiles.length > 0 && (
+                  <span className="text-[#5C795F] font-medium">
+                    {` (目前已選擇 ${coverFiles.length} 張，還可選擇 ${3 - coverFiles.length} 張)`}
+                  </span>
+                )}
               </p>
               <p>建議尺寸：1080 x 540 pixel，格式：JPEG、PNG、WebP</p>
-              <p className="text-primary mt-1">💡 支援一次選擇多張圖片，點擊「下一步」時上傳</p>
+              <div className="flex items-center gap-2 mt-2 p-3 bg-[#F5F7F5] rounded-xl">
+                <span className="text-lg">💡</span>
+                <p className="text-[#354738] font-medium">支援一次選擇多張圖片，點擊「下一步」時上傳</p>
+              </div>
             </div>
 
             {/* 已選擇圖片預覽 */}
             {coverFiles.length > 0 && (
-              <div>
-                <h3 className="text-lg font-medium mb-3">已選擇的封面圖片</h3>
-                <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col gap-3">
+                <h3 className="text-base font-medium text-[#4F4F4F]">已選擇的封面圖片</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {coverFiles.map((file, index) => (
-                    <ImagePreview
-                      key={index}
-                      src={file}
-                      alt={`活動封面 ${index + 1}`}
-                      width={240}
-                      height={120}
-                      onDelete={() => handleDeleteImage(index)}
-                    />
+                    <div key={index} className="relative">
+                      <ImagePreview
+                        src={file}
+                        alt={`活動封面 ${index + 1}`}
+                        width={240}
+                        height={120}
+                        onDelete={() => handleDeleteImage(index)}
+                      />
+                      <div className="absolute top-2 left-2 bg-[#5C795F] text-white text-xs px-2 py-1 rounded-full z-10">
+                        {index + 1}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

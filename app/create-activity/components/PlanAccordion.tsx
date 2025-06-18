@@ -11,6 +11,7 @@ import PlanAccordionItem from './PlanAccordionItem';
 import { useCreateEventPlans } from '@/swr/events/useCreateEventPlans';
 import { CreateEventPlansRequest } from '@/types/api/events';
 import toast from 'react-hot-toast';
+import { Icon } from '@iconify/react';
 
 interface PlanAccordionProps {
   /** 活動 ID（用於 API 呼叫） */
@@ -163,31 +164,46 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
     const canDeletePlan = fields.length > 1;
 
     return (
-      <div className="flex flex-col gap-8 self-stretch">
-        <div className="flex gap-2 justify-between items-center">
-          <h1 className="text-3xl font-semibold">方案設計</h1>
+      <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
+        <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
+          <h1 className="text-2xl font-semibold text-[#121212]">方案設計</h1>
 
           {/* 方案數量顯示 */}
-          <p className="text-lg font-semibold">
-            已建立方案 ({fields.length}/3)
-          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-base font-medium text-[#5C795F]">
+              已建立方案 ({fields.length}/3)
+            </span>
+            {fields.length === 3 && (
+              <span className="text-sm text-[#AB5F5F] bg-[#FFF5F5] px-2 py-1 rounded-full">
+                已達上限
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {/* 方案列表 */}
           {fields.length === 0 ? (
-            <div className="text-center py-8 bg-base-200 rounded-lg">
-              <p className="text-base-content/70">尚未建立任何方案</p>
+            <div className="text-center py-12 px-6 bg-gradient-to-br from-[#F5F7F5] to-[#E8F0E8] rounded-2xl border border-[#E0E6E0]">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#5C795F]/10 flex items-center justify-center">
+                <Icon 
+                  icon="material-symbols:assignment-outline" 
+                  className="w-8 h-8 text-[#5C795F]" 
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-[#121212] mb-2">尚未建立任何方案</h3>
+              <p className="text-[#4F4F4F] mb-6">開始建立您的第一個方案，為參與者提供精彩的露營體驗</p>
               <button
                 type="button"
-                className="btn btn-primary mt-4"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-[#5C795F] hover:bg-[#4a6651] text-white rounded-2xl font-semibold text-base transition-all duration-200 hover:scale-105 hover:shadow-lg"
                 onClick={handleAddPlan}
               >
+                <Icon icon="material-symbols:add" className="text-lg" />
                 建立第一個方案
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {fields.map((field, index) => (
                 <PlanAccordionItem
                   key={field.id}
@@ -201,13 +217,14 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
 
               {/* 新增方案按鈕（在列表底部） */}
               {canAddMorePlan && (
-                <div className="flex justify-center my-4">
+                <div className="flex justify-center mt-6">
                   <button
                     type="button"
-                    className="flex items-center justify-center gap-1 px-6 py-4 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] border-none text-white font-semibold text-base leading-[1.2] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl border-2 border-dashed border-[#5C795F] bg-white hover:bg-[#5C795F] text-[#5C795F] hover:text-white font-semibold text-base transition-all duration-200 hover:scale-105"
                     onClick={handleAddPlan}
                   >
-                    新增方案
+                    <Icon icon="material-symbols:add" className="w-5 h-5" />
+                    新增方案 ({fields.length}/3)
                   </button>
                 </div>
               )}

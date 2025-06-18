@@ -193,83 +193,88 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
   }), [eventId, trigger, uploadImages, isUploading, prepareUploadData, validateFiles]);
 
   return (
-    <div className="flex flex-col gap-8 self-stretch">
-      <h1 className="text-3xl font-semibold">上傳活動圖片</h1>
+    <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
+      <h1 className="text-2xl font-semibold text-[#121212]">上傳活動圖片</h1>
 
-      <div className="space-y-8">
+      <div className="flex flex-col gap-6">
         <FormField
           label="活動圖片"
           name="eventImages"
           required
           error={errors.eventImages?.message as string}
         >
-          <div className="space-y-4">
-            {/* 上傳區域 */}
-            <div className="mb-6">
-              <FileUploader
-                accept="image/jpeg, image/png, image/webp"
-                maxSize={4 * 1024 * 1024} // 4MB
-                onFileSelect={handleFileSelect}
-                error={errors.eventImages?.message as string}
-                disabled={isUploading || eventImages.length >= 3}
-              />
-              {eventImages.length >= 3 && (
-                <p className="text-sm text-warning mt-2">
-                  已達到最多 3 張圖片的上傳限制
-                </p>
-              )}
-            </div>
+          <div className="flex flex-col gap-4">
+            {/* 上傳區域（僅在少於3張圖片時顯示） */}
+            {eventImages.length < 3 && (
+              <div>
+                <FileUploader
+                  accept="image/jpeg, image/png, image/webp"
+                  maxSize={4 * 1024 * 1024} // 4MB
+                  onFileSelect={handleFileSelect}
+                  error={errors.eventImages?.message as string}
+                  disabled={isUploading}
+                />
+              </div>
+            )}
 
             {/* 上傳提示 */}
-            <div className="text-sm text-base-content/70 mb-6">
-              <div className="flex justify-between items-center mb-1">
-                <p>上傳活動相關圖片，展示活動場地或過往活動照片</p>
-                <span className={`badge ${eventImages.length >= 3 ? 'badge-warning' : 'badge-primary'}`}>
-                  {eventImages.length}/3 張圖片
-                </span>
-              </div>
+            <div className="flex flex-col gap-2 text-sm text-[#4F4F4F]">
+              <p className="text-[#121212]">
+                上傳活動相關圖片，展示活動場地或過往活動照片（最多3張）
+                {eventImages.length > 0 && (
+                  <span className="text-[#5C795F] font-medium">
+                    {` (目前已選擇 ${eventImages.length} 張，還可選擇 ${3 - eventImages.length} 張)`}
+                  </span>
+                )}
+              </p>
               <p>建議尺寸：1080 x 540 pixel，格式：JPEG、PNG、WebP</p>
+              <div className="flex items-center gap-2 mt-2 p-3 bg-[#F5F7F5] rounded-xl">
+                <span className="text-lg">💡</span>
+                <p className="text-[#354738] font-medium">每張圖片可以添加描述，幫助參與者了解活動內容</p>
+              </div>
             </div>
 
-            {/* 已上傳圖片預覽 */}
+            {/* 已選擇圖片預覽 */}
             {eventImages.length > 0 && (
-              <div>
-                <h3 className="text-lg font-medium mb-3">
-                  已上傳的活動圖片 ({eventImages.length} 張)
-                </h3>
-                <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-3">
+                <h3 className="text-base font-medium text-[#4F4F4F]">已選擇的活動圖片</h3>
+                <div className="flex flex-col gap-4">
                   {eventImages.map((image, index) => (
-                    <div key={index}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-60 shrink-0">
-                          <ImagePreview
-                            src={image.file}
-                            alt={`活動圖片 ${index + 1}`}
-                            width={240}
-                            height={120}
-                            onDelete={() => handleDeleteImage(index)}
-                          />
+                    <div key={index} className="flex flex-col lg:flex-row gap-4 p-4 border border-[#E0E0E0] rounded-xl">
+                      <div className="w-full lg:w-60 shrink-0">
+                        <ImagePreview
+                          src={image.file}
+                          alt={`活動圖片 ${index + 1}`}
+                          width={240}
+                          height={120}
+                          onDelete={() => handleDeleteImage(index)}
+                        />
+                        <div className="mt-2 text-center">
+                          <span className="inline-block bg-[#5C795F] text-white text-xs px-2 py-1 rounded-full">
+                            圖片 {index + 1}
+                          </span>
                         </div>
-                        <div className="flex-1">
-                          <div className="form-control w-full">
-                            <label className="label">
-                              <span className="label-text">
-                                圖片描述 (選填，最多100字)
-                              </span>
-                              <span className="label-text-alt">
-                                {image.description.length}/100
-                              </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex justify-between items-center">
+                            <label className="text-sm font-medium text-[#4F4F4F]">
+                              圖片描述 (選填，最多100字)
                             </label>
-                            <textarea
-                              className="textarea textarea-bordered w-full"
-                              placeholder="請輸入圖片描述..."
-                              maxLength={100}
-                              value={image.description}
-                              onChange={(e) =>
-                                handleDescriptionChange(index, e.target.value)
-                              }
-                            />
+                            <span className="text-xs text-[#B0B0B0]">
+                              {image.description.length}/100
+                            </span>
                           </div>
+                          <textarea
+                            className="w-full p-3 border bg-white border-[#B0B0B0] rounded-xl resize-none text-sm focus:border-[#5C795F] focus:outline-none"
+                            placeholder="請輸入圖片描述..."
+                            maxLength={100}
+                            rows={3}
+                            value={image.description}
+                            onChange={(e) =>
+                              handleDescriptionChange(index, e.target.value)
+                            }
+                          />
                         </div>
                       </div>
                     </div>
