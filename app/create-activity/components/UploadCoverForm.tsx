@@ -30,12 +30,8 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
   } = useFormContext<FormData>();
 
   // 整合 useUploadEventImages hook
-  // 使用空字符串作為預設值，避免條件式呼叫 Hook
-  const hookParams = eventId || '';
-  const { trigger: uploadImages, isMutating: isUploading } = useUploadEventImages(
-    hookParams, 
-    'cover' as EventImageType
-  );
+  // 新版本只需要圖片類型參數
+  const { trigger: uploadImages, isMutating: isUploading } = useUploadEventImages('cover' as EventImageType);
 
   // 使用 useImperativeHandle 暴露方法給父元件
   useImperativeHandle(ref, () => ({
@@ -108,9 +104,12 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
     
     try {
       // 上傳圖片到伺服器
-      const result = await uploadImages({ 
-        files: coverFiles 
-      });
+      // 新版本的 trigger 需要三個參數：files, eventId, descriptions
+      const result = await uploadImages(
+        coverFiles,    // files
+        eventId,       // eventId  
+        undefined      // descriptions (封面圖不需要描述)
+      );
       
       if (result && result.data) {
         // 顯示成功訊息
