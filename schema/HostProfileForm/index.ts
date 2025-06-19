@@ -2,18 +2,22 @@ import { z } from "zod";
 
 // 主辦單位資料表單驗證結構
 export const hostProfileSchema = z.object({
-  name: z.string()
+  name: z.string({ required_error: "請輸入主辦單位名稱" })
+    .min(1, { message: "請輸入主辦單位名稱" })
     .min(2, { message: "主辦單位名稱至少需要 2 個字元" })
     .max(50, { message: "主辦單位名稱不得超過 50 個字元" }),
   
-  description: z.string()
+  description: z.string({ required_error: "請輸入背景簡介" })
+    .min(1, { message: "請輸入背景簡介" })
     .min(10, { message: "描述至少需要 10 個字元" })
     .max(500, { message: "描述不得超過 500 個字元" }),
   
-  email: z.string()
+  email: z.string({ required_error: "請輸入電子郵件地址" })
+    .min(1, { message: "請輸入電子郵件地址" })
     .email({ message: "請輸入有效的電子郵件地址" }),
   
-  phone: z.string()
+  phone: z.string({ required_error: "請輸入電話號碼" })
+    .min(1, { message: "請輸入電話號碼" })
     .regex(/^09\d{8}$/, { message: "請輸入有效的台灣手機號碼，格式為09XXXXXXXX" }),
   
   photo: z.any()
