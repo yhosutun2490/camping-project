@@ -173,7 +173,7 @@ function HostActivities() {
                   {/* 已付款/已報名 */}
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-[#6D6D6D]">已付款/已報名</span>
-                    <span className="text-xs text-[#121212]">- / -</span>
+                    <span className="text-xs text-[#121212]">{ activity.paid_count } / { activity.signup_total }</span>
                   </div>
                   
                   {/* 人數上限 */}
@@ -186,9 +186,9 @@ function HostActivities() {
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-[#6D6D6D]">報名期間</span>
                     <div className="flex items-center gap-1 text-xs text-[#121212]">
-                      <span>-</span>
+                      <span>{formatDate(activity.registration_open_time)}</span>
                       <span>~</span>
-                      <span>-</span>
+                      <span>{formatDate(activity.registration_close_time)}</span>
                     </div>
                   </div>
                   
@@ -276,7 +276,7 @@ function HostActivities() {
 
               {/* 已付款/已報名 */}
               <div className="text-sm text-[#121212] text-center">
-                - / -
+                { activity.paid_count } / { activity.signup_total }
               </div>
 
               {/* 人數上限 */}
@@ -293,9 +293,9 @@ function HostActivities() {
 
               {/* 報名期間 */}
               <div className="flex flex-col items-center text-sm text-[#121212]">
-                <span>-</span>
+                <span>{formatDate(activity.registration_open_time)}</span>
                 <span className="text-center">~</span>
-                <span>-</span>
+                <span>{formatDate(activity.registration_close_time)}</span>
               </div>
 
               {/* 標籤 */}
