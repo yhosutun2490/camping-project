@@ -101,11 +101,11 @@ const TimePicker: React.FC<TimePickerProps> = ({
           className={`
             flex items-center justify-between gap-2 px-4 py-3 
             bg-white border rounded-2xl cursor-pointer
-            ${error ? 'border-red-500' : isOpen ? 'border-[#5C795F]' : 'border-[#B0B0B0]'}
+            ${error ? 'border-[#ab5f5f]' : isOpen ? 'border-[#5c795f]' : 'border-[#b0b0b0]'}
           `}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <span className={`text-base ${value ? 'text-black' : 'text-[#B0B0B0]'}`}>
+          <span className={`text-base leading-normal ${value ? 'text-[#121212]' : 'text-[#b0b0b0]'}`}>
             {value || placeholder}
           </span>
           <Icon icon="ic:outline-access-time" width="20" height="20" />
@@ -127,7 +127,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
                     <Icon icon="ic:outline-arrow-drop-up" width="20" height="20" />
                   </button>
                   
-                  <span className="text-base font-normal text-black min-w-[2ch] text-center">
+                  <span className="text-base font-normal leading-normal text-[#121212] min-w-[2ch] text-center">
                     {String(hours).padStart(2, '0')}
                   </span>
                   
@@ -141,7 +141,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
                 </div>
 
                 {/* 冒號分隔符 */}
-                <span className="text-base font-normal text-black">:</span>
+                <span className="text-base font-normal leading-normal text-[#121212]">:</span>
 
                 {/* 分鐘選擇 */}
                 <div className="flex flex-col items-center gap-2">
@@ -153,7 +153,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
                     <Icon icon="ic:outline-arrow-drop-up" width="20" height="20" />
                   </button>
                   
-                  <span className="text-base font-normal text-black min-w-[2ch] text-center">
+                  <span className="text-base font-normal leading-normal text-[#121212] min-w-[2ch] text-center">
                     {String(minutes).padStart(2, '0')}
                   </span>
                   
@@ -257,7 +257,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
       </div>
 
       {error && (
-        <span className="text-sm text-red-500">{error}</span>
+        <span className="label-text-alt text-xs font-normal text-[#AB5F5F] leading-[1.5em]">{error}</span>
       )}
     </div>
   );

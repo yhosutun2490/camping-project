@@ -74,15 +74,10 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
                 const formData = getValues();
                 const apiData = convertFormDataToApiFormat(formData.plans);
 
-                // 顯示上傳中提示
-                const submitToastId = toast.loading('正在建立方案...');
-
                 // 呼叫建立方案 API
                 // 新版本的 createEventPlans 需要兩個參數：payload, eventId
                 await createEventPlans(apiData, eventId);
 
-                // 處理建立結果 - 如果沒有拋出錯誤，表示建立成功
-                toast.success('方案建立成功', { id: submitToastId });
                 return true;
               } catch (error) {
                 console.error('建立方案時發生錯誤:', error);

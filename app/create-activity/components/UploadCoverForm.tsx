@@ -112,9 +112,6 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
       );
       
       if (result && result.data) {
-        // 顯示成功訊息
-        toast.success('封面圖片上傳成功！');
-        
         // 上傳成功後進入下一步
         onNextStep();
         return true;

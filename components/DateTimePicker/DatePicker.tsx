@@ -123,12 +123,12 @@ const DatePicker: React.FC<DatePickerProps> = ({
     );
   };
 
-  // 判斷日期是否可用（不是過去的日期）
+  // 判斷日期是否可用（只能選擇未來日期，不包括今天）
   const isAvailable = (day: number): boolean => {
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // 重置時間為午夜
-    return date >= today;
+    return date > today; // 改為 > 只允許未來日期
   };
 
   const calendarDays = generateCalendarDays();
@@ -141,11 +141,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
           className={`
             flex items-center justify-between gap-2 px-4 py-3 
             bg-white border rounded-2xl cursor-pointer
-            ${error ? 'border-red-500' : isOpen ? 'border-[#5C795F]' : 'border-[#B0B0B0]'}
+            ${error ? 'border-[#ab5f5f]' : isOpen ? 'border-[#5c795f]' : 'border-[#b0b0b0]'}
           `} 
           onClick={() => setIsOpen(!isOpen)}
         >
-          <span className={`text-base ${value ? 'text-black' : 'text-[#B0B0B0]'}`}>
+          <span className={`text-base leading-normal ${value ? 'text-[#121212]' : 'text-[#b0b0b0]'}`}>
             {value || placeholder}
           </span>
           <div>
@@ -203,11 +203,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
                           w-12 h-12 rounded-full flex items-center justify-center text-base font-normal
                           ${isSelected(day) 
                             ? 'bg-[#A1B4A2] border border-[#A1B4A2] text-black' 
+                            : !isAvailable(day)
+                            ? 'text-[#B0B0B0] cursor-not-allowed'
                             : isToday(day)
                             ? 'border border-[#A1B4A2] text-black'
-                            : isAvailable(day)
-                            ? 'text-[#3D3D3D] hover:bg-gray-100'
-                            : 'text-[#B0B0B0] cursor-not-allowed'
+                            : 'text-[#3D3D3D] hover:bg-gray-100'
                           }
                         `}
                       >
@@ -278,11 +278,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
                                 w-12 h-12 rounded-full flex items-center justify-center text-base font-normal
                                 ${isSelected(day) 
                                   ? 'bg-[#A1B4A2] border border-[#A1B4A2] text-black' 
+                                  : !isAvailable(day)
+                                  ? 'text-[#B0B0B0] cursor-not-allowed'
                                   : isToday(day)
                                   ? 'border border-[#A1B4A2] text-black'
-                                  : isAvailable(day)
-                                  ? 'text-[#3D3D3D] hover:bg-gray-100'
-                                  : 'text-[#B0B0B0] cursor-not-allowed'
+                                  : 'text-[#3D3D3D] hover:bg-gray-100'
                                 }
                               `}
                             >
@@ -320,7 +320,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
       </div>
 
       {error && (
-        <span className="text-sm text-red-500">{error}</span>
+        <span className="label-text-alt text-xs font-normal text-[#AB5F5F] leading-[1.5em]">{error}</span>
       )}
     </div>
   );

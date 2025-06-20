@@ -161,9 +161,6 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
             // 準備上傳資料
             const { files, descriptions } = prepareUploadData();
             
-            // 顯示上傳中提示
-            const uploadToastId = toast.loading('正在上傳活動圖片...');
-            
             // 呼叫上傳API
             // 新版本的 trigger 需要三個參數：files, eventId, descriptions
             await uploadImages(
@@ -172,8 +169,6 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
               descriptions  // descriptions
             );
             
-            // 處理上傳結果 - 如果沒有拋出錯誤，表示上傳成功
-            toast.success('圖片上傳成功', { id: uploadToastId });
             // 上傳成功後返回 true
             return true;
           } catch (error) {

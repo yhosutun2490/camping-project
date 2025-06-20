@@ -12,6 +12,16 @@ import ActivityCreationSuccess from './ActivityCreationSuccess';
 import StepNavigation from './StepNavigation';
 
 const CreateActivityForm: React.FC = () => {
+  // 建立本地日期函式（避免 UTC 時區問題）
+  const getLocalDateString = (daysOffset: number = 0) => {
+    const today = new Date();
+    today.setDate(today.getDate() + daysOffset);
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   // 添加 eventId 狀態
   const [eventId, setEventId] = useState<string | null>(null);
   
@@ -32,21 +42,21 @@ const CreateActivityForm: React.FC = () => {
       eventInfo: {
         title: '',
         organizer: '',
-        address: '', // 改名從 location 到 address
-        startDate: new Date().toISOString().slice(0, 10),
-        startTime: '00:00',
-        endDate: new Date().toISOString().slice(0, 10),
-        endTime: '00:00',
-        registration_startDate: new Date().toISOString().slice(0, 10),
+        address: '',
+        startDate: getLocalDateString(7), // 活動開始：7天後
+        startTime: '10:00',
+        endDate: getLocalDateString(7), // 活動結束：同一天
+        endTime: '18:00',
+        registration_startDate: getLocalDateString(1), // 報名開始：明天
         registration_startTime: '00:00',
-        registration_endDate: new Date().toISOString().slice(0, 10),
-        registration_endTime: '00:00',
-        max_participants: 1, // 改名從 maxParticipants 到 max_participants
+        registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
+        registration_endTime: '23:45',
+        max_participants: 1,
         price: 0, // 新增價格欄位
         description: '',
         tags: [],
-        cancel_policy: false, // 改名從 cancelPolicy 到 cancel_policy
-        event_notifications: [], // 改名從 notifications 到 event_notifications
+        cancel_policy: false,
+        event_notifications: [],
       },
       coverImages: [],
       eventImages: [],
