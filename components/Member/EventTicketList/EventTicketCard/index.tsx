@@ -29,19 +29,21 @@ export default function EventTicketCard({
   date,
   price,
 }: EventTicket) {
-  const ticketStatusMap: Record<"incoming" | "finished" | "refunded", string> =
+  const ticketStatusMap: Record<"incoming" | "finished" | "refunded" | "refunding", string> =
     {
       incoming: "即將到來",
       finished: "已完成",
       refunded: "已退款",
+      refunding: "退款中"
     };
   const ticketStatusColor: Record<
-    "incoming" | "finished" | "refunded",
+    "incoming" | "finished" | "refunded" | "refunding",
     string
   > = {
     incoming: "text-blue-600",
     finished: "text-green-600",
     refunded: "text-red-600",
+    refunding: "text-amber-700"
   };
   const router = useRouter();
   const eventDate = date.slice(0, 10);
