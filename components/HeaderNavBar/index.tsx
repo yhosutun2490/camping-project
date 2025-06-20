@@ -132,7 +132,7 @@ export default function HeaderNavBar({
           onClick={() => setIsBarScaleUp(false)}
         />
       )}
-      <div className="flex item-center space-x-1 md:space-x-4 h-10 z-1">
+      <div className="flex justify-between item-center space-x-2  md:space-x-4 h-10 z-1">
         <Link href="/event" className="flex items-center">
           <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
             活動列表

@@ -44,8 +44,8 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
         <input type="checkbox" />
         <div className="z-5 collapse-title flex gap-[12px] text-sm md:heading-5 text-neutral-950 pointer-events-none">
           <label
-            htmlFor={event.id}
-            className="cursor-pointer relative pointer-events-auto"
+            htmlFor={`${event.id}`}
+            className="cursor-pointer relative pointer-events-auto h-25"
             onClick={handleClickCover}
           >
             <ImageSkeleton
@@ -55,7 +55,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
               width={80}
               height={48}
               fallbackSrc="/main/main_bg_top_3.jpg"
-              className="min-w-30 h-30 object-cover rounded-2xl"
+              className="min-w-25 h-25 object-cover rounded-2xl"
             />
             {event.photos.length > 1 && (
               <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
@@ -119,7 +119,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           }}
         />
       </DialogModal>
-      <DialogModal id={event.id} modalRef={imagesModalRef}>
+      <DialogModal id={`${event.id}`} modalRef={imagesModalRef}>
         <div className="event_photos_details flex flex-col space-y-2 items-center">
           <div className="w-full heading-5 flex justify-between items-center text-primary-500">
             <p>活動圖片</p>

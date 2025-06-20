@@ -116,11 +116,11 @@ export default function EventFilterShell({
     return (
       <div
         style={style}
-        className="grid grid-cols-1 justify-center lg:grid-cols-2 xl:grid-cols-3 gap-10 px-4"
+        className="grid grid-cols-1 justify-center md:grid-cols-2 xl:grid-cols-3 gap-10 px-4"
       >
         {rowItems.map((item) => (
           <div
-            className="w-[85%] mb-5 sm:w-[450px] md:w-full mx-auto"
+            className="w-[85%] mb-5 sm:w-[450px] max-h-[400px] md:w-full mx-auto"
             key={item.id}
           >
             <EventCard
@@ -148,10 +148,10 @@ export default function EventFilterShell({
     <div className="min-h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
       <div className="border-b border-zinc-300 py-2 px-4">
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <TabList initialTagsList={initialEventTags} />
         </div>
-        <div className="flex justify-between space-x-4 md:hidden">
+        <div className="flex justify-between space-x-4 lg:hidden">
           <EventTagPortalModal initialTagsList={initialEventTags} />
           <PriceRangePortalModal />
         </div>
@@ -160,7 +160,7 @@ export default function EventFilterShell({
       {/* ——— 主體區：左側 Filter + 右側 List ——— */}
       <div className="flex flex-1 min-h-0">
         {/* 左側 Filter */}
-        <aside className="hidden md:block w-[300px] h-full py-6 px-4">
+        <aside className="hidden lg:block w-[300px] h-full py-6 px-4">
           <div className="sticky top-6">
             <PriceRangeFilter />
           </div>
