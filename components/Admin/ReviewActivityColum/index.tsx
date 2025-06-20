@@ -1,6 +1,7 @@
 import type { EventInfo } from "@/types/api/event/eventById";
-import IconWrapper from "@/components/ClientIcon/IconWrapper";
 import ImageSkeleton from "@/components/ImageSkeleton";
+import BadgeStatus from "@/components/Admin/BadgeStatus";
+import ApproveButtonList from "@/components/Admin/ApproveButtonList";
 import clsx from "clsx";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
@@ -102,35 +103,17 @@ export default function ReviewActivityRow({ event }: Props) {
       </div>
 
       {/* 名額  */}
-      <div className="text-center font-medium">{event.max_participants}</div>
+      <div className="text-start font-medium">{event.max_participants}</div>
       {/* 方案最大價格 */}
-      <div className="text-center">{planMaxPrice}</div>
+      <div className="text-start">{planMaxPrice}</div>
 
       {/* 狀態 badge */}
-      <div className="flex justify-center">
-        {event.active === "pending" && (
-          <span className="rounded bg-yellow-50 px-2 py-0.5 text-xs text-yellow-600">
-            待審核
-          </span>
-        )}
-        {event.active === "reject" && (
-          <span className="rounded bg-red-50 px-2 py-0.5 text-xs text-red-600">
-            已退回
-          </span>
-        )}
+      <div className="flex justify-start">
+         <BadgeStatus status={event.active === "pending" ? "pending" : "reject"} />
       </div>
 
       {/* 操作按鈕 */}
-      <div className="flex flex-col items-center justify-center gap-2">
-        <button className="btn-primary text-xs h-8 flex items-center gap-1">
-          <IconWrapper icon="mdi:check" className="text-white"></IconWrapper>
-          通過
-        </button>
-        <button className="btn-error text-xs h-8 flex items-center gap-1">
-          <IconWrapper icon="mdi:close" className="text-white"></IconWrapper>
-          退回
-        </button>
-      </div>
+      <ApproveButtonList />
     </div>
   );
 }
