@@ -18,13 +18,25 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
   }
 
   function handleClickCover(e: React.MouseEvent) {
-    e.stopPropagation(); // ① 阻止事件往上冒
-    imagesModalRef.current?.click();
+    e.stopPropagation();
+    if (imagesModalRef.current) imagesModalRef.current?.click();
   }
 
   function handleClickContent(e: React.MouseEvent) {
-    e.stopPropagation(); // ① 阻止事件往上冒
-    eventContentModalRef.current?.click();
+    e.stopPropagation();
+    if (eventContentModalRef.current) eventContentModalRef.current?.click();
+  }
+
+  function handleCloseImagesModal(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (imagesModalRef.current) {
+      imagesModalRef.current.checked = false;
+    }
+  }
+  function handleCloseContentModal() {
+    if (eventContentModalRef.current) {
+      eventContentModalRef.current.checked = false;
+    }
   }
   return (
     <div className="w-full bg-none border-1 border-primary-300 rounded-2xl">
@@ -47,7 +59,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
             />
             {event.photos.length > 1 && (
               <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                {event.photos.length} 張
+                {event.photos.length} 張 (點選查看)
               </span>
             )}
           </label>
@@ -96,6 +108,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
       </div>
       <DialogModal id={`${event.id}-content`} modalRef={eventContentModalRef}>
         <ActivityModalContent
+          handleCloseContentModal={handleCloseContentModal}
           content={{
             id: event.id,
             title: event.title,
@@ -108,7 +121,13 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
       </DialogModal>
       <DialogModal id={event.id} modalRef={imagesModalRef}>
         <div className="event_photos_details flex flex-col space-y-2 items-center">
-          <p className="heading-5 text-primary-500">活動圖片</p>
+          <div className="w-full heading-5 flex justify-between items-center text-primary-500">
+            <p>活動圖片</p>
+            <button className="btn-primary" onClick={handleCloseImagesModal}>
+              關閉
+            </button>
+          </div>
+
           {event.photos.map((item) => (
             <div
               className="event_photo_single flex flex-col items-center space-y-2"

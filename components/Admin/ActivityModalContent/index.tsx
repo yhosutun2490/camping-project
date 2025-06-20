@@ -6,10 +6,14 @@ type EventModalInfo = Pick<
 
 interface Props {
   content: EventModalInfo;
+  handleCloseContentModal?: ()=>void
 }
-export default function ActivityModalContent({ content }: Props) {
+export default function ActivityModalContent({ content,handleCloseContentModal }: Props) {
+
+ 
   return (
-    <div className="event_details">
+    <div className="event_details flex flex-col">
+      <button className="btn-primary w-fit self-end" onClick={handleCloseContentModal}>關閉</button>
       <ul className="space-y-2">
         <li className="description space-y-2">
           <p className="text-primary-500">活動描述:</p>

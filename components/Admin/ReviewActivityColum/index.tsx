@@ -20,6 +20,18 @@ export default function ReviewActivityRow({ event }: Props) {
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
 
+  function handleCloseImagesModal(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (imagesModalRef.current) {
+      imagesModalRef.current.checked = false;
+    }
+  }
+  function handleCloseContentModal() {
+    if (eventContentModalRef.current) {
+      eventContentModalRef.current.checked = false;
+    }
+  }
+
   return (
     <div
       className={clsx(
@@ -48,18 +60,29 @@ export default function ReviewActivityRow({ event }: Props) {
             />
             {event.photos.length > 1 && (
               <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                {event.photos.length} 張
+                {event.photos.length} 張 (點選查看)
               </span>
             )}
           </label>
 
           <DialogModal id={event.id} modalRef={imagesModalRef}>
             <div className="event_photos_details flex flex-col space-y-2 items-center">
-              <p className="heading-5 text-primary-500">活動圖片</p>
+              <div className="w-full heading-5 flex justify-between items-center text-primary-500">
+                <p>活動圖片</p>
+                <button
+                  className="btn-primary"
+                  onClick={handleCloseImagesModal}
+                >
+                  關閉
+                </button>
+              </div>
+
               {event.photos.map((item) => (
-                <div className="event_photo_single flex flex-col items-center space-y-2" key={item.id}>
+                <div
+                  className="event_photo_single flex flex-col items-center space-y-2"
+                  key={item.id}
+                >
                   <ImageSkeleton
-                    
                     src={item.photo_url}
                     alt={item.id}
                     width={80}
@@ -67,7 +90,9 @@ export default function ReviewActivityRow({ event }: Props) {
                     fallbackSrc="/main/main_bg_top_3.jpg"
                     className="w-70 h-40 object-cover rounded-2xl"
                   />
-                  <p className="photo_description heading-7 text-neutral-950">{item.description || '無描述'}</p>
+                  <p className="photo_description heading-7 text-neutral-950">
+                    {item.description || "無描述"}
+                  </p>
                 </div>
               ))}
             </div>
@@ -89,6 +114,7 @@ export default function ReviewActivityRow({ event }: Props) {
             modalRef={eventContentModalRef}
           >
             <ActivityModalContent
+              handleCloseContentModal={handleCloseContentModal}
               content={{
                 id: event.id,
                 title: event.title,
@@ -109,7 +135,9 @@ export default function ReviewActivityRow({ event }: Props) {
 
       {/* 狀態 badge */}
       <div className="flex justify-start">
-         <BadgeStatus status={event.active === "pending" ? "pending" : "reject"} />
+        <BadgeStatus
+          status={event.active === "pending" ? "pending" : "reject"}
+        />
       </div>
 
       {/* 操作按鈕 */}
