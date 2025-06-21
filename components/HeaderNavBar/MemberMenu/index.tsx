@@ -55,15 +55,26 @@ export default function MemberMenu({ user }: PropsType) {
       title: "主辦方管理",
       link: "/host",
     },
+    {
+      id: "4",
+      title: "審核活動",
+      link: "/admin/activity",
+    },
   ];
 
   // 依角色過濾清單
-  const filteredList = list.filter((item) => {
-    // 「主辦方管理」只給 host / admin 看
-    if (item.link === "/host") {
+  const filteredList = list.filter(({ link }) => {
+    // 1) /host* → host、admin 都能看
+    if (link.startsWith("/host")) {
       return memberRole === "host" || memberRole === "admin";
     }
-    // 其餘項目大家都可以看
+
+    // 2) /admin* → 只有 admin 能看
+    if (link.startsWith("/admin")) {
+      return memberRole === "admin";
+    }
+
+    // 3) 其他 → 全部角色都能看
     return true;
   });
   return (

@@ -1,6 +1,7 @@
 
 import SidebarToggle from "@/components/Member/SideBarToggle";
 import { memberGetProfile } from "@/api/server-components/member/profile";
+import { redirect } from "next/navigation"; 
 export const dynamic = "force-dynamic";
 export default async function MemberLayout({
   children,
@@ -8,6 +9,11 @@ export default async function MemberLayout({
   children: React.ReactNode;
 }>) {
   const memberInfo = await memberGetProfile();
+  const role = memberInfo?.data.member.role 
+  // if (role !== "admin") {
+  //   redirect("/"); 
+  // }
+
   const menuLists = [
     {
       id: "0",
