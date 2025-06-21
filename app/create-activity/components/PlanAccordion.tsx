@@ -21,7 +21,6 @@ interface PlanAccordionProps {
 // 定義 ref 類型
 export interface PlanAccordionRef {
   handleSubmit: () => Promise<boolean>;
-  getLoadingState: () => boolean;
 }
 
 const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
@@ -37,7 +36,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
 
     // 整合 useCreateEventPlans hook
     // 新版本不需要 eventId 參數
-    const { createEventPlans, isCreating } = useCreateEventPlans();
+    const { createEventPlans } = useCreateEventPlans();
 
     /**
      * 將表單資料轉換為 API 請求格式
@@ -92,7 +91,6 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           }
           return false;
         },
-        getLoadingState: () => isCreating,
       }),
       [
         eventId,
@@ -100,7 +98,6 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
         getValues,
         convertFormDataToApiFormat,
         createEventPlans,
-        isCreating,
       ]
     );
 

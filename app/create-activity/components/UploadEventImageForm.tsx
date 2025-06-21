@@ -25,7 +25,6 @@ interface UploadEventImageFormProps {
 // 定義 ref 類型
 export interface UploadEventImageFormRef {
   handleSubmit: () => Promise<boolean>;
-  getLoadingState: () => boolean;
 }
 
 const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImageFormProps>(({
@@ -184,8 +183,7 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
       }
       return false;
     },
-    getLoadingState: () => isUploading,
-  }), [eventId, trigger, uploadImages, isUploading, prepareUploadData, validateFiles]);
+  }), [eventId, trigger, uploadImages, prepareUploadData, validateFiles]);
 
   return (
     <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">

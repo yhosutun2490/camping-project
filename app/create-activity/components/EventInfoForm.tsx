@@ -30,7 +30,6 @@ interface EventInfoFormProps {
 
 export interface EventInfoFormRef {
   handleSubmit: () => Promise<boolean>;
-  getLoadingState: () => { isLoading: boolean; loadingText: string };
 }
 
 const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
@@ -42,35 +41,14 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       isLoading: eventTagsLoading,
     } = useEventTags();
 
-    // API 操作狀態管理
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     // 初始化 API Hooks
-    const { trigger: triggerCreateEvent, isMutating: isCreating } =
-      useCreateEvent();
-    const { updateEvent: triggerUpdateEvent, isUpdating: isUpdatingEvent } =
-      useUpdateEvent();
-    const { trigger: triggerUpdateEventNoticesTags, isMutating: isUpdating } =
-      useUpdateEventNoticesTags();
+    const { trigger: triggerCreateEvent } = useCreateEvent();
+    const { updateEvent: triggerUpdateEvent } = useUpdateEvent();
+    const { trigger: triggerUpdateEventNoticesTags } = useUpdateEventNoticesTags();
 
     // 使用 useImperativeHandle 暴露方法給父元件
     useImperativeHandle(ref, () => ({
       handleSubmit: handleNextStep,
-      getLoadingState: () => {
-        let loadingText = '';
-        if (isSubmitting || isCreating) {
-          loadingText = eventId ? '更新活動中...' : '建立活動中...';
-        } else if (isUpdatingEvent) {
-          loadingText = '更新活動中...';
-        } else if (isUpdating) {
-          loadingText = '更新標籤與通知中...';
-        }
-
-        return {
-          isLoading: isSubmitting || isCreating || isUpdatingEvent || isUpdating,
-          loadingText,
-        };
-      },
     }));
 
     // 將 API 回傳的標籤資料轉換為 FormCheckboxGroup 所需的格式
@@ -219,9 +197,6 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       }
 
       try {
-        // 開始提交，設定載入狀態
-        setIsSubmitting(true);
-
         const eventInfo = getValues('eventInfo');
         let currentEventId = eventId;
 
@@ -231,33 +206,45 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
           const updateEventData = prepareCreateEventData(eventInfo);
           console.log('準備更新活動，資料:', updateEventData);
 
-          const updateResult = await triggerUpdateEvent({
-            eventId: currentEventId,
-            payload: updateEventData,
-          });
-          console.log('更新活動結果:', updateResult);
+          try {
+            const updateResult = await triggerUpdateEvent({
+              eventId: currentEventId,
+              payload: updateEventData,
+            });
+            console.log('更新活動結果:', updateResult);
 
-          if (!updateResult?.data?.event?.id) {
-            throw new Error('活動更新失敗');
+            if (!updateResult?.data?.event?.id) {
+              throw new Error('活動更新失敗');
+            }
+          } catch (updateError) {
+            console.error('更新活動錯誤:', updateError);
+            toast.error(updateError instanceof Error ? updateError.message : '更新活動失敗');
+            return false;
           }
         } else {
           // 建立新活動
           const createEventData = prepareCreateEventData(eventInfo);
           console.log('準備建立活動，資料:', createEventData);
 
-          const createResult = await triggerCreateEvent(createEventData);
-          console.log('建立活動結果:', createResult);
+          try {
+            const createResult = await triggerCreateEvent(createEventData);
+            console.log('建立活動結果:', createResult);
 
-          if (!createResult?.data?.event?.id) {
-            throw new Error('活動建立失敗，未返回活動ID');
-          }
+            if (!createResult?.data?.event?.id) {
+              throw new Error('活動建立失敗，未返回活動ID');
+            }
 
-          // 取得活動ID，並設定為目前ID
-          currentEventId = createResult.data.event.id;
+            // 取得活動ID，並設定為目前ID
+            currentEventId = createResult.data.event.id;
 
-          // 通知父元件活動已建立並傳遞 ID
-          if (onEventCreated) {
-            onEventCreated(currentEventId);
+            // 通知父元件活動已建立並傳遞 ID
+            if (onEventCreated) {
+              onEventCreated(currentEventId);
+            }
+          } catch (createError) {
+            console.error('建立活動錯誤:', createError);
+            toast.error(createError instanceof Error ? createError.message : '建立活動失敗，可能為重複活動');
+            return false;
           }
         }
 
@@ -265,16 +252,22 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
         const updateData = prepareUpdateNoticesTagsData(eventInfo);
         console.log('準備更新標籤與通知，資料:', updateData);
 
-        // 這裡我們觸發更新操作，同時傳入最新的 eventId
-        const updateResult = await triggerUpdateEventNoticesTags(
-          updateData,
-          currentEventId
-        );
-        console.log('更新結果:', updateResult);
+        try {
+          // 這裡我們觸發更新操作，同時傳入最新的 eventId
+          const updateResult = await triggerUpdateEventNoticesTags(
+            updateData,
+            currentEventId
+          );
+          console.log('更新結果:', updateResult);
 
-        // 如果更新成功，回傳成功狀態
-        if (updateResult) {
-          return true;
+          // 如果更新成功，回傳成功狀態
+          if (updateResult) {
+            return true;
+          }
+        } catch (tagsError) {
+          console.error('更新標籤與通知錯誤:', tagsError);
+          toast.error('更新標籤與通知失敗');
+          return false;
         }
 
         return false;
@@ -284,10 +277,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
           error instanceof Error ? error.message : '活動處理過程中發生錯誤'
         );
         return false;
-      } finally {
-        // 無論成功或失敗都要重設載入狀態
-        setIsSubmitting(false);
-      }
+      } 
     };
 
     return (

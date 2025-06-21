@@ -11,6 +11,17 @@ import PlanAccordion, { PlanAccordionRef } from './PlanAccordion';
 import ActivityCreationSuccess from './ActivityCreationSuccess';
 import StepNavigation from './StepNavigation';
 
+// 定義每個步驟的載入狀態
+type StepLoadingState = {
+  isLoading: boolean;
+  loadingText: string;
+};
+
+// 定義所有步驟的載入狀態
+type StepsLoadingState = {
+  [key: number]: StepLoadingState;
+};
+
 const CreateActivityForm: React.FC = () => {
   // 建立本地日期函式（避免 UTC 時區問題）
   const getLocalDateString = (daysOffset: number = 0) => {
@@ -22,18 +33,36 @@ const CreateActivityForm: React.FC = () => {
     return `${yyyy}-${mm}-${dd}`;
   };
 
-  // 添加 eventId 狀態
+  // 活動 ID 狀態
   const [eventId, setEventId] = useState<string | null>(null);
   
-  // 添加載入狀態管理
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loadingText, setLoadingText] = useState<string>('處理中...');
+  // 統一管理所有步驟的載入狀態
+  const [stepsLoadingState, setStepsLoadingState] = useState<StepsLoadingState>({
+    1: { isLoading: false, loadingText: '建立活動中...' },
+    2: { isLoading: false, loadingText: '上傳封面圖片中...' },
+    3: { isLoading: false, loadingText: '上傳活動圖片中...' },
+    4: { isLoading: false, loadingText: '建立方案中...' },
+  });
 
   // 建立各步驟的 ref
   const eventInfoFormRef = useRef<EventInfoFormRef>(null);
   const uploadCoverFormRef = useRef<UploadCoverFormRef>(null);
   const uploadEventImageFormRef = useRef<UploadEventImageFormRef>(null);
   const planAccordionRef = useRef<PlanAccordionRef>(null);
+
+  // 當前步驟
+  const [currentStep, setCurrentStep] = useState<number>(1);
+
+  // 更新特定步驟的載入狀態
+  const updateStepLoadingState = (step: number, isLoading: boolean, loadingText?: string) => {
+    setStepsLoadingState(prevState => ({
+      ...prevState,
+      [step]: { 
+        isLoading, 
+        loadingText: loadingText || prevState[step].loadingText 
+      }
+    }));
+  };
 
   const methods = useForm<FormData>({
     resolver: zodResolver(FormDataSchema),
@@ -72,9 +101,6 @@ const CreateActivityForm: React.FC = () => {
     },
   });
 
-  // 步驟導航狀態
-  const [currentStep, setCurrentStep] = useState<number>(1);
-
   // 驗證指定步驟資料
   const validateStep = async (step: number) => {
     switch (step) {
@@ -91,11 +117,6 @@ const CreateActivityForm: React.FC = () => {
       default:
         return false;
     }
-  };
-
-  const handleNextStep = async () => {
-    const valid = await validateStep(currentStep);
-    if (valid && currentStep < 5) setCurrentStep(currentStep + 1);
   };
 
   const handlePrevStep = () => {
@@ -126,51 +147,49 @@ const CreateActivityForm: React.FC = () => {
    * 處理步驟的下一步邏輯
    */
   const handleStepNext = async () => {
-    console.log('handleStepNext 被調用，當前步驟:', currentStep);
-    setIsLoading(true);
+    const step = currentStep;
+    console.log(`處理第 ${step} 步驟的下一步操作`);
+    
+    // 設定當前步驟為載入中
+    updateStepLoadingState(step, true);
     
     try {
       let success = false;
       
-      switch (currentStep) {
+      switch (step) {
         case 1:
-          setLoadingText('建立活動中...');
           if (eventInfoFormRef.current) {
-            console.log('調用 EventInfoForm handleSubmit');
+            // 調用子元件方法，但載入狀態由父元件控制
             success = await eventInfoFormRef.current.handleSubmit();
-            console.log('EventInfoForm handleSubmit 結果:', success);
-          } else {
-            console.error('eventInfoFormRef.current 為 null');
           }
           break;
         case 2:
-          setLoadingText('上傳封面圖片中...');
           if (uploadCoverFormRef.current) {
             success = await uploadCoverFormRef.current.handleSubmit();
           }
           break;
         case 3:
-          setLoadingText('上傳活動圖片中...');
           success = await handleStep3Submit();
           break;
         case 4:
-          setLoadingText('建立方案中...');
           success = await handleStep4Submit();
-          break;
-        default:
           break;
       }
       
-      console.log('步驟完成，成功:', success, '當前步驟:', currentStep);
-      if (success && currentStep < 5) {
-        setCurrentStep(currentStep + 1);
-        console.log('跳轉到下一步:', currentStep + 1);
+      console.log(`步驟 ${step} 完成，結果:`, success);
+      
+      // 不論成功與否，立即重置這一步的載入狀態
+      updateStepLoadingState(step, false);
+      
+      // 如果成功且不是最後一步，進入下一步
+      if (success && step < 5) {
+        setCurrentStep(step + 1);
       }
     } catch (error) {
-      console.error('handleStepNext 錯誤:', error);
-    } finally {
-      setIsLoading(false);
-      console.log('設定 isLoading 為 false');
+      console.error(`步驟 ${step} 處理錯誤:`, error);
+      
+      // 發生錯誤時，立即重置當前步驟的載入狀態
+      updateStepLoadingState(step, false);
     }
   };
 
@@ -185,23 +204,15 @@ const CreateActivityForm: React.FC = () => {
    * 獲取當前步驟的按鈕配置
    */
   const getStepButtonConfig = () => {
-    // 如果是第1步，獲取 EventInfoForm 的載入狀態
-    let currentIsLoading = isLoading;
-    let currentLoadingText = loadingText;
+    const currentLoadingState = stepsLoadingState[currentStep];
     
-    if (currentStep === 1 && eventInfoFormRef.current) {
-      const eventInfoLoadingState = eventInfoFormRef.current.getLoadingState();
-      currentIsLoading = currentIsLoading || eventInfoLoadingState.isLoading;
-      currentLoadingText = eventInfoLoadingState.loadingText || currentLoadingText;
-    }
-
     const baseConfig = {
       showPrevButton: currentStep > 1 && currentStep < 5,
       showNextButton: currentStep < 5,
       onPrevClick: handlePrevStep,
       onNextClick: handleStepNext,
-      isLoading: currentIsLoading,
-      loadingText: currentLoadingText,
+      isLoading: currentLoadingState.isLoading,
+      loadingText: currentLoadingState.loadingText,
     };
 
     switch (currentStep) {
@@ -278,7 +289,6 @@ const CreateActivityForm: React.FC = () => {
             {currentStep === 2 && (
               <UploadCoverForm
                 ref={uploadCoverFormRef}
-                onNextStep={handleNextStep}
                 eventId={eventId}
               />
             )}

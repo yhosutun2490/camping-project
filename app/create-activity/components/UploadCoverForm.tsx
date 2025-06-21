@@ -10,18 +10,15 @@ import toast from 'react-hot-toast';
 import { EventImageType } from '@/types/api/events';
 
 interface UploadCoverFormProps {
-  /** 下一步 */
-  onNextStep: () => void;
   /** 活動 ID */
   eventId: string | null;
 }
 
 export interface UploadCoverFormRef {
   handleSubmit: () => Promise<boolean>;
-  getLoadingState: () => { isLoading: boolean; loadingText: string };
 }
 
-const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ onNextStep, eventId }, ref) => {
+const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ eventId }, ref) => {
   const {
     setValue,
     getValues,
@@ -36,10 +33,6 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
   // 使用 useImperativeHandle 暴露方法給父元件
   useImperativeHandle(ref, () => ({
     handleSubmit: handleNextStep,
-    getLoadingState: () => ({
-      isLoading: isUploading,
-      loadingText: isUploading ? '上傳封面圖片中...' : '',
-    }),
   }));
 
   // 本地狀態管理上傳的檔案
@@ -112,8 +105,7 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
       );
       
       if (result && result.data) {
-        // 上傳成功後進入下一步
-        onNextStep();
+        // 上傳成功，返回 true 讓父組件處理下一步
         return true;
       }
       
