@@ -19,5 +19,7 @@ export interface MemberOrderTicket {
 // ❷ API 回傳
 export interface PostMemberTicketsQrCodeResponse {
   msg: string;
-  ticket: MemberOrderTicket;
+  data: {
+    orders: MemberOrderTicket[]
+  }
 }

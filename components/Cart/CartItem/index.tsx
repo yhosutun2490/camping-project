@@ -48,7 +48,7 @@ export default function CartItem({
     <div className="relative w-full flex flex-col gap-4 md:flex-row justify-between border-b py-4">
       <div className="order_event_info flex">
         {/* Checkbox */}
-        <div className="self-center flex-shrink-0 mr-4 mt-1">
+        <div className="self-start lg:self-center flex-shrink-0 mr-4 mt-1">
           <CheckboxStyle
             value={order.id}
             checked={isSelected}
@@ -98,7 +98,7 @@ export default function CartItem({
         <p className="font-bold text-black whitespace-nowrap">
           NT${order.total_price.toLocaleString()}
         </p>
-        <div className="flex space-x-2 text-gray-400 text-xl">
+        <div className="flex space-x-2 text-gray-400 text-xl ml-auto">
           <IconWrapper icon="material-symbols-light:favorite-outline" />
           <div
             className="delete_order_icon cursor-pointer"

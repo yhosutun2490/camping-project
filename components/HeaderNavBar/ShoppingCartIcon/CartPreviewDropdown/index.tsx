@@ -40,7 +40,7 @@ export default function CartPreviewDropdown({
 
   return (
     <div
-      className={`absolute top-[135%] -right-50 w-[400px] max-h-[500px] bg-white border rounded shadow-lg z-50 ${className}`}
+      className={`absolute top-[130%] md:top-[135%] -right-36 sm:-right-5 md:-right-50 w-[350px] sm:w-[400px] max-h-[500px] bg-white border rounded shadow-lg z-50 ${className}`}
     >
       <div className="max-h-[400px] overflow-y-auto divide-y">
         {plans.map((plan, index) => (

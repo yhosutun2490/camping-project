@@ -60,6 +60,7 @@ export default function EventCard({
           src={image?.[0] || "/event/event_1.png"}
           alt="event"
           fill
+          sizes="100%"
           priority
           fallbackSrc="/event/event_1.png" // 提前準備一張小圖
           className="rounded-xl w-full object-cover hover:scale-115 transition-transform duration-300"
@@ -78,7 +79,7 @@ export default function EventCard({
         </h2>
         <div className="tags flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <div className="badge bg-primary-300 border-0 text-sm" key={tag}>
+            <div className="badge text-white bg-primary-300 border-0 text-sm" key={tag}>
               {tag}
             </div>
           ))}
