@@ -56,7 +56,7 @@ export function useAdminApproveEvent() {
 export function useAdminRejectEvent() {
   const { isMutating, trigger, error, data } = useSWRMutation(
     "/api/admin/events/:id/reject",
-    async (_key: string, { arg: payload }: { arg: {eventId: string} }) => {
+    async (_key: string, { arg: payload }: { arg: {eventId: string, reason?:string} }) => {
       const res = await axios.patch<PatchAdminApproveEventSuccessResponse>(
         "/api/admin/events/reject",
         payload

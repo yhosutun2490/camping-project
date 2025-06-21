@@ -201,7 +201,7 @@ export default function ReviewActivityRow({ event }: Props) {
       </div>
 
       {/* 操作按鈕 */}
-      <ApproveButtonList />
+      <ApproveButtonList eventId={event.id}/>
     </div>
   );
 }

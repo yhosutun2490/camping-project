@@ -32,6 +32,7 @@ export async function PATCH(
     /* 2. 轉呼後端 API */
     const res: AxiosResponse<PatchAdminApproveEventSuccessResponse> = await axiosInstance.patch(
       `/admin/events/${eventId}/approve`,
+      null, 
       {
         headers: { Cookie: `access_token=${token}` },
         withCredentials: true,

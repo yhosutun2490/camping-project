@@ -151,7 +151,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
             <span>{planMaxPrice}</span>
           </div>
         </div>
-        <ApproveButtonList className="flex-row justify-between mb-4 px-4" />
+        <ApproveButtonList eventId={event.id} className="flex-row justify-between mb-4 px-4" />
       </div>
       <DialogModal id={contentId} modalRef={eventContentModalRef}>
         <ActivityModalContent
