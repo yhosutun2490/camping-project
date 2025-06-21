@@ -5,6 +5,7 @@ import { FormData } from '../schema/formDataSchema';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { useEventTags } from '@/swr/meta/useEventTags';
+import { useHostEvents } from '@/swr/host/useHostEvents';
 
 interface ActivityCreationSuccessProps {
   /** 活動 ID */
@@ -25,9 +26,28 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
   // 獲取活動標籤資料
   const { data: eventTagsData } = useEventTags();
   
+  // 獲取主辦方活動列表並準備更新快取
+  const { mutate } = useHostEvents();
+  
   // 獲取表單資料以顯示活動摘要
   const formData = getValues();
   const { eventInfo, plans } = formData;
+
+  /**
+   * 前往管理頁面
+   */
+  const handleManageEvents = () => {
+    // 在導航到管理頁面前更新活動列表快取
+    mutate();
+    router.push('/host/activities');
+  };
+
+  /**
+   * 查看活動詳情
+   */
+  const handleViewEventDetail = () => {
+    router.push(`/event/${eventId}`);
+  };
 
   /**
    * 建立新的活動
@@ -40,20 +60,6 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
       // 備用方案：直接導航（保持原有行為）
       router.push('/create-activity');
     }
-  };
-
-  /**
-   * 查看活動詳情
-   */
-  const handleViewEventDetail = () => {
-    router.push(`/event/${eventId}`);
-  };
-
-  /**
-   * 前往管理頁面
-   */
-  const handleManageEvents = () => {
-    router.push('/host/activities');
   };
 
   /**
