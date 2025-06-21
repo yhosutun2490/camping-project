@@ -9,6 +9,7 @@ import FormSwitch from '../../../components/form/FormSwitch';
 import FormDynamicInputs from '../../../components/form/FormDynamicInputs';
 import { useEventTags } from '@/swr/meta/useEventTags';
 import { useCreateEvent } from '@/swr/events/useCreateEvent';
+import { useUpdateEvent } from '@/swr/events/useUpdateEvent';
 import { useUpdateEventNoticesTags } from '@/swr/events/useUpdateEventNoticesTags';
 import {
   CreateEventRequest,
@@ -23,6 +24,8 @@ import FormNumberInput from '@/components/form/FormNumberInput';
 interface EventInfoFormProps {
   /** 活動建立後的回調函式，提供活動 ID */
   onEventCreated?: (id: string) => void;
+  /** 現有的活動 ID，用於更新模式 */
+  eventId?: string | null;
 }
 
 export interface EventInfoFormRef {
@@ -31,7 +34,7 @@ export interface EventInfoFormRef {
 }
 
 const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
-  ({ onEventCreated }, ref) => {
+  ({ onEventCreated, eventId }, ref) => {
     // 使用 useEventTags 取得活動標籤
     const {
       data: eventTagsData,
@@ -45,6 +48,8 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
     // 初始化 API Hooks
     const { trigger: triggerCreateEvent, isMutating: isCreating } =
       useCreateEvent();
+    const { updateEvent: triggerUpdateEvent, isUpdating: isUpdatingEvent } =
+      useUpdateEvent();
     const { trigger: triggerUpdateEventNoticesTags, isMutating: isUpdating } =
       useUpdateEventNoticesTags();
 
@@ -54,13 +59,15 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       getLoadingState: () => {
         let loadingText = '';
         if (isSubmitting || isCreating) {
-          loadingText = '建立活動中...';
+          loadingText = eventId ? '更新活動中...' : '建立活動中...';
+        } else if (isUpdatingEvent) {
+          loadingText = '更新活動中...';
         } else if (isUpdating) {
           loadingText = '更新標籤與通知中...';
         }
 
         return {
-          isLoading: isSubmitting || isCreating || isUpdating,
+          isLoading: isSubmitting || isCreating || isUpdatingEvent || isUpdating,
           loadingText,
         };
       },
@@ -216,24 +223,42 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
         setIsSubmitting(true);
 
         const eventInfo = getValues('eventInfo');
+        let currentEventId = eventId;
 
-        // 步驟1: 建立活動
-        const createEventData = prepareCreateEventData(eventInfo);
-        console.log('準備建立活動，資料:', createEventData);
+        // 步驟1: 根據是否有 eventId 決定建立或更新活動
+        if (currentEventId) {
+          // 更新現有活動
+          const updateEventData = prepareCreateEventData(eventInfo);
+          console.log('準備更新活動，資料:', updateEventData);
 
-        const createResult = await triggerCreateEvent(createEventData);
-        console.log('建立活動結果:', createResult);
+          const updateResult = await triggerUpdateEvent({
+            eventId: currentEventId,
+            payload: updateEventData,
+          });
+          console.log('更新活動結果:', updateResult);
 
-        if (!createResult?.data?.event?.id) {
-          throw new Error('活動建立失敗，未返回活動ID');
-        }
+          if (!updateResult?.data?.event?.id) {
+            throw new Error('活動更新失敗');
+          }
+        } else {
+          // 建立新活動
+          const createEventData = prepareCreateEventData(eventInfo);
+          console.log('準備建立活動，資料:', createEventData);
 
-        // 取得活動ID，並設定為目前ID
-        const eventId = createResult.data.event.id;
+          const createResult = await triggerCreateEvent(createEventData);
+          console.log('建立活動結果:', createResult);
 
-        // 通知父元件活動已建立並傳遞 ID
-        if (onEventCreated) {
-          onEventCreated(eventId);
+          if (!createResult?.data?.event?.id) {
+            throw new Error('活動建立失敗，未返回活動ID');
+          }
+
+          // 取得活動ID，並設定為目前ID
+          currentEventId = createResult.data.event.id;
+
+          // 通知父元件活動已建立並傳遞 ID
+          if (onEventCreated) {
+            onEventCreated(currentEventId);
+          }
         }
 
         // 步驟2: 準備更新資料
@@ -243,7 +268,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
         // 這裡我們觸發更新操作，同時傳入最新的 eventId
         const updateResult = await triggerUpdateEventNoticesTags(
           updateData,
-          eventId
+          currentEventId
         );
         console.log('更新結果:', updateResult);
 
@@ -256,7 +281,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       } catch (error) {
         console.error('表單提交錯誤:', error);
         toast.error(
-          error instanceof Error ? error.message : '活動建立過程中發生錯誤'
+          error instanceof Error ? error.message : '活動處理過程中發生錯誤'
         );
         return false;
       } finally {

@@ -272,6 +272,7 @@ const CreateActivityForm: React.FC = () => {
               <EventInfoForm
                 ref={eventInfoFormRef}
                 onEventCreated={handleEventCreated}
+                eventId={eventId}
               />
             )}
             {currentStep === 2 && (

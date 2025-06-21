@@ -140,3 +140,42 @@ export type CreateEventPlansResponse = SuccessResponse<{
   event_info_id: string;
   plans: EventPlan[];
 }>;
+
+// 更新活動請求參數介面
+export interface UpdateEventRequest {
+  title: string;
+  address: string;
+  description: string;
+  start_time: string;
+  end_time: string;
+  max_participants: number;
+  cancel_policy: string;
+  registration_open_time?: string;
+  registration_close_time?: string;
+}
+
+// 更新活動回應中的活動資料介面
+export interface UpdatedEventData {
+  id: string;
+  host_info_id: string;
+  title: string;
+  address: string;
+  description: string;
+  start_time: string;
+  end_time: string;
+  max_participants: number;
+  cancel_policy: string;
+  active: string;
+  status: string;
+  registration_open_time: string;
+  registration_close_time: string;
+  latitude: number;
+  longitude: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// 更新活動回應介面
+export type UpdateEventResponse = SuccessResponse<{
+  event: UpdatedEventData;
+}>;
