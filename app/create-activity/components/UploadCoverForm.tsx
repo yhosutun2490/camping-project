@@ -19,6 +19,7 @@ export interface UploadCoverFormRef {
 }
 
 const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ eventId }, ref) => {
+
   const {
     setValue,
     getValues,

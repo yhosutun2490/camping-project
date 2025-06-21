@@ -34,6 +34,7 @@ export interface EventInfoFormRef {
 
 const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
   ({ onEventCreated, eventId }, ref) => {
+
     // 使用 useEventTags 取得活動標籤
     const {
       data: eventTagsData,
@@ -187,10 +188,6 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       // 先觸發表單驗證，僅驗證 eventInfo 欄位
       const isValid = await trigger('eventInfo');
 
-      console.log('表單驗證結果:', isValid);
-      console.log('表單錯誤:', errors);
-      console.log('表單資料:', getValues('eventInfo'));
-
       if (!isValid) {
         toast.error('請檢查表單內容是否正確填寫');
         return false;
@@ -204,31 +201,26 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
         if (currentEventId) {
           // 更新現有活動
           const updateEventData = prepareCreateEventData(eventInfo);
-          console.log('準備更新活動，資料:', updateEventData);
 
           try {
             const updateResult = await triggerUpdateEvent({
               eventId: currentEventId,
               payload: updateEventData,
             });
-            console.log('更新活動結果:', updateResult);
 
             if (!updateResult?.data?.event?.id) {
               throw new Error('活動更新失敗');
             }
           } catch (updateError) {
             console.error('更新活動錯誤:', updateError);
-            toast.error(updateError instanceof Error ? updateError.message : '更新活動失敗');
             return false;
           }
         } else {
           // 建立新活動
           const createEventData = prepareCreateEventData(eventInfo);
-          console.log('準備建立活動，資料:', createEventData);
 
           try {
             const createResult = await triggerCreateEvent(createEventData);
-            console.log('建立活動結果:', createResult);
 
             if (!createResult?.data?.event?.id) {
               throw new Error('活動建立失敗，未返回活動ID');
@@ -243,14 +235,12 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
             }
           } catch (createError) {
             console.error('建立活動錯誤:', createError);
-            toast.error(createError instanceof Error ? createError.message : '建立活動失敗，可能為重複活動');
             return false;
           }
         }
 
         // 步驟2: 準備更新資料
         const updateData = prepareUpdateNoticesTagsData(eventInfo);
-        console.log('準備更新標籤與通知，資料:', updateData);
 
         try {
           // 這裡我們觸發更新操作，同時傳入最新的 eventId
@@ -258,24 +248,20 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
             updateData,
             currentEventId
           );
-          console.log('更新結果:', updateResult);
-
+          
           // 如果更新成功，回傳成功狀態
           if (updateResult) {
             return true;
           }
+          
+          return false;
         } catch (tagsError) {
           console.error('更新標籤與通知錯誤:', tagsError);
-          toast.error('更新標籤與通知失敗');
           return false;
         }
-
-        return false;
       } catch (error) {
         console.error('表單提交錯誤:', error);
-        toast.error(
-          error instanceof Error ? error.message : '活動處理過程中發生錯誤'
-        );
+        toast.error('提交失敗，請稍後再試');
         return false;
       } 
     };

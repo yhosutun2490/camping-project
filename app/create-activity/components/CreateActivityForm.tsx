@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormDataSchema, FormData } from '../schema/formDataSchema';
@@ -10,6 +10,7 @@ import UploadEventImageForm, { UploadEventImageFormRef } from './UploadEventImag
 import PlanAccordion, { PlanAccordionRef } from './PlanAccordion';
 import ActivityCreationSuccess from './ActivityCreationSuccess';
 import StepNavigation from './StepNavigation';
+import toast from 'react-hot-toast';
 
 // 定義每個步驟的載入狀態
 type StepLoadingState = {
@@ -52,6 +53,22 @@ const CreateActivityForm: React.FC = () => {
 
   // 當前步驟
   const [currentStep, setCurrentStep] = useState<number>(1);
+  
+  // 是否需要滾動的標記
+  const [shouldScroll, setShouldScroll] = useState<boolean>(false);
+  
+  // 監聽步驟變化，自動滾動到頂部
+  useEffect(() => {
+    if (shouldScroll) {
+      // 延遲滾動確保 DOM 已更新
+      const timer = setTimeout(() => {
+        scrollToTop();
+        setShouldScroll(false); // 重置滾動標記
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, shouldScroll]);
 
   // 更新特定步驟的載入狀態
   const updateStepLoadingState = (step: number, isLoading: boolean, loadingText?: string) => {
@@ -120,7 +137,10 @@ const CreateActivityForm: React.FC = () => {
   };
 
   const handlePrevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
+    if (currentStep > 1) {
+      setShouldScroll(true); // 標記需要滾動
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   /**
@@ -144,11 +164,29 @@ const CreateActivityForm: React.FC = () => {
   };
 
   /**
+   * 將頁面捲軸直接置頂（無動畫）
+   */
+  const scrollToTop = () => {
+    // 取得真正的滾動容器
+    const scrollContainer = document.getElementById('main-scroll-container');
+    
+    if (!scrollContainer) {
+      console.error('找不到滾動容器 #main-scroll-container');
+      return;
+    }
+    
+    // 直接置頂，不使用動畫
+    scrollContainer.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  };
+
+  /**
    * 處理步驟的下一步邏輯
    */
   const handleStepNext = async () => {
     const step = currentStep;
-    console.log(`處理第 ${step} 步驟的下一步操作`);
     
     // 設定當前步驟為載入中
     updateStepLoadingState(step, true);
@@ -176,13 +214,12 @@ const CreateActivityForm: React.FC = () => {
           break;
       }
       
-      console.log(`步驟 ${step} 完成，結果:`, success);
-      
       // 不論成功與否，立即重置這一步的載入狀態
       updateStepLoadingState(step, false);
       
       // 如果成功且不是最後一步，進入下一步
       if (success && step < 5) {
+        setShouldScroll(true); // 標記需要滾動
         setCurrentStep(step + 1);
       }
     } catch (error) {
@@ -190,6 +227,9 @@ const CreateActivityForm: React.FC = () => {
       
       // 發生錯誤時，立即重置當前步驟的載入狀態
       updateStepLoadingState(step, false);
+      
+      // 顯示錯誤訊息
+      toast.error('發生未預期的錯誤，請稍後再試');
     }
   };
 
@@ -198,6 +238,58 @@ const CreateActivityForm: React.FC = () => {
    */
   const handleEventCreated = (id: string) => {
     setEventId(id);
+  };
+
+  /**
+   * 重置表單到初始狀態
+   */
+  const resetFormToInitialState = () => {
+    // 重置 react-hook-form 表單狀態
+    methods.reset({
+      eventInfo: {
+        title: '',
+        organizer: '',
+        address: '',
+        startDate: getLocalDateString(7), // 活動開始：7天後
+        startTime: '10:00',
+        endDate: getLocalDateString(7), // 活動結束：同一天
+        endTime: '18:00',
+        registration_startDate: getLocalDateString(1), // 報名開始：明天
+        registration_startTime: '00:00',
+        registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
+        registration_endTime: '23:45',
+        max_participants: 1,
+        price: 0,
+        description: '',
+        tags: [],
+        cancel_policy: false,
+        event_notifications: [],
+      },
+      coverImages: [],
+      eventImages: [],
+      plans: [
+        {
+          title: '基本方案',
+          price: 100,
+          discountPrice: undefined,
+          content: [],
+          addOns: [],
+        },
+      ],
+    });
+    
+    // 重置狀態
+    setShouldScroll(true); // 標記需要滾動
+    setCurrentStep(1);
+    setEventId(null);
+    
+    // 重置所有步驟的載入狀態
+    setStepsLoadingState({
+      1: { isLoading: false, loadingText: '建立活動中...' },
+      2: { isLoading: false, loadingText: '上傳封面圖片中...' },
+      3: { isLoading: false, loadingText: '上傳活動圖片中...' },
+      4: { isLoading: false, loadingText: '建立方案中...' },
+    });
   };
 
   /**
@@ -256,7 +348,10 @@ const CreateActivityForm: React.FC = () => {
     const checks = Array.from({ length: step - 1 }, (_, i) =>
       validateStep(i + 1)
     );
-    if ((await Promise.all(checks)).every(Boolean)) setCurrentStep(step);
+    if ((await Promise.all(checks)).every(Boolean)) {
+      setShouldScroll(true); // 標記需要滾動
+      setCurrentStep(step);
+    }
   };
 
   return (
@@ -308,6 +403,7 @@ const CreateActivityForm: React.FC = () => {
               (eventId ? (
                 <ActivityCreationSuccess
                   eventId={eventId}
+                  onCreateNewActivity={resetFormToInitialState}
                 />
               ) : (
                 <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm text-center">

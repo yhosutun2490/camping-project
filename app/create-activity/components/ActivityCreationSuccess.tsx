@@ -9,13 +9,16 @@ import { useEventTags } from '@/swr/meta/useEventTags';
 interface ActivityCreationSuccessProps {
   /** 活動 ID */
   eventId: string;
+  /** 建立新活動的回調函式 */
+  onCreateNewActivity?: () => void;
 }
 
 /**
  * 活動建立成功結果頁面
  * 顯示建立成功的活動摘要資訊和後續動作選項
  */
-function ActivityCreationSuccess({ eventId }: ActivityCreationSuccessProps) {
+function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreationSuccessProps) {
+
   const router = useRouter();
   const { getValues } = useFormContext<FormData>();
   
@@ -30,7 +33,13 @@ function ActivityCreationSuccess({ eventId }: ActivityCreationSuccessProps) {
    * 建立新的活動
    */
   const handleCreateNewEvent = () => {
-    router.push('/create-activity');
+    if (onCreateNewActivity) {
+      // 使用回調函式重置表單狀態並回到步驟一
+      onCreateNewActivity();
+    } else {
+      // 備用方案：直接導航（保持原有行為）
+      router.push('/create-activity');
+    }
   };
 
   /**

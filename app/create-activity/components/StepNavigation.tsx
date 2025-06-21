@@ -33,13 +33,24 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
   isLoading = false,
   loadingText = '處理中...',
 }) => {
+
+  // 處理下一步點擊事件
+  const handleNextClick = () => {
+    onNextClick?.();
+  };
+
+  // 處理返回點擊事件
+  const handlePrevClick = () => {
+    onPrevClick?.();
+  };
+
   return (
     <div className="flex flex-row items-center justify-end gap-4 px-6 py-4 bg-white self-stretch">
       {showPrevButton && onPrevClick && (
         <button
           type="button"
           className="flex items-center justify-center gap-1 px-6 py-4 rounded-2xl border-2 border-[#354738] bg-white text-[#354738] hover:bg-[#354738] hover:text-white font-semibold text-base leading-[1.2] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={onPrevClick}
+          onClick={handlePrevClick}
           disabled={isLoading}
         >
           {prevButtonText}
@@ -49,10 +60,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
         <button
           type="button"
           className="flex items-center justify-center gap-1 px-6 py-4 rounded-2xl bg-[#5C795F] hover:bg-[#4a6651] border-none text-white font-semibold text-base leading-[1.2] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => {
-            console.log('下一步按鈕被點擊');
-            onNextClick();
-          }}
+          onClick={handleNextClick}
           disabled={nextButtonDisabled || isLoading}
         >
           {isLoading ? (

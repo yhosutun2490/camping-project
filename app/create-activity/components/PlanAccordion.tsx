@@ -25,6 +25,7 @@ export interface PlanAccordionRef {
 
 const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
   ({ eventId }, ref) => {
+
     // 從 formContext 獲取方法
     const { control, trigger, getValues } = useFormContext<FormData>();
 
@@ -178,13 +179,17 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           {fields.length === 0 ? (
             <div className="text-center py-12 px-6 bg-gradient-to-br from-[#F5F7F5] to-[#E8F0E8] rounded-2xl border border-[#E0E6E0]">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#5C795F]/10 flex items-center justify-center">
-                <Icon 
-                  icon="material-symbols:assignment-outline" 
-                  className="w-8 h-8 text-[#5C795F]" 
+                <Icon
+                  icon="material-symbols:assignment-outline"
+                  className="w-8 h-8 text-[#5C795F]"
                 />
               </div>
-              <h3 className="text-lg font-semibold text-[#121212] mb-2">尚未建立任何方案</h3>
-              <p className="text-[#4F4F4F] mb-6">開始建立您的第一個方案，為參與者提供精彩的露營體驗</p>
+              <h3 className="text-lg font-semibold text-[#121212] mb-2">
+                尚未建立任何方案
+              </h3>
+              <p className="text-[#4F4F4F] mb-6">
+                開始建立您的第一個方案，為參與者提供精彩的露營體驗
+              </p>
               <button
                 type="button"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-[#5C795F] hover:bg-[#4a6651] text-white rounded-2xl font-semibold text-base transition-all duration-200 hover:scale-105 hover:shadow-lg"
