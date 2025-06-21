@@ -1,22 +1,42 @@
-import type { EventInfo } from "@/types/api/event/eventById";
+"use client";
+import type { EventSummary } from "@/types/api/admin";
 import ImageSkeleton from "@/components/ImageSkeleton";
 import BadgeStatus from "@/components/Admin/BadgeStatus";
 import ApproveButtonList from "@/components/Admin/ApproveButtonList";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
-import { useRef, useId } from "react";
+import { useRef, useId, useState } from "react";
 
 interface Props {
-  event: EventInfo;
+  event: EventSummary;
 }
 export default function ReviewActivityInfoMobile({ event }: Props) {
-  const planMaxPrice = Math.max(...event.plans.map((p) => p.price));
+  const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
 
-  const uid = useId();                // 產生全域唯一、且穩定的 ID
-  const imagesId   = `${uid}-${event.id}`;       // 行動版圖片 modal
-  const contentId  = `${uid}-${event.id}-content`; // 行動版文案 modal
+  const uid = useId(); // 產生全域唯一、且穩定的 ID
+  const imagesId = `${uid}-${event.id}`; // 行動版圖片 modal
+  const contentId = `${uid}-${event.id}-content`; // 行動版文案 modal
+
+  // 審核圖片資料
+  const [photoDetail, setPhotoDetail] = useState<
+    Array<{ id: string; photo_url: string; description?: string }>
+  >([]);
+  const [loadingPhotos, setLoadingPhotos] = useState<boolean>(false);
+  const [photoErr, setPhotoErr] = useState<string | null>(null);
+
+  // 審核內容資料
+  const [contentDetail, setContentDetail] = useState<{
+    title?: string;
+    cancel_policy?: string;
+    description?: string;
+    notices?: string;
+    plans?: any;
+    id?: string;
+  }>({});
+  const [loadingContents, setLoadingContents] = useState<boolean>(false);
+  const [contentErr, seContentErr] = useState<string | null>(null);
 
   function sliceDate(date: string): string {
     return date.slice(0, 10);
@@ -54,16 +74,16 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           >
             <ImageSkeleton
               key={event.id}
-              src={event.photos[0].photo_url}
+              src={event.cover_photo_url}
               alt={event.title}
               width={80}
               height={48}
               fallbackSrc="/main/main_bg_top_3.jpg"
               className="min-w-25 h-25 object-cover rounded-2xl"
             />
-            {event.photos.length > 1 && (
+            {event.photo_count > 1 && (
               <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                {event.photos.length} 張 (點選查看)
+                {event.photo_count} 張 (點選查看)
               </span>
             )}
           </label>
@@ -71,7 +91,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
             <p className="text-neutral-950 text-sm">{event.title}</p>
             <div className="flex gap-4">
               <BadgeStatus
-                status={event.active === "pending" ? "pending" : "reject"}
+                status={event.active_status === "待審核" ? "pending" : "reject"}
               />
               <label
                 className="cursor-pointer pointer-events-auto"
@@ -85,16 +105,14 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
                 </span>
               </label>
             </div>
-
-            <p className="text-neutral-700 line-clamp-3">{event.description}</p>
           </div>
         </div>
         <div className="collapse-content text-sm">
           {/* 日期  */}
           <div className="text-start text-neutral-500 flex gap-2">
             <p className="heading-6">日期:</p>
-            <span>{sliceDate(event.start_time)}</span> ~{" "}
-            <span>{sliceDate(event.end_time)}</span>
+            <span>{sliceDate(event.start_date)}</span> ~{" "}
+            <span>{sliceDate(event.end_date)}</span>
           </div>
           {/* 名額  */}
           <div className="text-start text-neutral-500 flex gap-2">
@@ -114,11 +132,13 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           handleCloseContentModal={handleCloseContentModal}
           content={{
             id: event.id,
-            title: event.title,
-            cancel_policy: event.cancel_policy,
-            description: event.description,
-            notices: event.notices,
-            plans: event.plans,
+            title: contentDetail.title ?? "",
+            cancel_policy: contentDetail.cancel_policy ?? "",
+            description: contentDetail.description ?? "",
+            notices: Array.isArray(contentDetail.notices)
+              ? contentDetail.notices
+              : [],
+            plans: contentDetail.plans ?? [],
           }}
         />
       </DialogModal>
@@ -131,7 +151,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
             </button>
           </div>
 
-          {event.photos.map((item) => (
+          {photoDetail.map((item) => (
             <div
               className="event_photo_single flex flex-col items-center space-y-2"
               key={item.id}

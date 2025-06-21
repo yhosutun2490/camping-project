@@ -73,7 +73,7 @@ export default function TabListAnchor({ offset }: Props) {
               after:w-[20px]
               after:h-[10px] 
               lg:after:w-[30px] 
-              lg:after:h-[15px] 
+              lg:after:h-[16px] 
               after:rounded-b-full 
               after:bg-primary-50
               after:border-2

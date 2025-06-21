@@ -106,7 +106,10 @@ export default function MemberMenu({ user }: PropsType) {
           </MenuList>
         )}
         <p className="hidden md:block text-xl text-primary-500 ml-[0.5rem]">
-          {user} 您好
+          <span className="inline-block max-w-[50px] truncate align-bottom">
+            {user}
+          </span>
+          您好
         </p>
         <Icon
           icon="carbon:triangle-down-solid"

@@ -59,7 +59,7 @@ export default function HeaderNavBar({
     <div
       className={clsx(
         "navbar fixed inset-x-0 w-full h-[130px] items-start md:h-[80px] md:items-center",
-        "flex flex-wrap justify-between px-[1rem] sm:px-[6%] lg:px-[8%] z-20 cursor-pointer delay-50 ease-in-out transition-all",
+        "flex flex-wrap justify-between px-[1rem] sm:px-[5%] lg:px-[8%] z-20 cursor-pointer delay-50 ease-in-out transition-all",
         {
           "bg-transparent": isHome && !isBarScaleUp,
           "bg-white shadow-md": !isHome || !isTopSectionVisible,
@@ -132,8 +132,8 @@ export default function HeaderNavBar({
           onClick={() => setIsBarScaleUp(false)}
         />
       )}
-      <div className="flex justify-between item-center space-x-2  md:space-x-4 h-10 z-1">
-        <Link href="/event" className="flex items-center">
+      <div className="flex justify-between item-center space-x-1 md:space-x-4 h-10 z-1">
+        <Link href="/event" className="flex items-center text-neutral-950">
           <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
             活動列表
           </p>
@@ -141,8 +141,8 @@ export default function HeaderNavBar({
 
         {userId ? (
           isHost ? (
-            <Link href="/create-activity" className="flex items-center">
-              <p className="relative inline-block text-neutral-950 text-base hover:text-primary-500">
+            <Link href="/create-activity" className="flex items-center text-neutral-950">
+              <p className="relative inline-block text-base hover:text-primary-500">
                 辦活動
               </p>
             </Link>

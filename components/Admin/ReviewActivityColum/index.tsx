@@ -1,14 +1,15 @@
-import type { EventInfo } from "@/types/api/event/eventById";
+"use client"
 import ImageSkeleton from "@/components/ImageSkeleton";
 import BadgeStatus from "@/components/Admin/BadgeStatus";
 import ApproveButtonList from "@/components/Admin/ApproveButtonList";
 import clsx from "clsx";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import type {EventSummary} from "@/types/api/admin"
 
 interface Props {
-  event: EventInfo;
+  event: EventSummary;
 }
 
 function sliceDate(date: string): string {
@@ -16,9 +17,30 @@ function sliceDate(date: string): string {
 }
 
 export default function ReviewActivityRow({ event }: Props) {
-  const planMaxPrice = Math.max(...event.plans.map((p) => p.price));
+  const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
+  
+  // 審核圖片資料
+  const [photoDetail, setPhotoDetail] = useState<Array<{ id: string; photo_url: string; description?: string }>>([]);
+  const [loadingPhotos, setLoadingPhotos] = useState<boolean>(false);
+  const [photoErr, setPhotoErr] = useState<string | null>(null);
+
+  // 審核內容資料
+  const [contentDetail, setContentDetail] = useState<{
+    title?: string;
+    cancel_policy?: string;
+    description?: string;
+    notices?: string;
+    plans?: any;
+    id?: string;
+  }>({});
+  const [loadingContents, setLoadingContents] = useState<boolean>(false);
+  const [contentErr, seContentErr] = useState<string | null>(null);
+
+
+
+
 
   function handleCloseImagesModal(e: React.MouseEvent) {
     e.stopPropagation();
@@ -41,8 +63,8 @@ export default function ReviewActivityRow({ event }: Props) {
     >
       {/* 日期 */}
       <div className="text-xs leading-5">
-        <div>{sliceDate(event.start_time)}</div>
-        <div>{sliceDate(event.end_time)}</div>
+        <div>{sliceDate(event.start_date)}</div>
+        <div>{sliceDate(event.end_date)}</div>
       </div>
 
       {/* 活動內容（圖片 + 文案） */}
@@ -51,16 +73,16 @@ export default function ReviewActivityRow({ event }: Props) {
           <label htmlFor={event.id} className="cursor-pointer">
             <ImageSkeleton
               key={event.id}
-              src={event.photos[0].photo_url}
+              src={event.cover_photo_url}
               alt={event.title}
               width={80}
               height={48}
               fallbackSrc="/main/main_bg_top_3.jpg"
               className="w-40 h-25 object-cover rounded-2xl"
             />
-            {event.photos.length > 1 && (
+            {event.photo_count > 1 && (
               <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                {event.photos.length} 張 (點選查看)
+                {event.photo_count} 張 (點選查看)
               </span>
             )}
           </label>
@@ -77,21 +99,21 @@ export default function ReviewActivityRow({ event }: Props) {
                 </button>
               </div>
 
-              {event.photos.map((item) => (
+              {photoDetail.map((item) => (
                 <div
                   className="event_photo_single flex flex-col items-center space-y-2"
                   key={item.id}
                 >
                   <ImageSkeleton
-                    src={item.photo_url}
-                    alt={item.id}
+                    src={item?.photo_url}
+                    alt={item?.id}
                     width={80}
                     height={48}
                     fallbackSrc="/main/main_bg_top_3.jpg"
                     className="w-70 h-40 object-cover rounded-2xl"
                   />
                   <p className="photo_description heading-7 text-neutral-950">
-                    {item.description || "無描述"}
+                    {item?.description || "無描述"}
                   </p>
                 </div>
               ))}
@@ -117,11 +139,11 @@ export default function ReviewActivityRow({ event }: Props) {
               handleCloseContentModal={handleCloseContentModal}
               content={{
                 id: event.id,
-                title: event.title,
-                cancel_policy: event.cancel_policy,
-                description: event.description,
-                notices: event.notices,
-                plans: event.plans,
+                title: contentDetail.title ?? "",
+                cancel_policy: contentDetail.cancel_policy ?? "",
+                description: contentDetail.description ?? '',
+                notices: Array.isArray(contentDetail.notices) ? contentDetail.notices : [],
+                plans: contentDetail.plans ?? [],
               }}
             />
           </DialogModal>
@@ -136,7 +158,7 @@ export default function ReviewActivityRow({ event }: Props) {
       {/* 狀態 badge */}
       <div className="flex justify-start">
         <BadgeStatus
-          status={event.active === "pending" ? "pending" : "reject"}
+          status={event.active_status === "待審核" ? "pending" : "reject"}
         />
       </div>
 

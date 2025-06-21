@@ -10,9 +10,9 @@ export default async function MemberLayout({
 }>) {
   const memberInfo = await memberGetProfile();
   const role = memberInfo?.data.member.role 
-  // if (role !== "admin") {
-  //   redirect("/"); 
-  // }
+  if (role !== "admin") {
+    redirect("/"); 
+  }
 
   const menuLists = [
     {
