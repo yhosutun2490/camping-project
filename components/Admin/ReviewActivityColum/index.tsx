@@ -1,13 +1,17 @@
-import type { EventInfo } from "@/types/api/event/eventById";
-import IconWrapper from "@/components/ClientIcon/IconWrapper";
+"use client"
 import ImageSkeleton from "@/components/ImageSkeleton";
+import BadgeStatus from "@/components/Admin/BadgeStatus";
+import ApproveButtonList from "@/components/Admin/ApproveButtonList";
 import clsx from "clsx";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import type {EventSummary,EventPhoto,EventDetail} from "@/types/api/admin"
+import { useAdminEventFetcher } from '@/swr/admin/event/useAdminEvent'
+
 
 interface Props {
-  event: EventInfo;
+  event: EventSummary;
 }
 
 function sliceDate(date: string): string {
@@ -15,9 +19,79 @@ function sliceDate(date: string): string {
 }
 
 export default function ReviewActivityRow({ event }: Props) {
-  const planMaxPrice = Math.max(...event.plans.map((p) => p.price));
+  const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
+
+  // 取得活動單一資料swr
+  const {trigger:getAdminEventById} = useAdminEventFetcher()
+  
+  // 審核圖片資料
+  const [photoDetail, setPhotoDetail] = useState<EventPhoto[]>([]);
+
+  type EditableKeys =
+  | 'id'
+  | 'title'
+  | 'cancel_policy'
+  | 'description'
+  | 'eventPlanBox';        // 同上，若 plans 在別的巢狀就另外定義
+
+
+  type EventContent = Partial<Pick<EventDetail, EditableKeys>>;
+
+  // 審核內容資料
+  const [contentDetail, setContentDetail] = useState<EventContent>({
+      id:  "",
+      title: "",
+      cancel_policy: "",
+      description: "",
+      eventPlanBox: []
+  });
+
+
+  async function handleOpenImageModal (e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      const res = await getAdminEventById({ eventId: event.id })
+      const photoBox = res.data.eventPhotoBox
+      setPhotoDetail(photoBox)
+      if (imagesModalRef.current) imagesModalRef.current.click()
+    } catch(err) {
+      console.log("取得活動image有誤",err)
+    }
+  }
+
+  async function handleOpenContentModal (e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      const res = await getAdminEventById({ eventId: event.id })
+      const eventData = res.data
+      const contentBox = {
+          id: eventData.id,
+          title: eventData.title,
+          cancel_policy: eventData.cancel_policy,
+          description: eventData.description,
+          eventPlanBox: eventData.eventPlanBox
+      }
+      setContentDetail(contentBox)
+      if (eventContentModalRef.current) eventContentModalRef.current.click()
+    } catch(err) {
+      console.log("取得活動內容有誤",err)
+    }
+  }
+
+
+  function handleCloseImagesModal(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (imagesModalRef.current) {
+      imagesModalRef.current.checked = false;
+    }
+  }
+  function handleCloseContentModal() {
+    if (eventContentModalRef.current) {
+      eventContentModalRef.current.checked = false;
+    }
+  }
 
   return (
     <div
@@ -28,59 +102,72 @@ export default function ReviewActivityRow({ event }: Props) {
     >
       {/* 日期 */}
       <div className="text-xs leading-5">
-        <div>{sliceDate(event.start_time)}</div>
-        <div>{sliceDate(event.end_time)}</div>
+        <div>{sliceDate(event.start_date)}</div>
+        <div>{sliceDate(event.end_date)}</div>
       </div>
 
       {/* 活動內容（圖片 + 文案） */}
       <div className="flex flex-col items-start gap-3">
         <div className="relative image_row flex flex-wrap gap-2 cursor-pointer rounded-2xl">
-          <label htmlFor={event.id} className="cursor-pointer">
+          <label className="cursor-pointer" onClick={handleOpenImageModal}>
             <ImageSkeleton
               key={event.id}
-              src={event.photos[0].photo_url}
+              src={event.cover_photo_url}
               alt={event.title}
               width={80}
               height={48}
               fallbackSrc="/main/main_bg_top_3.jpg"
               className="w-40 h-25 object-cover rounded-2xl"
             />
-            {event.photos.length > 1 && (
+            {event.photo_count > 1 && (
               <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-                {event.photos.length} 張
+                {event.photo_count} 張 (點選查看)
               </span>
             )}
           </label>
 
           <DialogModal id={event.id} modalRef={imagesModalRef}>
             <div className="event_photos_details flex flex-col space-y-2 items-center">
-              <p className="heading-5 text-primary-500">活動圖片</p>
-              {event.photos.map((item) => (
-                <div className="event_photo_single flex flex-col items-center space-y-2" key={item.id}>
+              <div className="w-full heading-5 flex justify-between items-center text-primary-500">
+                <p>活動圖片</p>
+                <button
+                  className="btn-primary"
+                  onClick={handleCloseImagesModal}
+                >
+                  關閉
+                </button>
+              </div>
+
+              {photoDetail.map((item) => (
+                <div
+                  className="event_photo_single flex flex-col items-center space-y-2"
+                  key={item.id}
+                >
                   <ImageSkeleton
-                    
-                    src={item.photo_url}
-                    alt={item.id}
+                    src={item?.photo_url}
+                    alt={item?.id}
                     width={80}
                     height={48}
                     fallbackSrc="/main/main_bg_top_3.jpg"
                     className="w-70 h-40 object-cover rounded-2xl"
                   />
-                  <p className="photo_description heading-7 text-neutral-950">{item.description || '無描述'}</p>
+                  <p className="photo_description heading-7 text-neutral-950">
+                    {item?.description || "無描述"}
+                  </p>
                 </div>
               ))}
             </div>
           </DialogModal>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex flex-col space-x-2 items-start">
           <p className="heading-7 text-neutral-950">{event.title}</p>
-          <label htmlFor={`${event.id}-content`} className="cursor-pointer">
+          <label className="cursor-pointer" onClick={handleOpenContentModal}>
             <span
-              className="underline 
+              className="underline text-sm 
           text-gray-500 whitespace-nowrap cursor-pointer"
             >
-              內容
+              詳細文案內容
             </span>
           </label>
           <DialogModal
@@ -88,13 +175,13 @@ export default function ReviewActivityRow({ event }: Props) {
             modalRef={eventContentModalRef}
           >
             <ActivityModalContent
+              handleCloseContentModal={handleCloseContentModal}
               content={{
-                id: event.id,
-                title: event.title,
-                cancel_policy: event.cancel_policy,
-                description: event.description,
-                notices: event.notices,
-                plans: event.plans,
+                id: contentDetail.id ?? "",
+                title: contentDetail.title ?? "",
+                cancel_policy: contentDetail.cancel_policy ?? "",
+                description: contentDetail.description ?? "",
+                eventPlanBox: contentDetail.eventPlanBox ?? []
               }}
             />
           </DialogModal>
@@ -102,35 +189,19 @@ export default function ReviewActivityRow({ event }: Props) {
       </div>
 
       {/* 名額  */}
-      <div className="text-center font-medium">{event.max_participants}</div>
+      <div className="text-start font-medium">{event.max_participants}</div>
       {/* 方案最大價格 */}
-      <div className="text-center">{planMaxPrice}</div>
+      <div className="text-start">{planMaxPrice}</div>
 
       {/* 狀態 badge */}
-      <div className="flex justify-center">
-        {event.active === "pending" && (
-          <span className="rounded bg-yellow-50 px-2 py-0.5 text-xs text-yellow-600">
-            待審核
-          </span>
-        )}
-        {event.active === "reject" && (
-          <span className="rounded bg-red-50 px-2 py-0.5 text-xs text-red-600">
-            已退回
-          </span>
-        )}
+      <div className="flex justify-start">
+        <BadgeStatus
+          status={event.active_status === "待審核" ? "pending" : "reject"}
+        />
       </div>
 
       {/* 操作按鈕 */}
-      <div className="flex flex-col items-center justify-center gap-2">
-        <button className="btn-primary text-xs h-8 flex items-center gap-1">
-          <IconWrapper icon="mdi:check" className="text-white"></IconWrapper>
-          通過
-        </button>
-        <button className="btn-error text-xs h-8 flex items-center gap-1">
-          <IconWrapper icon="mdi:close" className="text-white"></IconWrapper>
-          退回
-        </button>
-      </div>
+      <ApproveButtonList eventId={event.id}/>
     </div>
   );
 }

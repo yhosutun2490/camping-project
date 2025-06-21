@@ -55,15 +55,26 @@ export default function MemberMenu({ user }: PropsType) {
       title: "主辦方管理",
       link: "/host",
     },
+    {
+      id: "4",
+      title: "審核活動",
+      link: "/admin/activity",
+    },
   ];
 
   // 依角色過濾清單
-  const filteredList = list.filter((item) => {
-    // 「主辦方管理」只給 host / admin 看
-    if (item.link === "/host") {
-      return memberRole === "host" || memberRole === "admin";
+  const filteredList = list.filter(({ link }) => {
+    // 1) /host* → host、admin 都能看
+    if (link.startsWith("/host")) {
+      return memberRole === "host";
     }
-    // 其餘項目大家都可以看
+
+    // 2) /admin* → 只有 admin 能看
+    if (link.startsWith("/admin")) {
+      return memberRole === "admin";
+    }
+
+    // 3) 其他 → 全部角色都能看
     return true;
   });
   return (
@@ -95,7 +106,10 @@ export default function MemberMenu({ user }: PropsType) {
           </MenuList>
         )}
         <p className="hidden md:block text-xl text-primary-500 ml-[0.5rem]">
-          {user} 您好
+          <span className="inline-block max-w-[50px] truncate align-bottom">
+            {user}
+          </span>
+          您好
         </p>
         <Icon
           icon="carbon:triangle-down-solid"

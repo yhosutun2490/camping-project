@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import DialogModal from "@/components/DialogModal";
 import { useRouter } from "next/navigation";
 
-export type TicketStatus = "incoming" | "finished" | "refunded";
+export type TicketStatus = "incoming" | "finished" | "refunded" | "refunding";
 export type EventTicket = {
   imageUrl: string;
   status: TicketStatus;
@@ -29,19 +29,21 @@ export default function EventTicketCard({
   date,
   price,
 }: EventTicket) {
-  const ticketStatusMap: Record<"incoming" | "finished" | "refunded", string> =
+  const ticketStatusMap: Record<"incoming" | "finished" | "refunded" | "refunding", string> =
     {
       incoming: "即將到來",
       finished: "已完成",
       refunded: "已退款",
+      refunding: "退款中"
     };
   const ticketStatusColor: Record<
-    "incoming" | "finished" | "refunded",
+    "incoming" | "finished" | "refunded" | "refunding",
     string
   > = {
     incoming: "text-blue-600",
     finished: "text-green-600",
     refunded: "text-red-600",
+    refunding: "text-amber-700"
   };
   const router = useRouter();
   const eventDate = date.slice(0, 10);
@@ -64,17 +66,17 @@ export default function EventTicketCard({
   async function handleOnClickApplyQRcode(orderId: string) {
     try {
       const res = await postOrderQRcode({ orderId });
-      if (!res.qr_image_url) throw new Error("沒有拿到 URL");
-      setQrCodeImageUrl(res.qr_image_url);
+      if (!res[0].qr_image_url) throw new Error("沒有拿到 URL");
+      setQrCodeImageUrl(res[0].qr_image_url);
       if (qrCodeModalRef.current) {
         setTimeout(() => qrCodeModalRef.current?.click(), 0);
       }
       toast.success("申請QR code成功");
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        toast.error("申請QR code失敗");
+         toast.error(`申請QR code失敗`);
       } else {
-        toast.error("申請QR code失敗");
+        toast.error(`申請QR code失敗`);
       }
     }
   }
@@ -140,7 +142,7 @@ export default function EventTicketCard({
             <div className="text-primary-500 font-bold mb-2">NT${price}</div>
           </div>
           <div className="hidden md:block flex space-x-2 justify-end">
-            {status !== "refunded" && (
+            {(status !== "refunded" && status !== "refunding") && (
               <button
                 className="cursor-pointer w-[110px] text-sm text-white bg-primary-500 px-3 py-1 
               rounded hover:bg-primary-600"

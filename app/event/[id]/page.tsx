@@ -153,7 +153,7 @@ export default async function EventByIdPage({
   return (
     <div className="relative bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
-        className="tab-list sticky top-0 z-10 bg-white w-full h-[52px] lg:h-[90px] 
+        className="tab-list sticky top-2 z-10 bg-white w-full h-[52px] md:top-0 lg:h-[90px] 
       flex items-center justify-between border-b-2 border-primary-500"
       >
         <TabListAnchor />

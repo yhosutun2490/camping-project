@@ -12,7 +12,7 @@ export function usePostMemberOrdersQRcode() {
         `/api/member/orders/ticket`,
         arg
       );
-      return res.data.ticket;
+      return res.data.data.orders;
     }
   );
 

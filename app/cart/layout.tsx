@@ -12,7 +12,7 @@ export default function CartLayout({
       </div>
     
       {/* 主區塊要可滾動 */}
-      <main className="cart_page_content flex-1 min-h-0 px-[4%] sm:px-[10%] xl:px-[15%]">{children}</main>
+      <main className="cart_page_content flex-1 min-h-0 px-[4%] sm:px-[5%] lg:px-[10%] xl:px-[15%]">{children}</main>
     </div>
   );
 }

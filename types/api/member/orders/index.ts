@@ -4,7 +4,7 @@ type EventAddon = {
   name: string;
   price: number;
 };
-export type OrderStatus = "Unpaid" | "Paid" | "Refunded";   // ← 和後端保持一致
+export type OrderStatus = "Unpaid" | "Paid" | "Refunded" | "Refunding";   // ← 和後端保持一致
 export type MemberOrder = {
   id: string;
   event_info: {

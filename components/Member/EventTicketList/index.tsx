@@ -10,19 +10,21 @@ import type { TicketStatus } from "@/components/Member/EventTicketList/EventTick
 const tabList = [
   { label: "即將到來", value: "incoming" },
   { label: "已完成", value: "finished" },
-  { label: "已取消 (退款)",value: "refunded" },  
+  { label: "退款中", value: "refunding" },
+  { label: "已退款",value: "refunded" },  
 ];
 type TabValue = (typeof tabList)[number]["value"];
 
 
 interface Props {
   ordersPaid: GetMemberOrdersResponse['data']['orders']
+  ordersRefunding: GetMemberOrdersResponse['data']['orders']
   ordersRefund: GetMemberOrdersResponse['data']['orders']
 }
-export default function EventTicketList({ordersPaid, ordersRefund}:Props) {
+export default function EventTicketList({ordersPaid, ordersRefunding ,ordersRefund}:Props) {
   const [activeTab, setActiveTab] = useState<TabList>(tabList[0])
    /* ---------- 3. 訂單分組 ---------- */
-  const { incoming, finished, refunded } = useMemo(() => {
+  const { incoming, finished, refunded, refunding } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);   
 
@@ -34,14 +36,15 @@ export default function EventTicketList({ordersPaid, ordersRefund}:Props) {
       new Date(o.event_info.date) < today
     );
 
-    return { incoming, finished, refunded: ordersRefund };
-  }, [ordersPaid, ordersRefund]);
+    return { incoming, finished, refunding:ordersRefunding, refunded: ordersRefund };
+  }, [ordersPaid, ordersRefunding,ordersRefund]);
 
   /* ---------- 4. 依 Tab 取出對應清單 ---------- */
   const groupedTickets: Record<TabValue, typeof incoming> = {
     incoming,
     finished,
     refunded,
+    refunding
   };
   // 目前查看訂單種類
   const activeTicketList = groupedTickets[activeTab.value as TabValue];
@@ -54,7 +57,7 @@ export default function EventTicketList({ordersPaid, ordersRefund}:Props) {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-      {activeTicketList.map((ticket: (typeof incoming)[number]) => (
+      {activeTicketList.length? activeTicketList.map((ticket: (typeof incoming)[number]) => (
         <EventTicketCard
           key={ticket.id}
           imageUrl={ticket.event_info.image ?? ""}
@@ -65,7 +68,7 @@ export default function EventTicketList({ordersPaid, ordersRefund}:Props) {
           date={ticket.event_info.date}
           price={ticket.total_price}
         />
-      ))}
+      )) : <p className="heading-4 text-primary-500">尚無目前符合條件的票卷</p>}
     </div>
   );
 }

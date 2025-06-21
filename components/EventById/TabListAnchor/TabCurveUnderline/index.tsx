@@ -14,7 +14,7 @@ export default function TabCurveUnderline({
   width = 30,
   height = 12,
   strokeColor = "#5A7D5A",
-  fillColor = "white",
+  fillColor = "transparent",
   strokeWidth = 6,
   className = "",
 }: TabCurveUnderlineProps) {
