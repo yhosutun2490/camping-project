@@ -13,26 +13,18 @@ export function useUpdateEventNoticesTags() {
     // 使用簡化的 API 路由
     "/api/events/notices-tags",
     async (_key: string, { arg }: { arg: { payload: UpdateEventNoticesTagsRequest, dynamicEventId: string } }) => {
-      console.log("🚀 [useUpdateEventNoticesTags] Hook 開始執行");
-      console.log("📦 傳入參數:", JSON.stringify(arg, null, 2));
       
       try {
         // 檢查 eventId 是否存在
         if (!arg.dynamicEventId) {
-          console.error("❌ 活動 ID 不存在");
           throw new Error("活動 ID 不存在，無法更新標籤與通知");
         }
-        
-        console.log("🎯 目標活動 ID:", arg.dynamicEventId);
         
         // 將 eventId 包含在請求體中
         const requestPayload = {
           ...arg.payload,
           eventId: arg.dynamicEventId
         };
-        
-        console.log("📤 準備發送的請求載荷:", JSON.stringify(requestPayload, null, 2));
-        console.log("📡 API 端點:", "/api/events/notices-tags");
         
         const response = await axios.patch<UpdateEventNoticesTagsResponse>(
           "/api/events/notices-tags",
@@ -44,9 +36,7 @@ export function useUpdateEventNoticesTags() {
           }
         );
         
-        console.log("✅ API 請求成功");
-        console.log("📊 回應狀態:", response.status);
-        console.log("📄 回應資料:", JSON.stringify(response.data, null, 2));
+        toast.success('活動建立完成，標籤與通知設定成功！');
         
         return response.data;
       } catch (error: unknown) {

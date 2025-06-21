@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormDataSchema, FormData } from '../schema/formDataSchema';
@@ -10,20 +10,76 @@ import UploadEventImageForm, { UploadEventImageFormRef } from './UploadEventImag
 import PlanAccordion, { PlanAccordionRef } from './PlanAccordion';
 import ActivityCreationSuccess from './ActivityCreationSuccess';
 import StepNavigation from './StepNavigation';
+import toast from 'react-hot-toast';
+
+// 定義每個步驟的載入狀態
+type StepLoadingState = {
+  isLoading: boolean;
+  loadingText: string;
+};
+
+// 定義所有步驟的載入狀態
+type StepsLoadingState = {
+  [key: number]: StepLoadingState;
+};
 
 const CreateActivityForm: React.FC = () => {
-  // 添加 eventId 狀態
+  // 建立本地日期函式（避免 UTC 時區問題）
+  const getLocalDateString = (daysOffset: number = 0) => {
+    const today = new Date();
+    today.setDate(today.getDate() + daysOffset);
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  // 活動 ID 狀態
   const [eventId, setEventId] = useState<string | null>(null);
   
-  // 添加載入狀態管理
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loadingText, setLoadingText] = useState<string>('處理中...');
+  // 統一管理所有步驟的載入狀態
+  const [stepsLoadingState, setStepsLoadingState] = useState<StepsLoadingState>({
+    1: { isLoading: false, loadingText: '建立活動中...' },
+    2: { isLoading: false, loadingText: '上傳封面圖片中...' },
+    3: { isLoading: false, loadingText: '上傳活動圖片中...' },
+    4: { isLoading: false, loadingText: '建立方案中...' },
+  });
 
   // 建立各步驟的 ref
   const eventInfoFormRef = useRef<EventInfoFormRef>(null);
   const uploadCoverFormRef = useRef<UploadCoverFormRef>(null);
   const uploadEventImageFormRef = useRef<UploadEventImageFormRef>(null);
   const planAccordionRef = useRef<PlanAccordionRef>(null);
+
+  // 當前步驟
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  
+  // 是否需要滾動的標記
+  const [shouldScroll, setShouldScroll] = useState<boolean>(false);
+  
+  // 監聽步驟變化，自動滾動到頂部
+  useEffect(() => {
+    if (shouldScroll) {
+      // 延遲滾動確保 DOM 已更新
+      const timer = setTimeout(() => {
+        scrollToTop();
+        setShouldScroll(false); // 重置滾動標記
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, shouldScroll]);
+
+  // 更新特定步驟的載入狀態
+  const updateStepLoadingState = (step: number, isLoading: boolean, loadingText?: string) => {
+    setStepsLoadingState(prevState => ({
+      ...prevState,
+      [step]: { 
+        isLoading, 
+        loadingText: loadingText || prevState[step].loadingText 
+      }
+    }));
+  };
 
   const methods = useForm<FormData>({
     resolver: zodResolver(FormDataSchema),
@@ -32,21 +88,21 @@ const CreateActivityForm: React.FC = () => {
       eventInfo: {
         title: '',
         organizer: '',
-        address: '', // 改名從 location 到 address
-        startDate: new Date().toISOString().slice(0, 10),
-        startTime: '00:00',
-        endDate: new Date().toISOString().slice(0, 10),
-        endTime: '00:00',
-        registration_startDate: new Date().toISOString().slice(0, 10),
+        address: '',
+        startDate: getLocalDateString(7), // 活動開始：7天後
+        startTime: '10:00',
+        endDate: getLocalDateString(7), // 活動結束：同一天
+        endTime: '18:00',
+        registration_startDate: getLocalDateString(1), // 報名開始：明天
         registration_startTime: '00:00',
-        registration_endDate: new Date().toISOString().slice(0, 10),
-        registration_endTime: '00:00',
-        max_participants: 1, // 改名從 maxParticipants 到 max_participants
+        registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
+        registration_endTime: '23:45',
+        max_participants: 1,
         price: 0, // 新增價格欄位
         description: '',
         tags: [],
-        cancel_policy: false, // 改名從 cancelPolicy 到 cancel_policy
-        event_notifications: [], // 改名從 notifications 到 event_notifications
+        cancel_policy: false,
+        event_notifications: [],
       },
       coverImages: [],
       eventImages: [],
@@ -61,9 +117,6 @@ const CreateActivityForm: React.FC = () => {
       ],
     },
   });
-
-  // 步驟導航狀態
-  const [currentStep, setCurrentStep] = useState<number>(1);
 
   // 驗證指定步驟資料
   const validateStep = async (step: number) => {
@@ -83,13 +136,11 @@ const CreateActivityForm: React.FC = () => {
     }
   };
 
-  const handleNextStep = async () => {
-    const valid = await validateStep(currentStep);
-    if (valid && currentStep < 5) setCurrentStep(currentStep + 1);
-  };
-
   const handlePrevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
+    if (currentStep > 1) {
+      setShouldScroll(true); // 標記需要滾動
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   /**
@@ -113,54 +164,72 @@ const CreateActivityForm: React.FC = () => {
   };
 
   /**
+   * 將頁面捲軸直接置頂（無動畫）
+   */
+  const scrollToTop = () => {
+    // 取得真正的滾動容器
+    const scrollContainer = document.getElementById('main-scroll-container');
+    
+    if (!scrollContainer) {
+      console.error('找不到滾動容器 #main-scroll-container');
+      return;
+    }
+    
+    // 直接置頂，不使用動畫
+    scrollContainer.scrollTo({
+      top: 0,
+      behavior: 'instant'
+    });
+  };
+
+  /**
    * 處理步驟的下一步邏輯
    */
   const handleStepNext = async () => {
-    console.log('handleStepNext 被調用，當前步驟:', currentStep);
-    setIsLoading(true);
+    const step = currentStep;
+    
+    // 設定當前步驟為載入中
+    updateStepLoadingState(step, true);
     
     try {
       let success = false;
       
-      switch (currentStep) {
+      switch (step) {
         case 1:
-          setLoadingText('建立活動中...');
           if (eventInfoFormRef.current) {
-            console.log('調用 EventInfoForm handleSubmit');
+            // 調用子元件方法，但載入狀態由父元件控制
             success = await eventInfoFormRef.current.handleSubmit();
-            console.log('EventInfoForm handleSubmit 結果:', success);
-          } else {
-            console.error('eventInfoFormRef.current 為 null');
           }
           break;
         case 2:
-          setLoadingText('上傳封面圖片中...');
           if (uploadCoverFormRef.current) {
             success = await uploadCoverFormRef.current.handleSubmit();
           }
           break;
         case 3:
-          setLoadingText('上傳活動圖片中...');
           success = await handleStep3Submit();
           break;
         case 4:
-          setLoadingText('建立方案中...');
           success = await handleStep4Submit();
-          break;
-        default:
           break;
       }
       
-      console.log('步驟完成，成功:', success, '當前步驟:', currentStep);
-      if (success && currentStep < 5) {
-        setCurrentStep(currentStep + 1);
-        console.log('跳轉到下一步:', currentStep + 1);
+      // 不論成功與否，立即重置這一步的載入狀態
+      updateStepLoadingState(step, false);
+      
+      // 如果成功且不是最後一步，進入下一步
+      if (success && step < 5) {
+        setShouldScroll(true); // 標記需要滾動
+        setCurrentStep(step + 1);
       }
     } catch (error) {
-      console.error('handleStepNext 錯誤:', error);
-    } finally {
-      setIsLoading(false);
-      console.log('設定 isLoading 為 false');
+      console.error(`步驟 ${step} 處理錯誤:`, error);
+      
+      // 發生錯誤時，立即重置當前步驟的載入狀態
+      updateStepLoadingState(step, false);
+      
+      // 顯示錯誤訊息
+      toast.error('發生未預期的錯誤，請稍後再試');
     }
   };
 
@@ -172,26 +241,70 @@ const CreateActivityForm: React.FC = () => {
   };
 
   /**
+   * 重置表單到初始狀態
+   */
+  const resetFormToInitialState = () => {
+    // 重置 react-hook-form 表單狀態
+    methods.reset({
+      eventInfo: {
+        title: '',
+        organizer: '',
+        address: '',
+        startDate: getLocalDateString(7), // 活動開始：7天後
+        startTime: '10:00',
+        endDate: getLocalDateString(7), // 活動結束：同一天
+        endTime: '18:00',
+        registration_startDate: getLocalDateString(1), // 報名開始：明天
+        registration_startTime: '00:00',
+        registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
+        registration_endTime: '23:45',
+        max_participants: 1,
+        price: 0,
+        description: '',
+        tags: [],
+        cancel_policy: false,
+        event_notifications: [],
+      },
+      coverImages: [],
+      eventImages: [],
+      plans: [
+        {
+          title: '基本方案',
+          price: 100,
+          discountPrice: undefined,
+          content: [],
+          addOns: [],
+        },
+      ],
+    });
+    
+    // 重置狀態
+    setShouldScroll(true); // 標記需要滾動
+    setCurrentStep(1);
+    setEventId(null);
+    
+    // 重置所有步驟的載入狀態
+    setStepsLoadingState({
+      1: { isLoading: false, loadingText: '建立活動中...' },
+      2: { isLoading: false, loadingText: '上傳封面圖片中...' },
+      3: { isLoading: false, loadingText: '上傳活動圖片中...' },
+      4: { isLoading: false, loadingText: '建立方案中...' },
+    });
+  };
+
+  /**
    * 獲取當前步驟的按鈕配置
    */
   const getStepButtonConfig = () => {
-    // 如果是第1步，獲取 EventInfoForm 的載入狀態
-    let currentIsLoading = isLoading;
-    let currentLoadingText = loadingText;
+    const currentLoadingState = stepsLoadingState[currentStep];
     
-    if (currentStep === 1 && eventInfoFormRef.current) {
-      const eventInfoLoadingState = eventInfoFormRef.current.getLoadingState();
-      currentIsLoading = currentIsLoading || eventInfoLoadingState.isLoading;
-      currentLoadingText = eventInfoLoadingState.loadingText || currentLoadingText;
-    }
-
     const baseConfig = {
       showPrevButton: currentStep > 1 && currentStep < 5,
       showNextButton: currentStep < 5,
       onPrevClick: handlePrevStep,
       onNextClick: handleStepNext,
-      isLoading: currentIsLoading,
-      loadingText: currentLoadingText,
+      isLoading: currentLoadingState.isLoading,
+      loadingText: currentLoadingState.loadingText,
     };
 
     switch (currentStep) {
@@ -235,7 +348,10 @@ const CreateActivityForm: React.FC = () => {
     const checks = Array.from({ length: step - 1 }, (_, i) =>
       validateStep(i + 1)
     );
-    if ((await Promise.all(checks)).every(Boolean)) setCurrentStep(step);
+    if ((await Promise.all(checks)).every(Boolean)) {
+      setShouldScroll(true); // 標記需要滾動
+      setCurrentStep(step);
+    }
   };
 
   return (
@@ -262,12 +378,12 @@ const CreateActivityForm: React.FC = () => {
               <EventInfoForm
                 ref={eventInfoFormRef}
                 onEventCreated={handleEventCreated}
+                eventId={eventId}
               />
             )}
             {currentStep === 2 && (
               <UploadCoverForm
                 ref={uploadCoverFormRef}
-                onNextStep={handleNextStep}
                 eventId={eventId}
               />
             )}
@@ -287,6 +403,7 @@ const CreateActivityForm: React.FC = () => {
               (eventId ? (
                 <ActivityCreationSuccess
                   eventId={eventId}
+                  onCreateNewActivity={resetFormToInitialState}
                 />
               ) : (
                 <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm text-center">

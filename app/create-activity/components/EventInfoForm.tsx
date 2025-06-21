@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormData } from '../schema/formDataSchema';
+import { FormData, createFieldValidator } from '../schema/formDataSchema';
 import FormField from '../../../components/form/FormField';
 import FormInput from '../../../components/form/FormInput';
 import FormCheckboxGroup from '../../../components/form/FormCheckboxGroup';
@@ -9,6 +9,7 @@ import FormSwitch from '../../../components/form/FormSwitch';
 import FormDynamicInputs from '../../../components/form/FormDynamicInputs';
 import { useEventTags } from '@/swr/meta/useEventTags';
 import { useCreateEvent } from '@/swr/events/useCreateEvent';
+import { useUpdateEvent } from '@/swr/events/useUpdateEvent';
 import { useUpdateEventNoticesTags } from '@/swr/events/useUpdateEventNoticesTags';
 import {
   CreateEventRequest,
@@ -23,15 +24,17 @@ import FormNumberInput from '@/components/form/FormNumberInput';
 interface EventInfoFormProps {
   /** 活動建立後的回調函式，提供活動 ID */
   onEventCreated?: (id: string) => void;
+  /** 現有的活動 ID，用於更新模式 */
+  eventId?: string | null;
 }
 
 export interface EventInfoFormRef {
   handleSubmit: () => Promise<boolean>;
-  getLoadingState: () => { isLoading: boolean; loadingText: string };
 }
 
 const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
-  ({ onEventCreated }, ref) => {
+  ({ onEventCreated, eventId }, ref) => {
+
     // 使用 useEventTags 取得活動標籤
     const {
       data: eventTagsData,
@@ -39,31 +42,14 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       isLoading: eventTagsLoading,
     } = useEventTags();
 
-    // API 操作狀態管理
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     // 初始化 API Hooks
-    const { trigger: triggerCreateEvent, isMutating: isCreating } =
-      useCreateEvent();
-    const { trigger: triggerUpdateEventNoticesTags, isMutating: isUpdating } =
-      useUpdateEventNoticesTags();
+    const { trigger: triggerCreateEvent } = useCreateEvent();
+    const { updateEvent: triggerUpdateEvent } = useUpdateEvent();
+    const { trigger: triggerUpdateEventNoticesTags } = useUpdateEventNoticesTags();
 
     // 使用 useImperativeHandle 暴露方法給父元件
     useImperativeHandle(ref, () => ({
       handleSubmit: handleNextStep,
-      getLoadingState: () => {
-        let loadingText = '';
-        if (isSubmitting || isCreating) {
-          loadingText = '建立活動中...';
-        } else if (isUpdating) {
-          loadingText = '更新標籤與通知中...';
-        }
-
-        return {
-          isLoading: isSubmitting || isCreating || isUpdating,
-          loadingText,
-        };
-      },
     }));
 
     // 將 API 回傳的標籤資料轉換為 FormCheckboxGroup 所需的格式
@@ -85,6 +71,68 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       trigger,
       formState: { errors },
     } = useFormContext<FormData>();
+
+    // 建立欄位驗證器實例
+    const fieldValidator = createFieldValidator();
+    
+    // 自定義錯誤狀態管理
+    const [customErrors, setCustomErrors] = useState<Record<string, string>>({});
+
+    // 智能驗證函式 - 根據變更的欄位進行相關驗證
+    const handleSmartValidation = (changedField: keyof FormData['eventInfo'], formData: FormData['eventInfo']) => {
+      const newErrors: Record<string, string> = {};
+      
+      // 根據變更的欄位決定要檢查哪些驗證
+      if (['startDate', 'startTime', 'endDate', 'endTime'].includes(changedField)) {
+        // 檢查活動時間邏輯
+        if (!fieldValidator.validateActivityTimes(
+          formData.startDate, formData.startTime, 
+          formData.endDate, formData.endTime
+        )) {
+          newErrors.endTime = '活動結束時間必須晚於開始時間';
+        }
+      }
+      
+      if (['registration_startDate', 'registration_startTime', 'registration_endDate', 'registration_endTime'].includes(changedField)) {
+        // 檢查報名時間邏輯
+        if (!fieldValidator.validateRegistrationTimes(
+          formData.registration_startDate, formData.registration_startTime,
+          formData.registration_endDate, formData.registration_endTime
+        )) {
+          newErrors.registration_endTime = '報名結束時間必須晚於報名開始時間';
+        }
+        
+        // 檢查報名與活動時間關聯
+        if (!fieldValidator.validateRegistrationActivityTimes(
+          formData.registration_endDate, formData.registration_endTime,
+          formData.startDate, formData.startTime
+        )) {
+          newErrors.registration_endTime = '報名結束時間不得晚於活動開始時間';
+        }
+      }
+      
+      setCustomErrors(newErrors);
+    };
+
+    // 處理時間欄位變更
+    const handleDateTimeChange = (field: keyof FormData['eventInfo'], value: string) => {
+      const fullFieldName = `eventInfo.${field}` as const;
+      setValue(fullFieldName, value);
+      
+      // 觸發該欄位的基本驗證
+      trigger(fullFieldName);
+      
+      // 延遲執行智能驗證，等 setValue 完成
+      setTimeout(() => {
+        const currentFormData = getValues('eventInfo');
+        handleSmartValidation(field, currentFormData);
+      }, 0);
+    };
+
+    // 取得顯示的錯誤訊息（優先顯示自定義錯誤）
+    const getErrorMessage = (field: keyof FormData['eventInfo']) => {
+      return customErrors[field] || errors.eventInfo?.[field]?.message;
+    };
 
     // 處理表單資料轉換為 API 請求格式
     const prepareCreateEventData = (
@@ -140,73 +188,87 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       // 先觸發表單驗證，僅驗證 eventInfo 欄位
       const isValid = await trigger('eventInfo');
 
-      console.log('表單驗證結果:', isValid);
-      console.log('表單錯誤:', errors);
-      console.log('表單資料:', getValues('eventInfo'));
-
       if (!isValid) {
         toast.error('請檢查表單內容是否正確填寫');
         return false;
       }
 
       try {
-        // 開始提交，設定載入狀態
-        setIsSubmitting(true);
-
         const eventInfo = getValues('eventInfo');
+        let currentEventId = eventId;
 
-        // 步驟1: 建立活動
-        const createEventData = prepareCreateEventData(eventInfo);
-        console.log('準備建立活動，資料:', createEventData);
+        // 步驟1: 根據是否有 eventId 決定建立或更新活動
+        if (currentEventId) {
+          // 更新現有活動
+          const updateEventData = prepareCreateEventData(eventInfo);
 
-        const createResult = await triggerCreateEvent(createEventData);
-        console.log('建立活動結果:', createResult);
+          try {
+            const updateResult = await triggerUpdateEvent({
+              eventId: currentEventId,
+              payload: updateEventData,
+            });
 
-        if (!createResult?.data?.event?.id) {
-          throw new Error('活動建立失敗，未返回活動ID');
-        }
+            if (!updateResult?.data?.event?.id) {
+              throw new Error('活動更新失敗');
+            }
+          } catch (updateError) {
+            console.error('更新活動錯誤:', updateError);
+            return false;
+          }
+        } else {
+          // 建立新活動
+          const createEventData = prepareCreateEventData(eventInfo);
 
-        // 取得活動ID，並設定為目前ID
-        const eventId = createResult.data.event.id;
+          try {
+            const createResult = await triggerCreateEvent(createEventData);
 
-        // 通知父元件活動已建立並傳遞 ID
-        if (onEventCreated) {
-          onEventCreated(eventId);
+            if (!createResult?.data?.event?.id) {
+              throw new Error('活動建立失敗，未返回活動ID');
+            }
+
+            // 取得活動ID，並設定為目前ID
+            currentEventId = createResult.data.event.id;
+
+            // 通知父元件活動已建立並傳遞 ID
+            if (onEventCreated) {
+              onEventCreated(currentEventId);
+            }
+          } catch (createError) {
+            console.error('建立活動錯誤:', createError);
+            return false;
+          }
         }
 
         // 步驟2: 準備更新資料
         const updateData = prepareUpdateNoticesTagsData(eventInfo);
-        console.log('準備更新標籤與通知，資料:', updateData);
 
-        // 這裡我們觸發更新操作，同時傳入最新的 eventId
-        const updateResult = await triggerUpdateEventNoticesTags(
-          updateData,
-          eventId
-        );
-        console.log('更新結果:', updateResult);
-
-        // 如果更新成功，回傳成功狀態
-        if (updateResult) {
-          toast.success('活動建立完成，標籤與通知設定成功！');
-          return true;
+        try {
+          // 這裡我們觸發更新操作，同時傳入最新的 eventId
+          const updateResult = await triggerUpdateEventNoticesTags(
+            updateData,
+            currentEventId
+          );
+          
+          // 如果更新成功，回傳成功狀態
+          if (updateResult) {
+            return true;
+          }
+          
+          return false;
+        } catch (tagsError) {
+          console.error('更新標籤與通知錯誤:', tagsError);
+          return false;
         }
-
-        return false;
       } catch (error) {
         console.error('表單提交錯誤:', error);
-        toast.error(
-          error instanceof Error ? error.message : '活動建立過程中發生錯誤'
-        );
+        toast.error('提交失敗，請稍後再試');
         return false;
-      } finally {
-        // 無論成功或失敗都要重設載入狀態
-        setIsSubmitting(false);
-      }
+      } 
     };
 
     return (
       <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
-        <h1 className="text-2xl font-semibold text-[#121212]">創建活動</h1>
+        <h1 className="text-2xl font-semibold leading-normal text-[#121212]">創建活動</h1>
 
         <div className="flex flex-col gap-6">
           {/* 活動主題 */}
@@ -247,51 +309,39 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
           {/* 活動開始時間 - 響應式排版 */}
           <div className="flex flex-col gap-3 md:flex-row md:gap-3">
             <div className="flex flex-col gap-1 md:w-1/2">
-              <label className="text-sm font-normal text-[#4F4F4F]">
-                <span className="text-[#AB5F5F]">*</span>活動開始時間
+              <label className="text-sm font-normal leading-normal text-[#4f4f4f]">
+                <span className="text-[#ab5f5f]">*</span>活動開始時間
               </label>
               <div className="flex flex-row justify-stretch items-stretch gap-3">
                 <DatePicker
                   value={getValues('eventInfo.startDate')}
-                  onChange={(date) => {
-                    setValue('eventInfo.startDate', date);
-                    trigger('eventInfo.startDate');
-                  }}
-                  error={errors.eventInfo?.startDate?.message}
+                  onChange={(date) => handleDateTimeChange('startDate', date)}
+                  error={getErrorMessage('startDate')}
                 />
 
                 <TimePicker
                   value={getValues('eventInfo.startTime')}
-                  onChange={(time) => {
-                    setValue('eventInfo.startTime', time);
-                    trigger('eventInfo.startTime');
-                  }}
-                  error={errors.eventInfo?.startTime?.message}
+                  onChange={(time) => handleDateTimeChange('startTime', time)}
+                  error={getErrorMessage('startTime')}
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1 md:w-1/2">
-              <label className="text-sm font-normal text-[#4F4F4F]">
-                <span className="text-[#AB5F5F]">*</span>活動結束時間
+              <label className="text-sm font-normal leading-normal text-[#4f4f4f]">
+                <span className="text-[#ab5f5f]">*</span>活動結束時間
               </label>
               <div className="flex flex-row justify-stretch items-stretch gap-3">
                 <DatePicker
                   value={getValues('eventInfo.endDate')}
-                  onChange={(date) => {
-                    setValue('eventInfo.endDate', date);
-                    trigger('eventInfo.endDate');
-                  }}
-                  error={errors.eventInfo?.endDate?.message}
+                  onChange={(date) => handleDateTimeChange('endDate', date)}
+                  error={getErrorMessage('endDate')}
                 />
 
                 <TimePicker
                   value={getValues('eventInfo.endTime')}
-                  onChange={(time) => {
-                    setValue('eventInfo.endTime', time);
-                    trigger('eventInfo.endTime');
-                  }}
-                  error={errors.eventInfo?.endTime?.message}
+                  onChange={(time) => handleDateTimeChange('endTime', time)}
+                  error={getErrorMessage('endTime')}
                 />
               </div>
             </div>
@@ -300,51 +350,39 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
           {/* 報名時間 - 響應式排版 */}
           <div className="flex flex-col gap-3 md:flex-row md:gap-3">
             <div className="flex flex-col gap-1 md:w-1/2">
-              <label className="text-sm font-normal text-[#4F4F4F]">
-                <span className="text-[#AB5F5F]">*</span>報名開始時間
+              <label className="text-sm font-normal leading-normal text-[#4f4f4f]">
+                <span className="text-[#ab5f5f]">*</span>報名開始時間
               </label>
               <div className="flex flex-row justify-stretch items-stretch gap-3">
                 <DatePicker
                   value={getValues('eventInfo.registration_startDate')}
-                  onChange={(date) => {
-                    setValue('eventInfo.registration_startDate', date);
-                    trigger('eventInfo.registration_startDate');
-                  }}
-                  error={errors.eventInfo?.registration_startDate?.message}
+                  onChange={(date) => handleDateTimeChange('registration_startDate', date)}
+                  error={getErrorMessage('registration_startDate')}
                 />
 
                 <TimePicker
                   value={getValues('eventInfo.registration_startTime')}
-                  onChange={(time) => {
-                    setValue('eventInfo.registration_startTime', time);
-                    trigger('eventInfo.registration_startTime');
-                  }}
-                  error={errors.eventInfo?.registration_startTime?.message}
+                  onChange={(time) => handleDateTimeChange('registration_startTime', time)}
+                  error={getErrorMessage('registration_startTime')}
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1 md:w-1/2">
-              <label className="text-sm font-normal text-[#4F4F4F]">
-                <span className="text-[#AB5F5F]">*</span>報名結束時間
+              <label className="text-sm font-normal leading-normal text-[#4f4f4f]">
+                <span className="text-[#ab5f5f]">*</span>報名結束時間
               </label>
               <div className="flex flex-row justify-stretch items-stretch gap-3">
                 <DatePicker
                   value={getValues('eventInfo.registration_endDate')}
-                  onChange={(date) => {
-                    setValue('eventInfo.registration_endDate', date);
-                    trigger('eventInfo.registration_endDate');
-                  }}
-                  error={errors.eventInfo?.registration_endDate?.message}
+                  onChange={(date) => handleDateTimeChange('registration_endDate', date)}
+                  error={getErrorMessage('registration_endDate')}
                 />
 
                 <TimePicker
                   value={getValues('eventInfo.registration_endTime')}
-                  onChange={(time) => {
-                    setValue('eventInfo.registration_endTime', time);
-                    trigger('eventInfo.registration_endTime');
-                  }}
-                  error={errors.eventInfo?.registration_endTime?.message}
+                  onChange={(time) => handleDateTimeChange('registration_endTime', time)}
+                  error={getErrorMessage('registration_endTime')}
                 />
               </div>
             </div>
@@ -396,10 +434,10 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
                 {eventTagsLoading ? (
                   <div className="flex items-center gap-2">
                     <span className="loading loading-spinner loading-sm"></span>
-                    <span>載入標籤中...</span>
+                    <span className="text-base font-normal leading-normal text-[#6d6d6d]">載入標籤中...</span>
                   </div>
                 ) : eventTagsError ? (
-                  <div className="text-red-500">
+                  <div className="text-base font-normal leading-normal text-[#ab5f5f]">
                     載入標籤失敗，請重新整理頁面
                   </div>
                 ) : (

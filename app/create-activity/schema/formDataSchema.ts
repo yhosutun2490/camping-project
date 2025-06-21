@@ -1,36 +1,78 @@
 import * as z from 'zod';
 
-// Step1: 活動基本資訊
+// 建立日期時間驗證輔助函式
+const createDateTimeValidation = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return {
+    // 檢查是否為未來日期
+    isFutureDate: (date: string) => {
+      const inputDate = new Date(date);
+      inputDate.setHours(0, 0, 0, 0);
+      return inputDate > today;
+    },
+    
+    // 檢查是否為未來日期時間（使用本地時區）
+    isFutureDateTime: (date: string, time: string) => {
+      // 使用本地時區建立日期時間物件
+      const [year, month, day] = date.split('-').map(Number);
+      const [hours, minutes] = time.split(':').map(Number);
+      const dateTime = new Date(year, month - 1, day, hours, minutes);
+      const now = new Date();
+      return dateTime > now;
+    }
+  };
+};
+
+const dateTimeValidator = createDateTimeValidation();
+
+// Step1: 活動基本資訊 - 加強欄位層級驗證
 export const EventInfoSchema = z
   .object({
     title: z.string().min(1, '請輸入活動主題').max(100, '最多100字'),
     organizer: z.string().min(1, '請輸入主辦方名稱').max(50, '最多50字'),
     // 更改為 address
     address: z.string().min(1, '請輸入活動地點').max(200, '最多200字'),
+    
+    // 活動日期時間 - 增加即時驗證
     startDate: z
       .string()
-      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
+      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD')
+      .refine((val) => dateTimeValidator.isFutureDate(val), '活動開始日期必須是未來日期'),
+    
     startTime: z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
+    
     endDate: z
       .string()
-      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
+      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD')
+      .refine((val) => dateTimeValidator.isFutureDate(val), '活動結束日期必須是未來日期'),
+    
     endTime: z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
+    
+    // 報名日期時間 - 增加即時驗證
     registration_startDate: z
       .string()
-      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
+      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD')
+      .refine((val) => dateTimeValidator.isFutureDate(val), '報名開始日期必須是未來日期'),
+    
     registration_startTime: z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
+    
     registration_endDate: z
       .string()
-      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD'),
+      .refine((val) => /^\d{4}-\d{2}-\d{2}$/.test(val), '格式需為YYYY-MM-DD')
+      .refine((val) => dateTimeValidator.isFutureDate(val), '報名結束日期必須是未來日期'),
+    
     registration_endTime: z
       .string()
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
+    
     // 改為 max_participants
     max_participants: z.number().min(1, '至少1人').max(10000, '最多10000人'),
     // 新增價格
@@ -43,10 +85,76 @@ export const EventInfoSchema = z
     // 改為 event_notifications
     event_notifications: z.array(z.string().min(5, '至少5字')).optional(),
   })
-  .refine((data) => data.endDate >= data.startDate, {
-    message: '結束日期不可早於開始日期',
-    path: ['endDate'],
+  // 跨欄位驗證規則
+  .refine((data) => {
+    // 1. 活動開始時間不得超過結束時間
+    const startDateTime = new Date(`${data.startDate}T${data.startTime}:00`);
+    const endDateTime = new Date(`${data.endDate}T${data.endTime}:00`);
+    return endDateTime > startDateTime;
+  }, {
+    message: '活動結束時間必須晚於開始時間',
+    path: ['endTime'],
+  })
+  .refine((data) => {
+    // 2. 報名開始時間不得超過結束時間
+    const registrationStartDateTime = new Date(`${data.registration_startDate}T${data.registration_startTime}:00`);
+    const registrationEndDateTime = new Date(`${data.registration_endDate}T${data.registration_endTime}:00`);
+    return registrationEndDateTime > registrationStartDateTime;
+  }, {
+    message: '報名結束時間必須晚於報名開始時間',
+    path: ['registration_endTime'],
+  })
+  .refine((data) => {
+    // 3. 報名結束時間不得晚於活動開始時間
+    const activityStartDateTime = new Date(`${data.startDate}T${data.startTime}:00`);
+    const registrationEndDateTime = new Date(`${data.registration_endDate}T${data.registration_endTime}:00`);
+    return registrationEndDateTime <= activityStartDateTime;
+  }, {
+    message: '報名結束時間不得晚於活動開始時間',
+    path: ['registration_endTime'],
+  })
+  .refine((data) => {
+    // 4. 報名開始日期時間必須是未來時間
+    return dateTimeValidator.isFutureDateTime(data.registration_startDate, data.registration_startTime);
+  }, {
+    message: '報名開始時間必須是未來時間',
+    path: ['registration_startTime'],
   });
+
+// 建立單獨的欄位驗證器（用於即時驗證）
+export const createFieldValidator = () => {
+  return {
+    // 驗證活動時間邏輯
+    validateActivityTimes: (startDate: string, startTime: string, endDate: string, endTime: string) => {
+      if (!startDate || !startTime || !endDate || !endTime) return true; // 如果欄位未完整填寫，不驗證
+      
+      const startDateTime = new Date(`${startDate}T${startTime}:00`);
+      const endDateTime = new Date(`${endDate}T${endTime}:00`);
+      return endDateTime > startDateTime;
+    },
+    
+    // 驗證報名時間邏輯
+    validateRegistrationTimes: (startDate: string, startTime: string, endDate: string, endTime: string) => {
+      if (!startDate || !startTime || !endDate || !endTime) return true;
+      
+      const startDateTime = new Date(`${startDate}T${startTime}:00`);
+      const endDateTime = new Date(`${endDate}T${endTime}:00`);
+      return endDateTime > startDateTime;
+    },
+    
+    // 驗證報名與活動時間關聯
+    validateRegistrationActivityTimes: (
+      regEndDate: string, regEndTime: string, 
+      actStartDate: string, actStartTime: string
+    ) => {
+      if (!regEndDate || !regEndTime || !actStartDate || !actStartTime) return true;
+      
+      const regEndDateTime = new Date(`${regEndDate}T${regEndTime}:00`);
+      const actStartDateTime = new Date(`${actStartDate}T${actStartTime}:00`);
+      return regEndDateTime <= actStartDateTime;
+    }
+  };
+};
 
 // 圖片檔案驗證
 const fileSchema = z
