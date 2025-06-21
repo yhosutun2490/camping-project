@@ -178,13 +178,25 @@ export const CoverImageSchema = z
   .min(1, '至少上傳1張封面圖片')
   .max(3, '最多3張封面圖片');
 
+// Step2: 封面圖片 (編輯模式)
+export const CoverImageSchemaEdit = z
+  .array(fileSchema)
+  .max(3, '最多3張封面圖片')
+  .optional();
+
 // Step3: 活動內容圖片
 export const EventImageSchema = z.object({
   file: fileSchema,
   description: z.string().max(100, '最多100字').optional(),
 });
 
-export const EventImagesSchema = z.array(EventImageSchema).optional();
+export const EventImagesSchema = z
+  .array(EventImageSchema)
+  .min(1, '請至少上傳一張活動圖片')
+  .max(3, '最多3張活動圖片');
+
+// Step3: 活動內容圖片 (編輯模式)
+export const EventImagesSchemaEdit = z.array(EventImageSchema).optional();
 
 // Step4: 活動方案
 const ContentSchema = z.object({
@@ -226,4 +238,13 @@ export const FormDataSchema = z.object({
   plans: PlanArraySchema,
 });
 
+// 編輯模式的表單 schema（圖片為非必填）
+export const FormDataSchemaEdit = z.object({
+  eventInfo: EventInfoSchema,
+  coverImages: CoverImageSchemaEdit,
+  eventImages: EventImagesSchemaEdit,
+  plans: PlanArraySchema,
+});
+
 export type FormData = z.infer<typeof FormDataSchema>;
+export type FormDataEdit = z.infer<typeof FormDataSchemaEdit>;

@@ -35,13 +35,14 @@ export function useUploadEventImages(type: EventImageType) {
           throw new Error("最多只能上傳 3 張圖片");
         }
 
-        // 檢查檔案是否為 JPG
+        // 檢查檔案格式 (支援 JPEG、PNG、WebP)
         console.log("🔍 檢查檔案格式...");
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
         for (const file of arg.files) {
           console.log("📁 檢查檔案:", file.name, file.type);
-          if (!file.type.includes("jpeg") && !file.type.includes("jpg")) {
+          if (!allowedTypes.includes(file.type)) {
             console.log("❌ 不支援的檔案格式:", file.type);
-            throw new Error("僅支援 JPG 格式的圖片");
+            throw new Error("僅支援 JPEG、PNG、WebP 格式的圖片");
           }
         }
 

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormDataSchema, FormData } from '@/app/create-activity/schema/formDataSchema';
+import { FormDataSchemaEdit, FormDataEdit } from '@/app/create-activity/schema/formDataSchema';
 import EventStepper from '@/app/create-activity/components/EventStepper';
 import EventInfoForm, { EventInfoFormRef } from '@/app/create-activity/components/EventInfoForm';
 import UploadCoverForm, { UploadCoverFormRef } from '@/app/create-activity/components/UploadCoverForm';
@@ -27,7 +27,7 @@ type StepsLoadingState = {
 // 定義元件 props
 interface EditActivityFormProps {
   /** 初始資料 */
-  initialData: FormData;
+  initialData: FormDataEdit;
   /** 活動 ID */
   eventId: string;
 }
@@ -82,8 +82,8 @@ const EditActivityForm: React.FC<EditActivityFormProps> = ({
     }));
   };
 
-  const methods = useForm<FormData>({
-    resolver: zodResolver(FormDataSchema),
+  const methods = useForm<FormDataEdit>({
+    resolver: zodResolver(FormDataSchemaEdit),
     mode: 'onChange',
     defaultValues: initialData,
   });
@@ -292,7 +292,7 @@ const EditActivityForm: React.FC<EditActivityFormProps> = ({
   };
 
   return (
-    <FormProvider<FormData> {...methods}>
+    <FormProvider<FormDataEdit> {...methods}>
       <div className="bg-[#F6F6F6] min-h-screen">
         <div className="max-w-4xl mx-auto pb-32"> {/* 添加底部邊距避免被固定導航遮擋 */}
           <div className="py-10">
@@ -322,12 +322,14 @@ const EditActivityForm: React.FC<EditActivityFormProps> = ({
               <UploadCoverForm
                 ref={uploadCoverFormRef}
                 eventId={eventId}
+                isEditMode={true} // 編輯模式
               />
             )}
             {currentStep === 3 && (
               <UploadEventImageForm
                 ref={uploadEventImageFormRef}
                 eventId={eventId}
+                isEditMode={true} // 編輯模式
               />
             )}
             {currentStep === 4 && (

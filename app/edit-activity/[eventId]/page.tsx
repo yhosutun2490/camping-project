@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import EditActivityForm from '@/app/edit-activity/components/EditActivityForm';
-import { FormData } from '@/app/create-activity/schema/formDataSchema';
+import { FormDataEdit } from '@/app/create-activity/schema/formDataSchema';
 import { useHostEventDetail } from '@/swr/events/useHostEventDetail';
 import toast from 'react-hot-toast';
 import { GetHostEventDetailResponse } from '@/types/api/host/eventDetail';
@@ -13,7 +13,7 @@ import { GetHostEventDetailResponse } from '@/types/api/host/eventDetail';
  * @param apiData API 回應的活動詳情資料
  * @returns 表單使用的 FormData 格式
  */
-function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormData {
+function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormDataEdit {
   // 日期時間轉換函式（避免 UTC 時區問題）
   const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
@@ -57,7 +57,7 @@ function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormData {
   // 轉換標籤資料
   const tags = apiData.tags?.map(tag => tag.id) || [];
 
-  const formData: FormData = {
+  const formData: FormDataEdit = {
     eventInfo: {
       title: apiData.title,
       organizer: apiData.host.name,
@@ -89,7 +89,7 @@ function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormData {
 export default function EditActivityPage() {
   const { eventId } = useParams();
   const { getEventDetail, isLoading, eventDetail, error } = useHostEventDetail();
-  const [formData, setFormData] = useState<FormData | null>(null);
+  const [formData, setFormData] = useState<FormDataEdit | null>(null);
 
   // 載入活動資料
   useEffect(() => {

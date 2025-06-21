@@ -53,6 +53,11 @@ function FileUploader({
         validateAndProcessFile(files[0]);
       }
     }
+    
+    // 清空 input value，確保可以重複選擇相同檔案
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   // 處理拖放
@@ -82,6 +87,11 @@ function FileUploader({
           validateAndProcessMultipleFiles(Array.from(e.dataTransfer.files));
         } else {
           validateAndProcessFile(e.dataTransfer.files[0]);
+        }
+        
+        // 清空 input value，確保可以重複選擇相同檔案
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
         }
       }
     }
@@ -151,10 +161,12 @@ function FileUploader({
     <div className="w-full">
       <div
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-base-200 transition-colors ${
-          dragActive ? 'border-primary bg-base-200' : 'border-base-300'
-        } ${error || internalError ? 'border-error' : ''} ${
-          disabled ? 'cursor-not-allowed opacity-50' : ''
-        }`}
+          error || internalError 
+            ? 'border-[#AB5F5F]' 
+            : dragActive 
+              ? 'border-primary bg-base-200' 
+              : 'border-base-300'
+        } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
         onClick={handleClick}
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
@@ -192,7 +204,7 @@ function FileUploader({
       
       {/* 顯示錯誤訊息 */}
       {(error || internalError) && (
-        <div className="mt-2 text-sm text-error">
+        <div className="mt-2 text-sm text-[#AB5F5F]">
           {error || internalError}
         </div>
       )}

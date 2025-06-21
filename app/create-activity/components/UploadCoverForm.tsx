@@ -12,13 +12,15 @@ import { EventImageType } from '@/types/api/events';
 interface UploadCoverFormProps {
   /** 活動 ID */
   eventId: string | null;
+  /** 是否為編輯模式 */
+  isEditMode?: boolean;
 }
 
 export interface UploadCoverFormRef {
   handleSubmit: () => Promise<boolean>;
 }
 
-const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ eventId }, ref) => {
+const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ eventId, isEditMode = false }, ref) => {
 
   const {
     setValue,
@@ -84,19 +86,30 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
       return false; // 驗證失敗，不繼續執行
     }
     
-    // 檢查是否有圖片
-    if (coverFiles.length === 0) {
+    // 檢查是否有圖片 (編輯模式下非必填)
+    if (coverFiles.length === 0 && !isEditMode) {
       toast.error('請至少上傳一張封面圖片');
       return false;
     }
     
-    // 檢查 eventId 是否存在
-    if (!eventId) {
+    // 檢查 eventId 是否存在 (只有在有圖片需要上傳時才檢查)
+    if (coverFiles.length > 0 && !eventId) {
       toast.error('無法上傳圖片：活動 ID 未設定');
       return false;
     }
     
+    // 如果沒有圖片且為編輯模式，直接返回成功
+    if (coverFiles.length === 0 && isEditMode) {
+      return true;
+    }
+    
     try {
+      // 確保 eventId 存在才進行上傳
+      if (!eventId) {
+        toast.error('無法上傳圖片：活動 ID 未設定');
+        return false;
+      }
+      
       // 上傳圖片到伺服器
       // 新版本的 trigger 需要三個參數：files, eventId, descriptions
       const result = await uploadImages(
@@ -126,8 +139,7 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
         <FormField
           label="封面圖片"
           name="coverImages"
-          required
-          error={errors.coverImages?.message as string}
+          required={!isEditMode}
         >
           <div className="flex flex-col gap-4">
             {/* 上傳區域（僅在少於3張圖片時顯示） */}
@@ -148,7 +160,10 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
             {/* 上傳提示 */}
             <div className="flex flex-col gap-2 text-sm text-[#4F4F4F]">
               <p className="text-[#121212]">
-                最多新增3張活動封面，至少需要上傳1張
+                {isEditMode 
+                  ? '最多新增3張活動封面 (可選擇更新)'
+                  : '最多新增3張活動封面，至少需要上傳1張'
+                }
                 {coverFiles.length > 0 && (
                   <span className="text-[#5C795F] font-medium">
                     {` (目前已選擇 ${coverFiles.length} 張，還可選擇 ${3 - coverFiles.length} 張)`}
@@ -158,7 +173,12 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
               <p>建議尺寸：1080 x 540 pixel，格式：JPEG、PNG、WebP</p>
               <div className="flex items-center gap-2 mt-2 p-3 bg-[#F5F7F5] rounded-xl">
                 <span className="text-lg">💡</span>
-                <p className="text-[#354738] font-medium">支援一次選擇多張圖片，點擊「下一步」時上傳</p>
+                <p className="text-[#354738] font-medium">
+                  {isEditMode 
+                    ? '編輯模式：可選擇更新封面圖片，若不上傳則保持原有封面'
+                    : '支援一次選擇多張圖片，點擊「下一步」時上傳'
+                  }
+                </p>
               </div>
             </div>
 

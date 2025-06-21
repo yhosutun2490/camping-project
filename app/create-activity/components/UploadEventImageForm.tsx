@@ -20,6 +20,8 @@ interface EventImage {
 interface UploadEventImageFormProps {
   /** 活動 ID */
   eventId: string | null;
+  /** 是否為編輯模式 */
+  isEditMode?: boolean;
 }
 
 // 定義 ref 類型
@@ -29,6 +31,7 @@ export interface UploadEventImageFormRef {
 
 const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImageFormProps>(({
   eventId,
+  isEditMode = false,
 }, ref) => {
   const {
     setValue,
@@ -116,11 +119,6 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
    * @returns {boolean} 是否通過驗證
    */
   const validateFiles = useCallback(() => {
-    if (eventImages.length === 0) {
-      toast.error('請至少上傳一張活動圖片');
-      return false;
-    }
-    
     // 檢查檔案格式與大小
     for (const image of eventImages) {
       const file = image.file;
@@ -147,43 +145,54 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
     handleSubmit: async () => {
       // 先執行 React Hook Form 驗證
       const isValid = await trigger('eventImages');
+      if (!isValid) {
+        return false; // 驗證失敗，不繼續執行
+      }
       
-      if (isValid) {
-        // 自定義檔案驗證
-        if (!validateFiles()) {
+      // 檢查 eventId 是否存在 (只有在有圖片需要上傳時才檢查)
+      if (eventImages.length > 0 && !eventId) {
+        toast.error('無法上傳圖片：活動 ID 未設定');
+        return false;
+      }
+      
+      // 如果沒有圖片且為編輯模式，直接返回成功
+      if (eventImages.length === 0 && isEditMode) {
+        return true;
+      }
+      
+      // 自定義檔案驗證
+      if (!validateFiles()) {
+        return false;
+      }
+
+      // 如果有活動ID且有檔案要上傳，則執行上傳
+      if (eventId && eventImages.length > 0) {
+        try {
+          // 準備上傳資料
+          const { files, descriptions } = prepareUploadData();
+          
+          // 呼叫上傳API
+          // 新版本的 trigger 需要三個參數：files, eventId, descriptions
+          await uploadImages(
+            files,        // files
+            eventId,      // eventId
+            descriptions  // descriptions
+          );
+          
+          // 上傳成功後返回 true
+          return true;
+        } catch (error) {
+          console.error('上傳活動圖片時發生錯誤:', error);
+          toast.error('上傳過程中發生錯誤，請稍後再試');
           return false;
         }
-
-        // 如果有活動ID且有檔案要上傳，則執行上傳
-        if (eventId) {
-          try {
-            // 準備上傳資料
-            const { files, descriptions } = prepareUploadData();
-            
-            // 呼叫上傳API
-            // 新版本的 trigger 需要三個參數：files, eventId, descriptions
-            await uploadImages(
-              files,        // files
-              eventId,      // eventId
-              descriptions  // descriptions
-            );
-            
-            // 上傳成功後返回 true
-            return true;
-          } catch (error) {
-            console.error('上傳活動圖片時發生錯誤:', error);
-            toast.error('上傳過程中發生錯誤，請稍後再試');
-            return false;
-          }
-        } else {
-          // 如果沒有活動ID，則只是儲存表單資料到狀態
-          console.warn('沒有提供活動ID，略過圖片上傳');
-          return true;
-        }
+      } else {
+        // 如果沒有活動ID，則只是儲存表單資料到狀態
+        console.warn('沒有提供活動ID，略過圖片上傳');
+        return true;
       }
-      return false;
     },
-  }), [eventId, trigger, uploadImages, prepareUploadData, validateFiles]);
+  }), [eventId, trigger, uploadImages, prepareUploadData, validateFiles, eventImages.length, isEditMode]);
 
   return (
     <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
@@ -193,8 +202,7 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
         <FormField
           label="活動圖片"
           name="eventImages"
-          required
-          error={errors.eventImages?.message as string}
+          required={!isEditMode}
         >
           <div className="flex flex-col gap-4">
             {/* 上傳區域（僅在少於3張圖片時顯示） */}
@@ -213,7 +221,10 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
             {/* 上傳提示 */}
             <div className="flex flex-col gap-2 text-sm text-[#4F4F4F]">
               <p className="text-[#121212]">
-                上傳活動相關圖片，展示活動場地或過往活動照片（最多3張）
+                {isEditMode 
+                  ? '上傳活動相關圖片，展示活動場地或過往活動照片（最多3張，可選擇更新）'
+                  : '上傳活動相關圖片，展示活動場地或過往活動照片（最多3張）'
+                }
                 {eventImages.length > 0 && (
                   <span className="text-[#5C795F] font-medium">
                     {` (目前已選擇 ${eventImages.length} 張，還可選擇 ${3 - eventImages.length} 張)`}
@@ -223,7 +234,12 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
               <p>建議尺寸：1080 x 540 pixel，格式：JPEG、PNG、WebP</p>
               <div className="flex items-center gap-2 mt-2 p-3 bg-[#F5F7F5] rounded-xl">
                 <span className="text-lg">💡</span>
-                <p className="text-[#354738] font-medium">每張圖片可以添加描述，幫助參與者了解活動內容</p>
+                <p className="text-[#354738] font-medium">
+                  {isEditMode 
+                    ? '編輯模式：可選擇更新活動圖片，若不上傳則保持原有圖片。每張圖片可以添加描述，幫助參與者了解活動內容'
+                    : '每張圖片可以添加描述，幫助參與者了解活動內容'
+                  }
+                </p>
               </div>
             </div>
 
