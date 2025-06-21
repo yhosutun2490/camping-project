@@ -1,15 +1,15 @@
-// app/api/admin/event/:id 審核方取單一活動資料
+// app/api/admin/event/:id/reject 審核方退回單一活動申請上架
 import { NextRequest, NextResponse } from "next/server";
 import axiosInstance from "@/api/axiosIntance";
 import { AxiosResponse } from "axios";
 import { formatAxiosError } from "@/utils/errors";
-import { GetAdminEventByIdSuccessResponse} from "@/types/api/admin"
+import { PatchAdminApproveEventSuccessResponse } from "@/types/api/admin"
 import { ErrorResponse } from "@/types/api/response";
 
-/** admin 依據event id 取得活動詳細資料 */
-export async function GET(
+/** admin 依據event id 退回活動申請 */
+export async function PATCH(
   req: NextRequest,
-): Promise<NextResponse<GetAdminEventByIdSuccessResponse | ErrorResponse>> {
+): Promise<NextResponse<PatchAdminApproveEventSuccessResponse | ErrorResponse>> {
 
   /* 1. 取 access_token（可改成 Authorization Bearer） */
   const token =
@@ -20,7 +20,7 @@ export async function GET(
       { status: 401 }
     );
   }
-  const eventId = req.nextUrl.searchParams.get('eventId')
+  const { eventId, reason } = await req.json();
   if (!eventId) {
     return NextResponse.json(
       { status: "error", message: "缺少活動id" },
@@ -30,8 +30,9 @@ export async function GET(
 
   try {
     /* 2. 轉呼後端 API */
-    const res: AxiosResponse<GetAdminEventByIdSuccessResponse> = await axiosInstance.get(
-      `/admin/events/${eventId}`,
+    const res: AxiosResponse<PatchAdminApproveEventSuccessResponse> = await axiosInstance.patch(
+      `/admin/events/${eventId}/reject`,
+      {reason},
       {
         headers: { Cookie: `access_token=${token}` },
         withCredentials: true,

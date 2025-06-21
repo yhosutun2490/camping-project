@@ -99,3 +99,13 @@ export type EventByIdResponse = {
 };
 
 export type GetAdminEventByIdSuccessResponse = SuccessResponse<EventByIdResponse>;
+
+export type PatchAdminApproveEventSuccessResponse = SuccessResponse<{
+  status: 'success',
+  message: "活動已通過審核並成功上架"
+}>
+
+export type PatchAdminRejectEventSuccessResponse = SuccessResponse<{
+  status: 'error',
+  message: "活動資訊缺少地點與報名限制，請補充後再送出審核"
+}>

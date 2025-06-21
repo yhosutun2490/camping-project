@@ -1,7 +1,7 @@
 import axios from 'axios'
 import useSWR, { mutate } from 'swr'
 import useSWRMutation from 'swr/mutation'
-import type { GetAdminEventByIdSuccessResponse } from '@/types/api/admin'
+import type { GetAdminEventByIdSuccessResponse, PatchAdminApproveEventSuccessResponse } from '@/types/api/admin'
 
 
 /* 讓別的元件能直接用 SWR cache 讀取 */
@@ -29,4 +29,46 @@ export function useAdminEventFetcher() {
   )
 
   return { trigger, isMutating, data, error }
+}
+
+/** Admin活動審核通過 */
+export function useAdminApproveEvent() {
+  const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/admin/events/:id/approve",
+    async (_key: string, { arg: payload }: { arg: {eventId: string} }) => {
+      const res = await axios.patch<PatchAdminApproveEventSuccessResponse>(
+        "/api/admin/events/approve",
+        payload
+      );
+      return res;
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+  };
+}
+
+/** Admin活動審核g失敗(退回) */
+export function useAdminRejectEvent() {
+  const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/admin/events/:id/reject",
+    async (_key: string, { arg: payload }: { arg: {eventId: string} }) => {
+      const res = await axios.patch<PatchAdminApproveEventSuccessResponse>(
+        "/api/admin/events/reject",
+        payload
+      );
+      return res;
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+  };
 }
