@@ -99,14 +99,14 @@ export default function ReviewActivityRow({ event }: Props) {
           </DialogModal>
         </div>
 
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap space-x-2 items-center">
           <p className="heading-7 text-neutral-950">{event.title}</p>
           <label htmlFor={`${event.id}-content`} className="cursor-pointer">
             <span
-              className="underline 
+              className="underline text-sm
           text-gray-500 whitespace-nowrap cursor-pointer"
             >
-              內容
+              詳細文案內容
             </span>
           </label>
           <DialogModal

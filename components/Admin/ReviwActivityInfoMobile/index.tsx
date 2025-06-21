@@ -4,7 +4,7 @@ import BadgeStatus from "@/components/Admin/BadgeStatus";
 import ApproveButtonList from "@/components/Admin/ApproveButtonList";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
-import { useRef } from "react";
+import { useRef, useId } from "react";
 
 interface Props {
   event: EventInfo;
@@ -13,6 +13,11 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
   const planMaxPrice = Math.max(...event.plans.map((p) => p.price));
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
+
+  const uid = useId();                // 產生全域唯一、且穩定的 ID
+  const imagesId   = `${uid}-${event.id}`;       // 行動版圖片 modal
+  const contentId  = `${uid}-${event.id}-content`; // 行動版文案 modal
+
   function sliceDate(date: string): string {
     return date.slice(0, 10);
   }
@@ -44,7 +49,6 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
         <input type="checkbox" />
         <div className="z-5 collapse-title flex gap-[12px] text-sm md:heading-5 text-neutral-950 pointer-events-none">
           <label
-            htmlFor={`${event.id}`}
             className="cursor-pointer relative pointer-events-auto h-25"
             onClick={handleClickCover}
           >
@@ -70,7 +74,6 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
                 status={event.active === "pending" ? "pending" : "reject"}
               />
               <label
-                htmlFor={`${event.id}-content`}
                 className="cursor-pointer pointer-events-auto"
                 onClick={handleClickContent}
               >
@@ -106,7 +109,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
         </div>
         <ApproveButtonList className="flex-row justify-between mb-4 px-4" />
       </div>
-      <DialogModal id={`${event.id}-content`} modalRef={eventContentModalRef}>
+      <DialogModal id={contentId} modalRef={eventContentModalRef}>
         <ActivityModalContent
           handleCloseContentModal={handleCloseContentModal}
           content={{
@@ -119,7 +122,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           }}
         />
       </DialogModal>
-      <DialogModal id={`${event.id}`} modalRef={imagesModalRef}>
+      <DialogModal id={imagesId} modalRef={imagesModalRef}>
         <div className="event_photos_details flex flex-col space-y-2 items-center">
           <div className="w-full heading-5 flex justify-between items-center text-primary-500">
             <p>活動圖片</p>
