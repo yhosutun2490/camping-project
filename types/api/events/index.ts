@@ -1,4 +1,4 @@
-import { SuccessResponse } from "@/types/api/response";
+import { SuccessResponse, SuccessResponseNoData } from "@/types/api/response";
 
 // 活動建立請求參數介面
 export interface CreateEventRequest {
@@ -160,6 +160,9 @@ export interface UpdateEventPlansRequest {
 export type UpdateEventPlansResponse = SuccessResponse<{
   message: string;
 }>;
+
+// 刪除活動方案回應介面
+export type DeleteEventPlanResponse = SuccessResponseNoData;
 
 // 更新活動請求參數介面
 export interface UpdateEventRequest {

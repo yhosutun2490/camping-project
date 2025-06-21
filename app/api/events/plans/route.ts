@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import axiosInstance from "@/api/axiosIntance";
 import { formatAxiosError } from "@/utils/errors";
-import { CreateEventPlansRequest, CreateEventPlansResponse, UpdateEventPlansRequest, UpdateEventPlansResponse } from "@/types/api/events";
+import { CreateEventPlansRequest, CreateEventPlansResponse, UpdateEventPlansRequest, UpdateEventPlansResponse, DeleteEventPlanResponse } from "@/types/api/events";
 import { ErrorResponse } from "@/types/api/response";
 
 /**
@@ -233,6 +233,109 @@ export async function PATCH(
     }
   } catch (error: unknown) {
     console.error("💥 處理活動方案更新時發生嚴重錯誤:", error);
+    console.error("🚨 錯誤堆疊:", error instanceof Error ? error.stack : "無堆疊資訊");
+    
+    // 處理 JSON 解析錯誤或其他未預期錯誤
+    return NextResponse.json<ErrorResponse>(
+      { status: "error", message: "伺服器錯誤，請稍後再試" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * 刪除活動方案的 API 路由處理函式
+ * 需登入並擁有活動主辦權限，用來刪除指定活動的特定方案
+ */
+export async function DELETE(
+  req: NextRequest
+): Promise<NextResponse<DeleteEventPlanResponse | ErrorResponse>> {
+  
+  try {
+    
+    // 檢查用戶是否已登入
+    const accessToken = req.headers.get("access_token");
+    
+    if (!accessToken) {
+      return NextResponse.json<ErrorResponse>(
+        { status: "failed", message: "請先登入會員" },
+        { status: 401 }
+      );
+    }
+
+    // 解析請求體，包含 eventId 和 planId
+    let requestBody: { eventId: string; planId: string };
+    
+    try {
+      requestBody = await req.json();
+    } catch (parseError) {
+      console.error("❌ 請求體解析失敗:", parseError);
+      return NextResponse.json<ErrorResponse>(
+        { status: "failed", message: "請求格式錯誤" },
+        { status: 400 }
+      );
+    }
+
+    const { eventId, planId } = requestBody;
+  
+    // 檢查活動 ID 和方案 ID 是否存在
+    if (!eventId || !planId) {
+      return NextResponse.json<ErrorResponse>(
+        { status: "failed", message: "缺少活動 ID 或方案 ID" },
+        { status: 400 }
+      );
+    }
+    
+    console.log("🗑️ 刪除活動方案請求 - 活動 ID:", eventId, "方案 ID:", planId);
+
+    try {
+      // 發送請求到後端 API，使用路徑參數
+      const response = await axiosInstance.delete<DeleteEventPlanResponse>(
+        `/events/${eventId}/plans/${planId}`,
+        {
+          headers: {
+            Cookie: `access_token=${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("✅ 後端 API 回應:", response.data);
+
+      // 返回成功回應
+      return NextResponse.json<DeleteEventPlanResponse>(response.data, { status: 200 });
+      
+    } catch (error: unknown) {
+      console.error("🐛 API 錯誤詳情:", error);
+      
+      // 處理 Axios 錯誤
+      const apiErr = formatAxiosError(error);
+
+      // 依據不同錯誤代碼回傳不同錯誤訊息
+      if (apiErr.httpCode === 400) {
+        return NextResponse.json<ErrorResponse>(
+          { status: "failed", message: "缺少活動 ID 或 plans 為空" },
+          { status: 400 }
+        );
+      } else if (apiErr.httpCode === 403) {
+        return NextResponse.json<ErrorResponse>(
+          { status: "failed", message: "非該活動主辦方" },
+          { status: 403 }
+        );
+      } else if (apiErr.httpCode === 404) {
+        return NextResponse.json<ErrorResponse>(
+          { status: "error", message: apiErr.message.includes("eventId") ? "eventId 不存在" : "planId 錯誤或不屬於此活動" },
+          { status: 404 }
+        );
+      } else {
+        return NextResponse.json<ErrorResponse>(
+          { status: "error", message: "伺服器錯誤，請稍後再試" },
+          { status: 500 }
+        );
+      }
+    }
+  } catch (error: unknown) {
+    console.error("💥 處理活動方案刪除時發生嚴重錯誤:", error);
     console.error("🚨 錯誤堆疊:", error instanceof Error ? error.stack : "無堆疊資訊");
     
     // 處理 JSON 解析錯誤或其他未預期錯誤

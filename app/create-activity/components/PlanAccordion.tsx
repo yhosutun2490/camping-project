@@ -10,6 +10,7 @@ import { FormData } from '../schema/formDataSchema';
 import PlanAccordionItem from './PlanAccordionItem';
 import { useCreateEventPlans } from '@/swr/events/useCreateEventPlans';
 import { useUpdateEventPlans } from '@/swr/events/useUpdateEventPlans';
+import { useDeleteEventPlan } from '@/swr/events/useDeleteEventPlan';
 import { CreateEventPlansRequest, UpdateEventPlansRequest } from '@/types/api/events';
 import toast from 'react-hot-toast';
 import { Icon } from '@iconify/react';
@@ -43,6 +44,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
     // 整合 hooks
     const { createEventPlans } = useCreateEventPlans();
     const { updateEventPlans } = useUpdateEventPlans();
+    const { trigger: deleteEventPlan } = useDeleteEventPlan();
 
     /**
      * 將表單資料轉換為建立 API 請求格式
@@ -161,20 +163,46 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
 
     // 刪除方案
     const handleDeletePlan = useCallback(
-      (index: number) => {
+      async (index: number) => {
         if (fields.length <= 1) return;
 
         // 添加確認對話框
         if (window.confirm(`確定要刪除方案 ${index + 1} 嗎？`)) {
-          remove(index);
+          // 從表單值中取得實際的方案資料，而不是從 fields 陣列
+          const formValues = getValues('plans');
+          const planToDelete = formValues[index];
 
-          // 更新展開狀態
-          setExpandedPlans((prev) =>
-            prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
-          );
+          console.log('🔍 刪除方案 (從 fields):', fields[index]);
+          console.log('🔍 刪除方案 (從表單值):', planToDelete);
+          
+          // 如果是編輯模式且方案有 ID，則呼叫刪除 API
+          if (isEditMode && planToDelete?.id && eventId) {
+            try {
+              await deleteEventPlan(eventId, planToDelete.id);
+              
+              // API 呼叫成功後，從表單中移除
+              remove(index);
+              
+              // 更新展開狀態
+              setExpandedPlans((prev) =>
+                prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
+              );
+            } catch (error) {
+              console.error('❌ 刪除方案失敗:', error);
+              // 錯誤已在 useDeleteEventPlan hook 中處理，這裡不需要額外處理
+            }
+          } else {
+            // 建立模式或方案沒有 ID，直接從表單中移除
+            remove(index);
+
+            // 更新展開狀態
+            setExpandedPlans((prev) =>
+              prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
+            );
+          }
         }
       },
-      [fields.length, remove]
+      [fields, isEditMode, eventId, deleteEventPlan, remove, getValues]
     );
 
     // 切換方案面板展開/收起

@@ -49,6 +49,8 @@ function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormDataEdi
     })) || []
   })) || [];
 
+  console.log('轉換後的方案資料:', plans);
+
   // 轉換通知資料
   const eventNotifications = apiData.notices
     ?.filter(notice => notice.type === 'event')
