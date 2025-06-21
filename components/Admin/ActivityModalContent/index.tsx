@@ -1,7 +1,7 @@
-import type { EventInfo } from "@/types/api/event/eventById";
+import type { EventDetail } from "@/types/api/admin";
 type EventModalInfo = Pick<
-  EventInfo,
-  "id" | "title" | "description" | "cancel_policy" | "notices" | "plans"
+  EventDetail,
+  "id" | "title" | "description" | "cancel_policy" | "eventPlanBox"
 >;
 
 interface Props {
@@ -10,7 +10,6 @@ interface Props {
 }
 export default function ActivityModalContent({ content,handleCloseContentModal }: Props) {
 
- 
   return (
     <div className="event_details flex flex-col">
       <div className="flex items-center justify-between">
@@ -27,18 +26,18 @@ export default function ActivityModalContent({ content,handleCloseContentModal }
           <p className="text-neutral-950"> {content.cancel_policy} </p>
         </li>
         <div className="plans"></div>
-        <li className="notices space-y-2">
+        {/* <li className="notices space-y-2">
           <p className="text-primary-500">注意事項:</p>
           <ul className="content text-neutral-950 list-disc list-inside p-2 border rounded-2xl border-primary-500 space-y-1">
             {content.notices.map((notice) => {
               return <li key={notice.id}>{notice.content}</li>;
             })}
           </ul>
-        </li>
+        </li> */}
         <li className="plans space-y-2">
           <p className="text-primary-500">方案內容:</p>
           <ul className="content space-y-4 text-neutral-950">
-            {content.plans.map((plan, index) => {
+            {content?.eventPlanBox.map((plan, index) => {
               return (
                 <li key={plan.id} className="p-2 border rounded-2xl border-primary-500">
                   <p>方案 {index + 1}</p>

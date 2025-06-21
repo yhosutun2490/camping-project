@@ -66,7 +66,7 @@ export default function MemberMenu({ user }: PropsType) {
   const filteredList = list.filter(({ link }) => {
     // 1) /host* → host、admin 都能看
     if (link.startsWith("/host")) {
-      return memberRole === "host" || memberRole === "admin";
+      return memberRole === "host";
     }
 
     // 2) /admin* → 只有 admin 能看

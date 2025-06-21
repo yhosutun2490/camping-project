@@ -6,7 +6,9 @@ import clsx from "clsx";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
 import { useRef, useState } from "react";
-import type {EventSummary} from "@/types/api/admin"
+import type {EventSummary,EventPhoto,EventDetail} from "@/types/api/admin"
+import { useAdminEventFetcher } from '@/swr/admin/event/useAdminEvent'
+
 
 interface Props {
   event: EventSummary;
@@ -20,26 +22,63 @@ export default function ReviewActivityRow({ event }: Props) {
   const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
+
+  // 取得活動單一資料swr
+  const {trigger:getAdminEventById} = useAdminEventFetcher()
   
   // 審核圖片資料
-  const [photoDetail, setPhotoDetail] = useState<Array<{ id: string; photo_url: string; description?: string }>>([]);
-  const [loadingPhotos, setLoadingPhotos] = useState<boolean>(false);
-  const [photoErr, setPhotoErr] = useState<string | null>(null);
+  const [photoDetail, setPhotoDetail] = useState<EventPhoto[]>([]);
+
+  type EditableKeys =
+  | 'id'
+  | 'title'
+  | 'cancel_policy'
+  | 'description'
+  | 'eventPlanBox';        // 同上，若 plans 在別的巢狀就另外定義
+
+
+  type EventContent = Partial<Pick<EventDetail, EditableKeys>>;
 
   // 審核內容資料
-  const [contentDetail, setContentDetail] = useState<{
-    title?: string;
-    cancel_policy?: string;
-    description?: string;
-    notices?: string;
-    plans?: any;
-    id?: string;
-  }>({});
-  const [loadingContents, setLoadingContents] = useState<boolean>(false);
-  const [contentErr, seContentErr] = useState<string | null>(null);
+  const [contentDetail, setContentDetail] = useState<EventContent>({
+      id:  "",
+      title: "",
+      cancel_policy: "",
+      description: "",
+      eventPlanBox: []
+  });
 
 
+  async function handleOpenImageModal (e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      const res = await getAdminEventById({ eventId: event.id })
+      const photoBox = res.data.eventPhotoBox
+      setPhotoDetail(photoBox)
+      if (imagesModalRef.current) imagesModalRef.current.click()
+    } catch(err) {
+      console.log("取得活動image有誤",err)
+    }
+  }
 
+  async function handleOpenContentModal (e: React.MouseEvent) {
+    e.stopPropagation();
+    try {
+      const res = await getAdminEventById({ eventId: event.id })
+      const eventData = res.data
+      const contentBox = {
+          id: eventData.id,
+          title: eventData.title,
+          cancel_policy: eventData.cancel_policy,
+          description: eventData.description,
+          eventPlanBox: eventData.eventPlanBox
+      }
+      setContentDetail(contentBox)
+      if (eventContentModalRef.current) eventContentModalRef.current.click()
+    } catch(err) {
+      console.log("取得活動內容有誤",err)
+    }
+  }
 
 
   function handleCloseImagesModal(e: React.MouseEvent) {
@@ -70,7 +109,7 @@ export default function ReviewActivityRow({ event }: Props) {
       {/* 活動內容（圖片 + 文案） */}
       <div className="flex flex-col items-start gap-3">
         <div className="relative image_row flex flex-wrap gap-2 cursor-pointer rounded-2xl">
-          <label htmlFor={event.id} className="cursor-pointer">
+          <label className="cursor-pointer" onClick={handleOpenImageModal}>
             <ImageSkeleton
               key={event.id}
               src={event.cover_photo_url}
@@ -121,11 +160,11 @@ export default function ReviewActivityRow({ event }: Props) {
           </DialogModal>
         </div>
 
-        <div className="flex flex-wrap space-x-2 items-center">
+        <div className="flex flex-col space-x-2 items-start">
           <p className="heading-7 text-neutral-950">{event.title}</p>
-          <label htmlFor={`${event.id}-content`} className="cursor-pointer">
+          <label className="cursor-pointer" onClick={handleOpenContentModal}>
             <span
-              className="underline text-sm
+              className="underline text-sm 
           text-gray-500 whitespace-nowrap cursor-pointer"
             >
               詳細文案內容
@@ -138,12 +177,11 @@ export default function ReviewActivityRow({ event }: Props) {
             <ActivityModalContent
               handleCloseContentModal={handleCloseContentModal}
               content={{
-                id: event.id,
+                id: contentDetail.id ?? "",
                 title: contentDetail.title ?? "",
                 cancel_policy: contentDetail.cancel_policy ?? "",
-                description: contentDetail.description ?? '',
-                notices: Array.isArray(contentDetail.notices) ? contentDetail.notices : [],
-                plans: contentDetail.plans ?? [],
+                description: contentDetail.description ?? "",
+                eventPlanBox: contentDetail.eventPlanBox ?? []
               }}
             />
           </DialogModal>

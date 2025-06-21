@@ -25,8 +25,8 @@ export default async function MemberLayout({
 
   return (
     <div
-      className="member_page_layout
-    grid md:grid-cols-[304px_1fr] min-h-0 px-[5%] lg:px-[8%] xl:px-[15%] pt-[40px] gap-10"
+      className="admin_page_layout
+    grid md:grid-cols-[304px_1fr] min-h-0 px-[5%] lg:px-[8%] xl:px-[15%] py-[40px] gap-10"
     >
       <SidebarToggle
         memberInfo={{

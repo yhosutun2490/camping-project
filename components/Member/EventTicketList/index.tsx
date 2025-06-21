@@ -57,7 +57,7 @@ export default function EventTicketList({ordersPaid, ordersRefunding ,ordersRefu
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-      {activeTicketList.map((ticket: (typeof incoming)[number]) => (
+      {activeTicketList.length? activeTicketList.map((ticket: (typeof incoming)[number]) => (
         <EventTicketCard
           key={ticket.id}
           imageUrl={ticket.event_info.image ?? ""}
@@ -68,7 +68,7 @@ export default function EventTicketList({ordersPaid, ordersRefunding ,ordersRefu
           date={ticket.event_info.date}
           price={ticket.total_price}
         />
-      ))}
+      )) : <p className="heading-4 text-primary-500">尚無目前符合條件的票卷</p>}
     </div>
   );
 }

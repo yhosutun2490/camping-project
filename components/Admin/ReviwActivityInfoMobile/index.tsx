@@ -1,10 +1,11 @@
 "use client";
-import type { EventSummary } from "@/types/api/admin";
 import ImageSkeleton from "@/components/ImageSkeleton";
 import BadgeStatus from "@/components/Admin/BadgeStatus";
 import ApproveButtonList from "@/components/Admin/ApproveButtonList";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
+import type { EventSummary, EventPhoto, EventDetail } from "@/types/api/admin";
+import { useAdminEventFetcher } from "@/swr/admin/event/useAdminEvent";
 import { useRef, useId, useState } from "react";
 
 interface Props {
@@ -14,42 +15,67 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
   const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
+  // 取得活動單一資料swr
+  const { trigger: getAdminEventById } = useAdminEventFetcher();
 
   const uid = useId(); // 產生全域唯一、且穩定的 ID
   const imagesId = `${uid}-${event.id}`; // 行動版圖片 modal
   const contentId = `${uid}-${event.id}-content`; // 行動版文案 modal
 
   // 審核圖片資料
-  const [photoDetail, setPhotoDetail] = useState<
-    Array<{ id: string; photo_url: string; description?: string }>
-  >([]);
-  const [loadingPhotos, setLoadingPhotos] = useState<boolean>(false);
-  const [photoErr, setPhotoErr] = useState<string | null>(null);
+  const [photoDetail, setPhotoDetail] = useState<EventPhoto[]>([]);
+
+  type EditableKeys =
+    | "id"
+    | "title"
+    | "cancel_policy"
+    | "description"
+    | "eventPlanBox"; // 同上，若 plans 在別的巢狀就另外定義
+
+  type EventContent = Partial<Pick<EventDetail, EditableKeys>>;
 
   // 審核內容資料
-  const [contentDetail, setContentDetail] = useState<{
-    title?: string;
-    cancel_policy?: string;
-    description?: string;
-    notices?: string;
-    plans?: any;
-    id?: string;
-  }>({});
-  const [loadingContents, setLoadingContents] = useState<boolean>(false);
-  const [contentErr, seContentErr] = useState<string | null>(null);
+  const [contentDetail, setContentDetail] = useState<EventContent>({
+    id: "",
+    title: "",
+    cancel_policy: "",
+    description: "",
+    eventPlanBox: [],
+  });
 
   function sliceDate(date: string): string {
     return date.slice(0, 10);
   }
 
-  function handleClickCover(e: React.MouseEvent) {
+  async function handleOpenImageModal(e: React.MouseEvent) {
     e.stopPropagation();
-    if (imagesModalRef.current) imagesModalRef.current?.click();
+    try {
+      const res = await getAdminEventById({ eventId: event.id });
+      const photoBox = res.data.eventPhotoBox;
+      setPhotoDetail(photoBox);
+      if (imagesModalRef.current) imagesModalRef.current.click();
+    } catch (err) {
+      console.log("取得活動image有誤", err);
+    }
   }
 
-  function handleClickContent(e: React.MouseEvent) {
+  async function handleOpenContentModal(e: React.MouseEvent) {
     e.stopPropagation();
-    if (eventContentModalRef.current) eventContentModalRef.current?.click();
+    try {
+      const res = await getAdminEventById({ eventId: event.id });
+      const eventData = res.data;
+      const contentBox = {
+        id: eventData.id,
+        title: eventData.title,
+        cancel_policy: eventData.cancel_policy,
+        description: eventData.description,
+        eventPlanBox: eventData.eventPlanBox,
+      };
+      setContentDetail(contentBox);
+      if (eventContentModalRef.current) eventContentModalRef.current.click();
+    } catch (err) {
+      console.log("取得活動內容有誤", err);
+    }
   }
 
   function handleCloseImagesModal(e: React.MouseEvent) {
@@ -70,7 +96,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
         <div className="z-5 collapse-title flex gap-[12px] text-sm md:heading-5 text-neutral-950 pointer-events-none">
           <label
             className="cursor-pointer relative pointer-events-auto h-25"
-            onClick={handleClickCover}
+            onClick={handleOpenImageModal}
           >
             <ImageSkeleton
               key={event.id}
@@ -95,7 +121,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
               />
               <label
                 className="cursor-pointer pointer-events-auto"
-                onClick={handleClickContent}
+                onClick={handleOpenContentModal}
               >
                 <span
                   className="underline 
@@ -131,14 +157,11 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
         <ActivityModalContent
           handleCloseContentModal={handleCloseContentModal}
           content={{
-            id: event.id,
+            id: contentDetail.id ?? "",
             title: contentDetail.title ?? "",
             cancel_policy: contentDetail.cancel_policy ?? "",
             description: contentDetail.description ?? "",
-            notices: Array.isArray(contentDetail.notices)
-              ? contentDetail.notices
-              : [],
-            plans: contentDetail.plans ?? [],
+            eventPlanBox: contentDetail.eventPlanBox ?? [],
           }}
         />
       </DialogModal>

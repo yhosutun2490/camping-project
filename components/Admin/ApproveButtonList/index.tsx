@@ -12,7 +12,8 @@ export default function ApproveButtonList({className}:Props) {
         <IconWrapper icon="mdi:check" className="text-white"></IconWrapper>
         通過
       </button>
-      <button className="btn-error  flex-grow-1 text-xs h-8 flex justify-center items-center gap-1">
+      <button className="cursor-pointer font-bold px-4 py-2 h-8 flex-grow-1 bg-orange-500 rounded-2xl 
+      text-white text-xs h-8 flex justify-center items-center gap-1 hover:bg-orange-700">
         <IconWrapper icon="mdi:close" className="text-white"></IconWrapper>
         退回
       </button>
