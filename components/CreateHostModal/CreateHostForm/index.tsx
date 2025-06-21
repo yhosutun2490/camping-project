@@ -70,7 +70,14 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
       ref,
       () => ({
         resetForm: () => {
-          reset();
+          reset({
+            name: '',
+            description: '',
+            email: '',
+            phone: '',
+            photo: null,
+            photo_background: null,
+          });
           clearErrors();
           setAvatarPreview(null);
           setBackgroundPreview(null);
@@ -197,13 +204,17 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
               className="object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-              <Icon
-                icon="material-symbols:image-outline"
-                className="text-gray-400"
-                width={48}
-                height={48}
-              />
+            <div className={`w-full h-full bg-gray-100 flex items-center justify-center ${
+              errors.photo_background ? 'bg-red-50' : ''
+            }`}>
+              <div className="text-center">
+                <Icon
+                  icon="material-symbols:image-outline"
+                  className={errors.photo_background ? 'text-[#AB5F5F]' : 'text-gray-400'}
+                  width={48}
+                  height={48}
+                />
+              </div>
             </div>
           )}
 
@@ -225,7 +236,7 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
             {backgroundPreview && (
               <Icon
                 icon="material-symbols:image-outline"
-                className={avatarPreview ? 'text-white' : 'text-gray-400'}
+                className={errors.photo_background ? 'text-[#AB5F5F]' : 'text-white'}
                 width={48}
                 height={48}
               />
@@ -237,10 +248,12 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
           </div>
 
           {/* 頭像 - 放在背景圖片區域的底部 */}
-          <div className="absolute left-10 bottom-0 transform translate-y-1/2 z-10">
+          <div className="absolute left-4 md:left-10 bottom-0 transform translate-y-1/2 z-10">
             <div className="relative">
               {/* 頭像容器 */}
-              <div className="w-24 h-24 rounded-full border-2 border-white overflow-hidden relative bg-white">
+              <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full border-2 overflow-hidden relative bg-white ${
+                errors.photo ? 'border-[#AB5F5F]' : 'border-white'
+              }`}>
                 {avatarPreview ? (
                   <Image
                     src={avatarPreview}
@@ -249,7 +262,16 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-100 flex items-center justify-center"></div>
+                  <div className={`w-full h-full bg-gray-100 flex items-center justify-center ${
+                    errors.photo ? 'bg-red-50' : ''
+                  }`}>
+                    <Icon
+                      icon="material-symbols:person"
+                      className={errors.photo ? 'text-[#AB5F5F]' : 'text-gray-400'}
+                      width={32}
+                      height={32}
+                    />
+                  </div>
                 )}
 
                 {/* 頭像點擊上傳遮罩 */}
@@ -262,10 +284,10 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
                   onClick={() => avatarInputRef.current?.click()}
                 >
                   <Icon
-                    icon="material-symbols:add-a-photo"
-                    className={avatarPreview ? 'text-white' : 'text-gray-400'}
-                    width={24}
-                    height={24}
+                    icon="material-symbols:person"
+                    className={avatarPreview ? 'text-white' : (errors.photo ? 'text-[#AB5F5F]' : 'text-gray-400')}
+                    width={32}
+                    height={32}
                   />
                 </div>
               </div>
@@ -283,7 +305,7 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
         </div>
 
         {/* 內容區域 */}
-        <div className="pt-12 px-10 pb-10">
+        <div className="pt-8 md:pt-12 px-4 md:px-10 pb-6 md:pb-10">
           <form
             onSubmit={handleSubmit(
               (data) => {
@@ -291,17 +313,31 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
               },
               (errors) => {
                 console.log('表單驗證錯誤:', errors);
-                toast.error('表單有錯誤，請檢查填寫的資料');
+                
+                // 檢查是否有圖片相關的錯誤
+                const hasPhotoError = errors.photo || errors.photo_background;
+                const hasFieldError = errors.name || errors.description || errors.email || errors.phone;
+                
+                if (hasPhotoError && hasFieldError) {
+                  toast.error('請填寫所有必填欄位並上傳頭像和背景圖片');
+                } else if (hasPhotoError) {
+                  toast.error('請上傳頭像和背景圖片');
+                } else if (hasFieldError) {
+                  toast.error('表單有錯誤，請檢查填寫的資料');
+                } else {
+                  toast.error('表單有錯誤，請檢查填寫的資料');
+                }
               }
             )}
             noValidate
           >
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6 mt-6">
               {/* 頭像和名稱區域 */}
               <div className="flex items-center gap-4">
                 {/* 名稱輸入框 */}
-                <div className="w-[300px]">
+                <div className="w-full max-w-[300px]">
                   <FormField
+                    required
                     label="名稱"
                     name="name"
                     error={errors.name?.message}
@@ -319,13 +355,14 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
               </div>
 
               {/* 背景簡介 */}
-              <div className="w-[624px]">
+              <div className="w-full max-w-[624px]">
                 <div className="flex flex-col gap-1">
                   <label className="text-[#4F4F4F] text-sm font-normal font-['Noto_Sans_TC'] leading-[1.5em]">
+                    <span className="text-[#AB5F5F]">*</span>
                     背景簡介
                   </label>
                   <div
-                    className={`bg-white border rounded-2xl px-4 py-3 h-[132px] ${
+                    className={`bg-white border rounded-2xl px-4 py-3 h-[120px] md:h-[132px] ${
                       errors.description
                         ? 'border-[#AB5F5F]'
                         : 'border-[#B0B0B0]'
@@ -334,7 +371,7 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
                     <textarea
                       {...register('description')}
                       placeholder="專業露營體驗策劃團隊，提供完善裝備與獨特自然環境，讓您遠離喧囂，擁抱大自然的美好時光。"
-                      className="w-full h-full text-[#121212] text-base font-normal font-['Noto_Sans_TC'] leading-[1.5em] bg-transparent border-none outline-none resize-none"
+                      className="w-full h-full text-[#121212] text-sm md:text-base font-normal font-['Noto_Sans_TC'] leading-[1.5em] bg-transparent border-none outline-none resize-none"
                     />
                   </div>
                   {errors.description && (
@@ -346,10 +383,11 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
               </div>
 
               {/* 電話號碼區域 */}
-              <div className="flex gap-6">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                 {/* 電話號碼 */}
-                <div className="w-[300px]">
+                <div className="w-full max-w-[300px]">
                   <FormField
+                    required
                     label="電話號碼"
                     name="phone"
                     error={errors.phone?.message}
@@ -368,8 +406,9 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
               </div>
 
               {/* 電子信箱 */}
-              <div className="w-[300px]">
+              <div className="w-full max-w-[300px]">
                 <FormField
+                  required
                   label="電子信箱"
                   name="email"
                   error={errors.email?.message}
@@ -386,18 +425,18 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
               </div>
 
               {/* 按鈕區域 */}
-              <div className="flex justify-start gap-3">
+              <div className="flex flex-col sm:flex-row justify-start gap-3">
                 <button
                   type="button"
                   onClick={close}
-                  className="bg-white text-[#4F4F4F] border border-[#B0B0B0] px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight"
+                  className="bg-white text-[#4F4F4F] border border-[#B0B0B0] px-4 md:px-6 py-3 md:py-4 rounded-2xl text-sm md:text-base font-semibold font-['Noto_Sans_TC'] leading-tight w-full sm:w-auto"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading || isSubmitting}
-                  className="bg-[#5C795F] text-white px-6 py-4 rounded-2xl text-base font-semibold font-['Noto_Sans_TC'] leading-tight flex items-center gap-1"
+                  className="bg-[#5C795F] text-white px-4 md:px-6 py-3 md:py-4 rounded-2xl text-sm md:text-base font-semibold font-['Noto_Sans_TC'] leading-tight flex items-center justify-center gap-1 w-full sm:w-auto"
                 >
                   {isLoading || isSubmitting ? (
                     <span className="loading loading-spinner loading-xs mr-2"></span>

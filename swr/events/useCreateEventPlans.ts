@@ -11,23 +11,14 @@ export function useCreateEventPlans() {
   const { isMutating, trigger: originalTrigger, error, data } = useSWRMutation(
     `/api/events/plans`,
     async (_key: string, { arg }: { arg: CreateEventPlansRequest & { eventId: string } }) => {
-      console.log("🚀 [useCreateEventPlans] Hook 開始執行");
-      console.log("📦 傳入參數:", JSON.stringify(arg, null, 2));
       
       try {
         // 檢查活動 ID 是否存在
         if (!arg.eventId) {
-          console.error("❌ 活動 ID 不存在");
           throw new Error("活動 ID 不存在，無法建立方案");
         }
         
-        console.log("🎯 目標活動 ID:", arg.eventId);
-        console.log("📝 方案數量:", arg.plans?.length || 0);
-        
         const { eventId, ...payload } = arg;
-        
-        console.log("📤 準備發送的請求載荷:", JSON.stringify({ eventId, ...payload }, null, 2));
-        console.log("📡 API 端點:", "/api/events/plans");
         
         const response = await axios.post<CreateEventPlansResponse>(
           "/api/events/plans", 
@@ -38,10 +29,6 @@ export function useCreateEventPlans() {
             },
           }
         );
-
-        console.log("✅ 活動方案建立成功");
-        console.log("📊 回應狀態:", response.status);
-        console.log("📄 回應資料:", JSON.stringify(response.data, null, 2));
 
         toast.success("活動方案建立成功");
         return response.data;

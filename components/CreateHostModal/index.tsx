@@ -1,5 +1,5 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import DialogModal from "@/components/DialogModal";
 import CreateHostForm from "@/components/CreateHostModal/CreateHostForm";
 import { useRouter } from "next/navigation";
@@ -40,6 +40,22 @@ export default function CreateHostModal({ onSuccess }: CreateHostModalProps) {
       router.push('/create-activity');
     }
   }
+
+  // 監聽 modal 關閉事件，重置表單狀態
+  useEffect(() => {
+    const modal = modalRef.current;
+    const handleChange = () => {
+      const isChecked = modal?.checked;
+      if (!isChecked) {
+        // 延遲重置表單，確保 modal 關閉動畫完成
+        setTimeout(() => {
+          formRef?.current?.resetForm();
+        }, 200);
+      }
+    };
+    modal?.addEventListener('change', handleChange);
+    return () => modal?.removeEventListener('change', handleChange);
+  });
 
   return (
     <>

@@ -42,8 +42,22 @@ export interface HostEvent {
   max_participants: number;
   /** 取消政策 */
   cancel_policy: string;
+  /** 報名開始時間 */
+  registration_open_time: string;
+  /** 報名結束時間 */
+  registration_close_time: string;
+  /** 報名總人數 */
+  signup_total: number;
+  /** 已付款人數 */
+  paid_count: number;
+  /** 是否開放報名 */
+  is_registration_open: boolean;
+  /** 剩餘名額 */
+  remaining_slots: number;
+  /** 報名率 */
+  signup_rate: number;
   /** 標籤列表 */
-  tags: string[];
+  tags: (string | null)[];
   /** 通知列表 */
   notices: EventNotice[];
   /** 活動圖片列表 */
