@@ -9,9 +9,11 @@ import { useFormContext, useFieldArray } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import PlanAccordionItem from './PlanAccordionItem';
 import { useCreateEventPlans } from '@/swr/events/useCreateEventPlans';
-import { CreateEventPlansRequest } from '@/types/api/events';
+import { useUpdateEventPlans } from '@/swr/events/useUpdateEventPlans';
+import { CreateEventPlansRequest, UpdateEventPlansRequest } from '@/types/api/events';
 import toast from 'react-hot-toast';
 import { Icon } from '@iconify/react';
+import { usePathname } from 'next/navigation';
 
 interface PlanAccordionProps {
   /** 活動 ID（用於 API 呼叫） */
@@ -25,6 +27,9 @@ export interface PlanAccordionRef {
 
 const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
   ({ eventId }, ref) => {
+    // 獲取當前路徑以判斷是建立模式還是編輯模式
+    const pathname = usePathname();
+    const isEditMode = pathname.includes('/edit-activity');
 
     // 從 formContext 獲取方法
     const { control, trigger, getValues } = useFormContext<FormData>();
@@ -35,19 +40,41 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       name: 'plans',
     });
 
-    // 整合 useCreateEventPlans hook
-    // 新版本不需要 eventId 參數
+    // 整合 hooks
     const { createEventPlans } = useCreateEventPlans();
+    const { updateEventPlans } = useUpdateEventPlans();
 
     /**
-     * 將表單資料轉換為 API 請求格式
+     * 將表單資料轉換為建立 API 請求格式
      * @param formPlans 表單中的方案資料
      * @returns API 請求格式的資料
      */
-    const convertFormDataToApiFormat = useCallback(
+    const convertFormDataToCreateApiFormat = useCallback(
       (formPlans: FormData['plans']): CreateEventPlansRequest => {
         return {
           plans: formPlans.map((plan) => ({
+            title: plan.title,
+            price: plan.price,
+            discounted_price: plan.discountPrice,
+            contents: plan.content?.map((item) => item.value) || [],
+            addons: plan.addOns || [],
+          })),
+        };
+      },
+      []
+    );
+
+    /**
+     * 將表單資料轉換為更新 API 請求格式
+     * @param formPlans 表單中的方案資料
+     * @returns API 請求格式的資料
+     */
+    const convertFormDataToUpdateApiFormat = useCallback(
+      (formPlans: FormData['plans']): UpdateEventPlansRequest => {
+        return {
+          plans: formPlans.map((plan) => ({
+            // 在編輯模式下，方案可能有 ID（用於更新）或沒有 ID（用於新增）
+            ...(plan.id && { id: plan.id }),
             title: plan.title,
             price: plan.price,
             discounted_price: plan.discountPrice,
@@ -70,23 +97,29 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           if (isValid) {
             if (eventId) {
               try {
-                // 獲取當前表單資料
-                const formData = getValues();
-                const apiData = convertFormDataToApiFormat(formData.plans);
+                // 取得表單資料
+                const formData = getValues('plans');
 
-                // 呼叫建立方案 API
-                // 新版本的 createEventPlans 需要兩個參數：payload, eventId
-                await createEventPlans(apiData, eventId);
+                if (isEditMode) {
+                  // 編輯模式：使用更新 API (PATCH)
+                  const updatePayload = convertFormDataToUpdateApiFormat(formData);
+                  
+                  await updateEventPlans(updatePayload, eventId);
+                } else {
+                  // 建立模式：使用建立 API (POST)
+                  const createPayload = convertFormDataToCreateApiFormat(formData);
+                  
+                  await createEventPlans(createPayload, eventId);
+                }
 
                 return true;
               } catch (error) {
-                console.error('建立方案時發生錯誤:', error);
-                toast.error('建立方案過程中發生錯誤，請稍後再試');
+                console.error('❌ 方案操作失敗:', error);
+                toast.error(isEditMode ? '方案更新過程中發生錯誤，請稍後再試' : '方案建立過程中發生錯誤，請稍後再試');
                 return false;
               }
             } else {
               // 如果沒有活動ID，則只是儲存表單資料到狀態
-              console.warn('沒有提供活動ID，略過方案建立');
               return true;
             }
           }
@@ -97,8 +130,11 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
         eventId,
         trigger,
         getValues,
-        convertFormDataToApiFormat,
+        isEditMode,
+        convertFormDataToCreateApiFormat,
+        convertFormDataToUpdateApiFormat,
         createEventPlans,
+        updateEventPlans,
       ]
     );
 

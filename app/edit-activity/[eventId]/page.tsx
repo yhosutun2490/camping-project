@@ -36,6 +36,7 @@ function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormData {
 
   // 轉換方案資料
   const plans = apiData.plans?.map(plan => ({
+    id: plan.id,
     title: plan.title,
     price: plan.price,
     discountPrice: plan.discounted_price || undefined,

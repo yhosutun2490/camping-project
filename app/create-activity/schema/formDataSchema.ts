@@ -198,6 +198,7 @@ const AddOnSchema = z.object({
 
 const PlanSchema = z
   .object({
+    id: z.string().optional(), // 用於更新時的方案 ID
     title: z.string().min(1, '請輸入方案標題').max(100, '最多100字'),
     price: z.number().min(0, '價格不可為負'),
     discountPrice: z.number().min(0, '價格不可為負').optional(),
