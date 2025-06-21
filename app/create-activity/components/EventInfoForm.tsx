@@ -268,7 +268,9 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
 
     return (
       <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
-        <h1 className="text-2xl font-semibold leading-normal text-[#121212]">創建活動</h1>
+        <h1 className="text-2xl font-semibold leading-normal text-[#121212]">
+          {eventId ? '編輯活動' : '建立活動'}
+        </h1>
 
         <div className="flex flex-col gap-6">
           {/* 活動主題 */}
