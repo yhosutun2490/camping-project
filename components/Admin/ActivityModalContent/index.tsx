@@ -13,7 +13,10 @@ export default function ActivityModalContent({ content,handleCloseContentModal }
  
   return (
     <div className="event_details flex flex-col">
-      <button className="btn-primary w-fit self-end" onClick={handleCloseContentModal}>關閉</button>
+      <div className="flex items-center justify-between">
+       <p className="heading-5 text-primary-500">活動內容</p>
+        <button className="btn-primary w-fit self-end" onClick={handleCloseContentModal}>關閉</button>
+      </div>  
       <ul className="space-y-2">
         <li className="description space-y-2">
           <p className="text-primary-500">活動描述:</p>
