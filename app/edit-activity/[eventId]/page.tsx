@@ -39,7 +39,7 @@ function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormDataEdi
     id: plan.id,
     title: plan.title,
     price: plan.price,
-    discountPrice: plan.discounted_price || undefined,
+    discountPrice: plan.discounted_price ?? 0,
     content: plan.eventPlanContentBox?.map(content => ({
       value: content.content
     })) || [],
