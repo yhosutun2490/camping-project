@@ -10,8 +10,6 @@ interface EditSuccessPageProps {
   eventId: string;
   /** 返回活動列表的回調函式 */
   onBackToActivities: () => void;
-  /** 查看活動詳情的回調函式 */
-  onViewActivity: () => void;
 }
 
 /**
@@ -20,7 +18,6 @@ interface EditSuccessPageProps {
  */
 function EditSuccessPage({ 
   onBackToActivities, 
-  onViewActivity,
   eventId
 }: EditSuccessPageProps) {
   const { getValues } = useFormContext<FormData>();
@@ -204,15 +201,7 @@ function EditSuccessPage({
         )}
 
         {/* 操作按鈕 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={onViewActivity}
-            className="flex items-center justify-center gap-2 bg-[#5C795F] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#354738] transition-colors shadow-sm"
-          >
-            <Icon icon="material-symbols:visibility" className="w-5 h-5" />
-            查看活動詳情
-          </button>
-          
+        <div className="flex justify-center">
           <button
             onClick={onBackToActivities}
             className="flex items-center justify-center gap-2 bg-white text-[#354738] px-6 py-3 rounded-lg font-medium border border-[#354738] hover:bg-[#f3f6f3] transition-colors"

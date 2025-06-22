@@ -223,13 +223,6 @@ const EditActivityForm: React.FC<EditActivityFormProps> = ({
   };
 
   /**
-   * 處理查看活動詳情
-   */
-  const handleViewActivity = () => {
-    router.push(`/event/${eventId}`);
-  };
-
-  /**
    * 獲取當前步驟的按鈕配置
    */
   const getStepButtonConfig = () => {
@@ -342,7 +335,6 @@ const EditActivityForm: React.FC<EditActivityFormProps> = ({
               <EditSuccessPage
                 eventId={eventId}
                 onBackToActivities={handleBackToActivities}
-                onViewActivity={handleViewActivity}
               />
             )}
           </div>
