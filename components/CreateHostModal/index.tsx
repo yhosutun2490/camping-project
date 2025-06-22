@@ -1,8 +1,8 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
 import DialogModal from "@/components/DialogModal";
 import CreateHostForm from "@/components/CreateHostModal/CreateHostForm";
-import { useRouter } from "next/navigation";
 
 // 表單操作的參考型別
 export type FormHandle = {
@@ -22,6 +22,10 @@ export default function CreateHostModal({ onSuccess }: CreateHostModalProps) {
   function closeModal(): void {
     if (modalRef.current) {
       modalRef.current.checked = false; // 關閉 modal
+      // 延遲重置表單，確保 modal 關閉動畫完成
+      setTimeout(() => {
+        formRef?.current?.resetForm();
+      }, 200);
     }
   }
 
@@ -34,35 +38,24 @@ export default function CreateHostModal({ onSuccess }: CreateHostModalProps) {
     if (onSuccess) {
       onSuccess();
     } else {
-      // 默認行為：導向建立活動頁面
-      // 刷新數據並導航到創建活動頁面
-      router.refresh();
-      router.push('/create-activity');
+      // 默認行為：重新載入資料並導向建立活動頁面
+      router.refresh(); // 重新載入伺服器組件資料
+      setTimeout(() => {
+        router.push('/create-activity');
+      }, 100);
     }
   }
-
-  // 監聽 modal 關閉事件，重置表單狀態
-  useEffect(() => {
-    const modal = modalRef.current;
-    const handleChange = () => {
-      const isChecked = modal?.checked;
-      if (!isChecked) {
-        // 延遲重置表單，確保 modal 關閉動畫完成
-        setTimeout(() => {
-          formRef?.current?.resetForm();
-        }, 200);
-      }
-    };
-    modal?.addEventListener('change', handleChange);
-    return () => modal?.removeEventListener('change', handleChange);
-  });
 
   return (
     <>
       <label htmlFor="create-host" className="flex items-center hover:text-primary-500 cursor-pointer">
         辦活動
       </label>
-      <DialogModal modalWidth="max-w-5xl" id="create-host" modalRef={modalRef}>
+      <DialogModal 
+        modalWidth="max-w-5xl" 
+        id="create-host" 
+        modalRef={modalRef}
+      >
         <p className="text-3xl text-base-200 text-center">
           成為主辦方
         </p>

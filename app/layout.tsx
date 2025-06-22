@@ -4,6 +4,7 @@ import HeaderNavBar from "@/components/HeaderNavBar";
 import Toast from "@/components/Toast";
 import LayoutContentWrapper from "@/components/LayoutContentWrapper";
 import { getUserInfo } from "@/api/server-components/checkUser"
+import { Metadata } from "next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +16,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-  
+export const metadata: Metadata = {
+  title: "森森不息 - 走進森林享受不息的感動",
+  description: "探索露營活動，享受大自然的美好",
+  icons: {
+    icon: '/header/logo_icon.svg'
+  }
+};
 
 export default async function RootLayout({
   children,

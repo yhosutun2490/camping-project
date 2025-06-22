@@ -3,18 +3,39 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useHostEvents } from '@/swr/host/useHostEvents';
 import { useEventTags } from '@/swr/meta/useEventTags';
 import { useSubmitEvent } from '@/swr/events/useSubmitEvent';
+import { useHostEventDetail } from '@/swr/events/useHostEventDetail';
 import type { EventStatus } from '@/types/api/host/events';
 
-// 不同狀態對應的樣式
-const statusStyles: Record<EventStatus, string> = {
-  草稿: 'bg-[#E7E7E7] text-[#6D6D6D]',
-  已發布: 'bg-[#E3E9E2] text-[#5C795F]',
-  已取消: 'bg-[#FFDBDB] text-[#AB5F5F]',
-  已結束: 'bg-[#FFDBDB] text-[#AB5F5F]',
+// 狀態映射對照表 - 將英文狀態轉換為中文顯示
+const statusMapping: Record<string, string> = {
+  // 英文狀態
+  'draft': '草稿',
+  'pending': '審核中', 
+  'published': '已發佈',
+  'archived': '已下架',
+  // 中文狀態（直接對應）
+  '草稿': '草稿',
+  '審核中': '審核中',
+  '已發佈': '已發佈', 
+  '已下架': '已下架',
+};
+
+// 狀態轉換函式
+const getDisplayStatus = (status: EventStatus): string => {
+  return statusMapping[status] || status;
+};
+
+// 不同狀態對應的樣式 - 全新設計
+const statusStyles: Record<string, string> = {
+  '草稿': 'bg-[#F6F6F6] text-[#6D6D6D] border border-[#E7E7E7]',
+  '審核中': 'bg-[#FFF7E6] text-[#D4A056] border border-[#F0D999]',
+  '已發佈': 'bg-[#E3E9E2] text-[#5C795F] border border-[#A1B4A2]',
+  '已下架': 'bg-[#FFEBEE] text-[#AB5F5F] border border-[#D4A5A5]'
 };
 
 // 日期格式化函式
@@ -27,17 +48,41 @@ const formatDate = (dateString: string) => {
 };
 
 function HostActivities() {
+  const router = useRouter();
   const [activeTag, setActiveTag] = useState<string>('');
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
 
   // 使用 API hook 取得主辦方活動資料和活動標籤
-  const { events, error, isLoading } = useHostEvents();
+  const { events, error, isLoading } = useHostEvents(activeTag);
   const {
     data: tagsData,
     error: tagsError,
     isLoading: tagsLoading,
   } = useEventTags();
   const { submitEvent } = useSubmitEvent();
+  const { getEventDetail } = useHostEventDetail();
+
+  // 處理編輯活動
+  const handleEditEvent = async (eventId: string) => {
+    try {
+      setLoadingEventId(eventId);
+      // 先取得活動詳情
+      const response = await getEventDetail({ eventId });
+      
+      if (response?.data) {
+        // 如果成功取得活動資料，導向編輯頁面
+        router.push(`/edit-activity/${eventId}`);
+      } else {
+        toast.error('無法取得活動資料');
+      }
+    } catch (error) {
+      console.error('取得活動詳情失敗:', error);
+      toast.error('取得活動資料失敗，請稍後再試');
+    } finally {
+      setLoadingEventId(null);
+    }
+  };
 
   // 處理提交活動審核
   const handleSubmitEvent = async (eventId: string) => {
@@ -117,9 +162,9 @@ function HostActivities() {
         {eventTags.map((tag) => (
           <button
             key={tag.id}
-            onClick={() => setActiveTag(tag.id)}
+            onClick={() => setActiveTag(tag.name)}
             className={`flex items-center gap-1 px-2 py-1 rounded-2xl border text-sm font-normal transition-colors ${
-              activeTag === tag.id
+              activeTag === tag.name
                 ? 'bg-[#F3F6F3] border-[#5C795F] text-[#5C795F]'
                 : 'bg-white border-transparent text-[#6D6D6D]'
             }`}
@@ -169,11 +214,11 @@ function HostActivities() {
                     </h3>
                     <div className="flex items-center gap-1">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-normal ${
-                          statusStyles[activity.active]
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          statusStyles[getDisplayStatus(activity.active)]
                         }`}
                       >
-                        {activity.active}
+                        {getDisplayStatus(activity.active)}
                       </span>
                       <button
                         onClick={() =>
@@ -267,18 +312,19 @@ function HostActivities() {
                 {/* 編輯按鈕 */}
                 <div className="flex gap-2">
                   <button
+                    onClick={() => handleEditEvent(activity.event_id)}
                     className={`flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors ${
-                      activity.active !== '草稿'
+                      getDisplayStatus(activity.active) !== '草稿'
                         ? 'bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed'
                         : 'bg-white text-[#121212] hover:bg-gray-50 border border-gray-200'
                     }`}
-                    disabled={activity.active !== '草稿'}
+                    disabled={getDisplayStatus(activity.active) !== '草稿'}
                   >
-                    編輯
+                    {loadingEventId === activity.event_id ? '載入中...' : '編輯'}
                   </button>
 
                   {/* 上架按鈕 - 只有草稿狀態才顯示 */}
-                  {activity.active === '草稿' && (
+                  {getDisplayStatus(activity.active) === '草稿' && (
                     <button
                       onClick={() => handleSubmitEvent(activity.event_id)}
                       className="flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors bg-[#5C795F] text-white hover:bg-[#4A6B4D]"
@@ -367,11 +413,11 @@ function HostActivities() {
               {/* 狀態 */}
               <div className="flex justify-center">
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-normal ${
-                    statusStyles[activity.active]
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    statusStyles[getDisplayStatus(activity.active)]
                   }`}
                 >
-                  {activity.active}
+                  {getDisplayStatus(activity.active)}
                 </span>
               </div>
 
@@ -397,7 +443,7 @@ function HostActivities() {
               {/* 編輯按鈕 */}
               <div className="flex flex-col justify-end gap-2">
                 {/* 上架按鈕 - 只有草稿狀態才顯示 */}
-                {activity.active === '草稿' && (
+                {getDisplayStatus(activity.active) === '草稿' && (
                   <button
                     onClick={() => handleSubmitEvent(activity.event_id)}
                     className="px-4 py-2 rounded-2xl text-sm font-semibold transition-colors bg-[#5C795F] text-white hover:bg-[#4A6B4D]"
@@ -406,14 +452,15 @@ function HostActivities() {
                   </button>
                 )}
                 <button
+                  onClick={() => handleEditEvent(activity.event_id)}
                   className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-colors ${
-                    activity.active !== '草稿'
+                    getDisplayStatus(activity.active) !== '草稿'
                       ? 'bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed'
                       : 'bg-white text-[#121212] hover:bg-gray-50'
                   }`}
-                  disabled={activity.active !== '草稿'}
+                  disabled={getDisplayStatus(activity.active) !== '草稿'}
                 >
-                  編輯
+                  {loadingEventId === activity.event_id ? '載入中...' : '編輯'}
                 </button>
               </div>
             </div>

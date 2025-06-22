@@ -1,66 +1,36 @@
 'use client';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { FormData } from '../schema/formDataSchema';
-import { useRouter } from 'next/navigation';
+import { FormData } from '@/app/create-activity/schema/formDataSchema';
 import { Icon } from '@iconify/react';
 import { useEventTags } from '@/swr/meta/useEventTags';
-import { useHostEvents } from '@/swr/host/useHostEvents';
 
-interface ActivityCreationSuccessProps {
+interface EditSuccessPageProps {
   /** 活動 ID */
   eventId: string;
-  /** 建立新活動的回調函式 */
-  onCreateNewActivity?: () => void;
+  /** 返回活動列表的回調函式 */
+  onBackToActivities: () => void;
+  /** 查看活動詳情的回調函式 */
+  onViewActivity: () => void;
 }
 
 /**
- * 活動建立成功結果頁面
- * 顯示建立成功的活動摘要資訊和後續動作選項
+ * 活動編輯成功結果頁面
+ * 顯示編輯成功的活動摘要資訊和後續動作選項
  */
-function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreationSuccessProps) {
-
-  const router = useRouter();
+function EditSuccessPage({ 
+  onBackToActivities, 
+  onViewActivity,
+  eventId
+}: EditSuccessPageProps) {
   const { getValues } = useFormContext<FormData>();
   
   // 獲取活動標籤資料
   const { data: eventTagsData } = useEventTags();
   
-  // 獲取主辦方活動列表並準備更新快取
-  const { mutate } = useHostEvents();
-  
   // 獲取表單資料以顯示活動摘要
   const formData = getValues();
   const { eventInfo, plans } = formData;
-
-  /**
-   * 前往管理頁面
-   */
-  const handleManageEvents = () => {
-    // 在導航到管理頁面前更新活動列表快取
-    mutate();
-    router.push('/host/activities');
-  };
-
-  /**
-   * 查看活動詳情
-   */
-  const handleViewEventDetail = () => {
-    router.push(`/event/${eventId}`);
-  };
-
-  /**
-   * 建立新的活動
-   */
-  const handleCreateNewEvent = () => {
-    if (onCreateNewActivity) {
-      // 使用回調函式重置表單狀態並回到步驟一
-      onCreateNewActivity();
-    } else {
-      // 備用方案：直接導航（保持原有行為）
-      router.push('/create-activity');
-    }
-  };
 
   /**
    * 格式化日期時間顯示
@@ -98,10 +68,10 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
             </div>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-[#121212] mb-3">
-            活動建立成功！
+            活動編輯完成！
           </h1>
           <p className="text-base text-[#4F4F4F] mb-4">
-            恭喜您成功建立了一個全新的露營活動
+            您的活動資訊已成功更新
           </p>
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-[#e7e7e7]">
             <Icon icon="material-symbols:event-available" className="w-4 h-4 text-[#5C795F]" />
@@ -133,7 +103,7 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
                 <div className="flex items-center gap-2">
                   <Icon icon="material-symbols:event" className="w-4 h-4 text-[#4F4F4F]" />
                   <span className="text-[#4F4F4F]">
-                   活動日期：{formatDateTime(eventInfo.startDate, eventInfo.startTime)} - {formatDateTime(eventInfo.endDate, eventInfo.endTime)}
+                   活動日期：{formatDateTime(eventInfo.startDate, eventInfo.startTime)} ~ {formatDateTime(eventInfo.endDate, eventInfo.endTime)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -155,7 +125,7 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
             <div>
               <h4 className="font-medium text-[#354738] mb-2">活動標籤</h4>
               <div className="flex flex-wrap gap-2 mb-4">
-                {eventInfo.tags.map((tagId, index) => (
+                {eventInfo.tags && eventInfo.tags.map((tagId, index) => (
                   <span 
                     key={index}
                     className="px-2 py-1 bg-[#f3f6f3] text-[#354738] text-xs rounded-full border border-[#d1ddd1]"
@@ -234,9 +204,9 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
         )}
 
         {/* 操作按鈕 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
-            onClick={handleViewEventDetail}
+            onClick={onViewActivity}
             className="flex items-center justify-center gap-2 bg-[#5C795F] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#354738] transition-colors shadow-sm"
           >
             <Icon icon="material-symbols:visibility" className="w-5 h-5" />
@@ -244,19 +214,11 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
           </button>
           
           <button
-            onClick={handleManageEvents}
+            onClick={onBackToActivities}
             className="flex items-center justify-center gap-2 bg-white text-[#354738] px-6 py-3 rounded-lg font-medium border border-[#354738] hover:bg-[#f3f6f3] transition-colors"
           >
-            <Icon icon="material-symbols:settings" className="w-5 h-5" />
-            管理我的活動
-          </button>
-          
-          <button
-            onClick={handleCreateNewEvent}
-            className="flex items-center justify-center gap-2 bg-[#f3f6f3] text-[#354738] px-6 py-3 rounded-lg font-medium hover:bg-[#e7f0e7] transition-colors border border-[#d1ddd1]"
-          >
-            <Icon icon="material-symbols:add-circle" className="w-5 h-5" />
-            建立新活動
+            <Icon icon="material-symbols:arrow-back" className="w-5 h-5" />
+            返回活動列表
           </button>
         </div>
 
@@ -265,12 +227,10 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
           <div className="flex items-start gap-3">
             <Icon icon="material-symbols:lightbulb" className="w-5 h-5 text-[#5C795F] mt-0.5" />
             <div>
-              <h4 className="font-medium text-[#354738] mb-1">接下來您可以：</h4>
-              <ul className="text-sm text-[#4F4F4F] space-y-1">
-                <li>• 分享活動連結給朋友們</li>
-                <li>• 在活動管理頁面查看報名狀況</li>
-                <li>• 隨時編輯活動資訊</li>
-              </ul>
+              <h4 className="font-medium text-[#354738] mb-1">溫馨提醒</h4>
+              <p className="text-sm text-[#4F4F4F]">
+                您的活動資訊已更新完成。如需要修改活動狀態或進行其他管理操作，請前往活動列表頁面。
+              </p>
             </div>
           </div>
         </div>
@@ -279,4 +239,4 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
   );
 }
 
-export default ActivityCreationSuccess;
+export default EditSuccessPage;

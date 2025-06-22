@@ -4,14 +4,18 @@ import React, {
   useCallback,
   forwardRef,
   useImperativeHandle,
+  useRef,
 } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import PlanAccordionItem from './PlanAccordionItem';
 import { useCreateEventPlans } from '@/swr/events/useCreateEventPlans';
-import { CreateEventPlansRequest } from '@/types/api/events';
+import { useUpdateEventPlans } from '@/swr/events/useUpdateEventPlans';
+import { useDeleteEventPlan } from '@/swr/events/useDeleteEventPlan';
+import { CreateEventPlansRequest, UpdateEventPlansRequest } from '@/types/api/events';
 import toast from 'react-hot-toast';
 import { Icon } from '@iconify/react';
+import { usePathname } from 'next/navigation';
 
 interface PlanAccordionProps {
   /** 活動 ID（用於 API 呼叫） */
@@ -25,6 +29,9 @@ export interface PlanAccordionRef {
 
 const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
   ({ eventId }, ref) => {
+    // 獲取當前路徑以判斷是建立模式還是編輯模式
+    const pathname = usePathname();
+    const isEditMode = pathname.includes('/edit-activity');
 
     // 從 formContext 獲取方法
     const { control, trigger, getValues } = useFormContext<FormData>();
@@ -35,19 +42,45 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       name: 'plans',
     });
 
-    // 整合 useCreateEventPlans hook
-    // 新版本不需要 eventId 參數
+    // 整合 hooks
     const { createEventPlans } = useCreateEventPlans();
+    const { updateEventPlans } = useUpdateEventPlans();
+    const { trigger: deleteEventPlan } = useDeleteEventPlan();
+
+    // ref 用於追蹤最新新增的方案
+    const lastPlanRef = useRef<HTMLDivElement>(null);
 
     /**
-     * 將表單資料轉換為 API 請求格式
+     * 將表單資料轉換為建立 API 請求格式
      * @param formPlans 表單中的方案資料
      * @returns API 請求格式的資料
      */
-    const convertFormDataToApiFormat = useCallback(
+    const convertFormDataToCreateApiFormat = useCallback(
       (formPlans: FormData['plans']): CreateEventPlansRequest => {
         return {
           plans: formPlans.map((plan) => ({
+            title: plan.title,
+            price: plan.price,
+            discounted_price: plan.discountPrice,
+            contents: plan.content?.map((item) => item.value) || [],
+            addons: plan.addOns || [],
+          })),
+        };
+      },
+      []
+    );
+
+    /**
+     * 將表單資料轉換為更新 API 請求格式
+     * @param formPlans 表單中的方案資料
+     * @returns API 請求格式的資料
+     */
+    const convertFormDataToUpdateApiFormat = useCallback(
+      (formPlans: FormData['plans']): UpdateEventPlansRequest => {
+        return {
+          plans: formPlans.map((plan) => ({
+            // 在編輯模式下，方案可能有 ID（用於更新）或沒有 ID（用於新增）
+            ...(plan.id && { id: plan.id }),
             title: plan.title,
             price: plan.price,
             discounted_price: plan.discountPrice,
@@ -70,23 +103,29 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           if (isValid) {
             if (eventId) {
               try {
-                // 獲取當前表單資料
-                const formData = getValues();
-                const apiData = convertFormDataToApiFormat(formData.plans);
+                // 取得表單資料
+                const formData = getValues('plans');
 
-                // 呼叫建立方案 API
-                // 新版本的 createEventPlans 需要兩個參數：payload, eventId
-                await createEventPlans(apiData, eventId);
+                if (isEditMode) {
+                  // 編輯模式：使用更新 API (PATCH)
+                  const updatePayload = convertFormDataToUpdateApiFormat(formData);
+                  
+                  await updateEventPlans(updatePayload, eventId);
+                } else {
+                  // 建立模式：使用建立 API (POST)
+                  const createPayload = convertFormDataToCreateApiFormat(formData);
+                  
+                  await createEventPlans(createPayload, eventId);
+                }
 
                 return true;
               } catch (error) {
-                console.error('建立方案時發生錯誤:', error);
-                toast.error('建立方案過程中發生錯誤，請稍後再試');
+                console.error('❌ 方案操作失敗:', error);
+                toast.error(isEditMode ? '方案更新過程中發生錯誤，請稍後再試' : '方案建立過程中發生錯誤，請稍後再試');
                 return false;
               }
             } else {
               // 如果沒有活動ID，則只是儲存表單資料到狀態
-              console.warn('沒有提供活動ID，略過方案建立');
               return true;
             }
           }
@@ -97,13 +136,28 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
         eventId,
         trigger,
         getValues,
-        convertFormDataToApiFormat,
+        isEditMode,
+        convertFormDataToCreateApiFormat,
+        convertFormDataToUpdateApiFormat,
         createEventPlans,
+        updateEventPlans,
       ]
     );
 
     // 控制哪些方案面板是展開的
     const [expandedPlans, setExpandedPlans] = useState<number[]>([0]); // 默認第一個展開
+
+    // 自動捲動到最新新增的方案
+    const scrollToNewPlan = () => {
+      setTimeout(() => {
+        if (lastPlanRef.current) {
+          lastPlanRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+      }, 100); // 等待DOM更新後再捲動
+    };
 
     // 新增方案
     const handleAddPlan = useCallback(() => {
@@ -113,32 +167,61 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       append({
         title: `方案 ${fields.length + 1}`,
         price: 0,
-        discountPrice: undefined,
-        content: [],
+        discountPrice: 0,
+        content: [{ value: '' }],
         addOns: [],
       });
 
       // 自動展開新添加的方案
       const newIndex = fields.length;
       setExpandedPlans((prev) => [...prev, newIndex]);
+      
+      // 新增方案後自動捲動
+      scrollToNewPlan();
     }, [append, fields.length]);
 
     // 刪除方案
     const handleDeletePlan = useCallback(
-      (index: number) => {
+      async (index: number) => {
         if (fields.length <= 1) return;
 
         // 添加確認對話框
         if (window.confirm(`確定要刪除方案 ${index + 1} 嗎？`)) {
-          remove(index);
+          // 從表單值中取得實際的方案資料，而不是從 fields 陣列
+          const formValues = getValues('plans');
+          const planToDelete = formValues[index];
 
-          // 更新展開狀態
-          setExpandedPlans((prev) =>
-            prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
-          );
+          console.log('🔍 刪除方案 (從 fields):', fields[index]);
+          console.log('🔍 刪除方案 (從表單值):', planToDelete);
+          
+          // 如果是編輯模式且方案有 ID，則呼叫刪除 API
+          if (isEditMode && planToDelete?.id && eventId) {
+            try {
+              await deleteEventPlan(eventId, planToDelete.id);
+              
+              // API 呼叫成功後，從表單中移除
+              remove(index);
+              
+              // 更新展開狀態
+              setExpandedPlans((prev) =>
+                prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
+              );
+            } catch (error) {
+              console.error('❌ 刪除方案失敗:', error);
+              // 錯誤已在 useDeleteEventPlan hook 中處理，這裡不需要額外處理
+            }
+          } else {
+            // 建立模式或方案沒有 ID，直接從表單中移除
+            remove(index);
+
+            // 更新展開狀態
+            setExpandedPlans((prev) =>
+              prev.filter((i) => i !== index).map((i) => (i > index ? i - 1 : i))
+            );
+          }
         }
       },
-      [fields.length, remove]
+      [fields, isEditMode, eventId, deleteEventPlan, remove, getValues]
     );
 
     // 切換方案面板展開/收起
@@ -202,14 +285,18 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           ) : (
             <div className="flex flex-col gap-4">
               {fields.map((field, index) => (
-                <PlanAccordionItem
+                <div
                   key={field.id}
-                  index={index}
-                  isExpanded={expandedPlans.includes(index)}
-                  onToggle={() => togglePlan(index)}
-                  onDelete={() => handleDeletePlan(index)}
-                  canDelete={canDeletePlan}
-                />
+                  ref={index === fields.length - 1 ? lastPlanRef : null} // 將ref指向最後一個方案
+                >
+                  <PlanAccordionItem
+                    index={index}
+                    isExpanded={expandedPlans.includes(index)}
+                    onToggle={() => togglePlan(index)}
+                    onDelete={() => handleDeletePlan(index)}
+                    canDelete={canDeletePlan}
+                  />
+                </div>
               ))}
 
               {/* 新增方案按鈕（在列表底部） */}

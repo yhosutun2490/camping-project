@@ -1,16 +1,17 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormDataSchema, FormData } from '../schema/formDataSchema';
-import EventStepper from './EventStepper';
-import EventInfoForm, { EventInfoFormRef } from './EventInfoForm';
-import UploadCoverForm, { UploadCoverFormRef } from './UploadCoverForm';
-import UploadEventImageForm, { UploadEventImageFormRef } from './UploadEventImageForm';
-import PlanAccordion, { PlanAccordionRef } from './PlanAccordion';
-import ActivityCreationSuccess from './ActivityCreationSuccess';
-import StepNavigation from './StepNavigation';
+import { FormDataSchemaEdit, FormDataEdit } from '@/app/create-activity/schema/formDataSchema';
+import EventStepper from '@/app/create-activity/components/EventStepper';
+import EventInfoForm, { EventInfoFormRef } from '@/app/create-activity/components/EventInfoForm';
+import UploadCoverForm, { UploadCoverFormRef } from '@/app/create-activity/components/UploadCoverForm';
+import UploadEventImageForm, { UploadEventImageFormRef } from '@/app/create-activity/components/UploadEventImageForm';
+import PlanAccordion, { PlanAccordionRef } from '@/app/create-activity/components/PlanAccordion';
+import StepNavigation from '@/app/create-activity/components/StepNavigation';
 import toast from 'react-hot-toast';
+import EditSuccessPage from './EditSuccessPage';
 
 // 定義每個步驟的載入狀態
 type StepLoadingState = {
@@ -23,26 +24,26 @@ type StepsLoadingState = {
   [key: number]: StepLoadingState;
 };
 
-const CreateActivityForm: React.FC = () => {
-  // 建立本地日期函式（避免 UTC 時區問題）
-  const getLocalDateString = (daysOffset: number = 0) => {
-    const today = new Date();
-    today.setDate(today.getDate() + daysOffset);
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  };
+// 定義元件 props
+interface EditActivityFormProps {
+  /** 初始資料 */
+  initialData: FormDataEdit;
+  /** 活動 ID */
+  eventId: string;
+}
 
-  // 活動 ID 狀態
-  const [eventId, setEventId] = useState<string | null>(null);
+const EditActivityForm: React.FC<EditActivityFormProps> = ({
+  initialData,
+  eventId,
+}) => {
+  const router = useRouter();
   
   // 統一管理所有步驟的載入狀態
   const [stepsLoadingState, setStepsLoadingState] = useState<StepsLoadingState>({
-    1: { isLoading: false, loadingText: '建立活動中...' },
-    2: { isLoading: false, loadingText: '上傳封面圖片中...' },
-    3: { isLoading: false, loadingText: '上傳活動圖片中...' },
-    4: { isLoading: false, loadingText: '建立方案中...' },
+    1: { isLoading: false, loadingText: '更新活動資訊中...' },
+    2: { isLoading: false, loadingText: '更新封面圖片中...' },
+    3: { isLoading: false, loadingText: '更新活動圖片中...' },
+    4: { isLoading: false, loadingText: '更新方案中...' },
   });
 
   // 建立各步驟的 ref
@@ -81,42 +82,18 @@ const CreateActivityForm: React.FC = () => {
     }));
   };
 
-  const methods = useForm<FormData>({
-    resolver: zodResolver(FormDataSchema),
+  const methods = useForm<FormDataEdit>({
+    resolver: zodResolver(FormDataSchemaEdit),
     mode: 'onChange',
-    defaultValues: {
-      eventInfo: {
-        title: '',
-        organizer: '',
-        address: '',
-        startDate: getLocalDateString(7), // 活動開始：7天後
-        startTime: '10:00',
-        endDate: getLocalDateString(7), // 活動結束：同一天
-        endTime: '18:00',
-        registration_startDate: getLocalDateString(1), // 報名開始：明天
-        registration_startTime: '00:00',
-        registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
-        registration_endTime: '23:00',
-        max_participants: 10,
-        price: 0, // 新增價格欄位
-        description: '',
-        tags: [],
-        cancel_policy: false,
-        event_notifications: [],
-      },
-      coverImages: [],
-      eventImages: [],
-      plans: [
-        {
-          title: '基本方案',
-          price: 0,
-          discountPrice: 0,
-          content: [],
-          addOns: [],
-        },
-      ],
-    },
+    defaultValues: initialData,
   });
+
+  // 當 initialData 變化時，重新載入表單資料
+  useEffect(() => {
+    if (initialData) {
+      methods.reset(initialData);
+    }
+  }, [initialData, methods]);
 
   // 驗證指定步驟資料
   const validateStep = async (step: number) => {
@@ -130,7 +107,7 @@ const CreateActivityForm: React.FC = () => {
       case 4:
         return methods.trigger('plans');
       case 5:
-        return true; // 第 5 步不需要驗證，只是結果展示
+        return true; // 成功頁面不需要驗證
       default:
         return false;
     }
@@ -171,7 +148,11 @@ const CreateActivityForm: React.FC = () => {
     const scrollContainer = document.getElementById('main-scroll-container');
     
     if (!scrollContainer) {
-      console.error('找不到滾動容器 #main-scroll-container');
+      // 備用方案：使用 window 滾動
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant'
+      });
       return;
     }
     
@@ -222,6 +203,7 @@ const CreateActivityForm: React.FC = () => {
         setShouldScroll(true); // 標記需要滾動
         setCurrentStep(step + 1);
       }
+      
     } catch (error) {
       console.error(`步驟 ${step} 處理錯誤:`, error);
       
@@ -234,62 +216,17 @@ const CreateActivityForm: React.FC = () => {
   };
 
   /**
-   * 處理活動建立成功後的回調
+   * 處理編輯完成後返回活動列表
    */
-  const handleEventCreated = (id: string) => {
-    setEventId(id);
+  const handleBackToActivities = () => {
+    router.push('/host/activities');
   };
 
   /**
-   * 重置表單到初始狀態
+   * 處理查看活動詳情
    */
-  const resetFormToInitialState = () => {
-    // 重置 react-hook-form 表單狀態
-    methods.reset({
-      eventInfo: {
-        title: '',
-        organizer: '',
-        address: '',
-        startDate: getLocalDateString(7), // 活動開始：7天後
-        startTime: '10:00',
-        endDate: getLocalDateString(7), // 活動結束：同一天
-        endTime: '18:00',
-        registration_startDate: getLocalDateString(1), // 報名開始：明天
-        registration_startTime: '00:00',
-        registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
-        registration_endTime: '23:45',
-        max_participants: 1,
-        price: 0,
-        description: '',
-        tags: [],
-        cancel_policy: false,
-        event_notifications: [],
-      },
-      coverImages: [],
-      eventImages: [],
-      plans: [
-        {
-          title: '基本方案',
-          price: 100,
-          discountPrice: undefined,
-          content: [],
-          addOns: [],
-        },
-      ],
-    });
-    
-    // 重置狀態
-    setShouldScroll(true); // 標記需要滾動
-    setCurrentStep(1);
-    setEventId(null);
-    
-    // 重置所有步驟的載入狀態
-    setStepsLoadingState({
-      1: { isLoading: false, loadingText: '建立活動中...' },
-      2: { isLoading: false, loadingText: '上傳封面圖片中...' },
-      3: { isLoading: false, loadingText: '上傳活動圖片中...' },
-      4: { isLoading: false, loadingText: '建立方案中...' },
-    });
+  const handleViewActivity = () => {
+    router.push(`/event/${eventId}`);
   };
 
   /**
@@ -312,25 +249,25 @@ const CreateActivityForm: React.FC = () => {
         return {
           ...baseConfig,
           showPrevButton: false,
-          nextButtonText: '繼續填寫，下一步',
+          nextButtonText: '更新資訊並繼續',
           nextButtonDisabled: false,
         };
       case 2:
         return {
           ...baseConfig,
-          nextButtonText: '上傳圖片並繼續下一步',
+          nextButtonText: '更新封面並繼續',
           nextButtonDisabled: false,
         };
       case 3:
         return {
           ...baseConfig,
-          nextButtonText: '上傳圖片並繼續下一步',
+          nextButtonText: '更新圖片並繼續',
           nextButtonDisabled: false,
         };
       case 4:
         return {
           ...baseConfig,
-          nextButtonText: '建立方案',
+          nextButtonText: '更新方案',
           nextButtonDisabled: false,
         };
       default:
@@ -355,19 +292,19 @@ const CreateActivityForm: React.FC = () => {
   };
 
   return (
-    <FormProvider<FormData> {...methods}>
-      <div className="bg-neutral-50 min-h-screen">
+    <FormProvider<FormDataEdit> {...methods}>
+      <div className="bg-[#F6F6F6] min-h-screen">
         <div className="max-w-4xl mx-auto pb-32"> {/* 添加底部邊距避免被固定導航遮擋 */}
           <div className="py-10">
             <EventStepper
               currentStep={currentStep}
               totalSteps={5}
               stepTitles={[
-                '基本資訊',
-                '活動封面',
-                '活動內容圖片',
-                '方案設計',
-                '建立完成',
+                '編輯基本資訊',
+                '編輯活動封面',
+                '編輯活動內容圖片',
+                '編輯方案設計',
+                '編輯完成',
               ]}
               onStepChange={handleStepChange}
               completedSteps={undefined}
@@ -377,20 +314,22 @@ const CreateActivityForm: React.FC = () => {
             {currentStep === 1 && (
               <EventInfoForm
                 ref={eventInfoFormRef}
-                onEventCreated={handleEventCreated}
                 eventId={eventId}
+                onEventCreated={() => {}} // 編輯模式不需要此回調
               />
             )}
             {currentStep === 2 && (
               <UploadCoverForm
                 ref={uploadCoverFormRef}
                 eventId={eventId}
+                isEditMode={true} // 編輯模式
               />
             )}
             {currentStep === 3 && (
               <UploadEventImageForm
                 ref={uploadEventImageFormRef}
                 eventId={eventId}
+                isEditMode={true} // 編輯模式
               />
             )}
             {currentStep === 4 && (
@@ -399,35 +338,19 @@ const CreateActivityForm: React.FC = () => {
                 eventId={eventId}
               />
             )}
-            {currentStep === 5 &&
-              (eventId ? (
-                <ActivityCreationSuccess
-                  eventId={eventId}
-                  onCreateNewActivity={resetFormToInitialState}
-                />
-              ) : (
-                <div className="max-w-4xl mx-auto bg-base-100 p-6 rounded-lg shadow-sm text-center">
-                  <h2 className="text-2xl font-bold mb-4 text-error">
-                    發生錯誤
-                  </h2>
-                  <p className="text-base-content/70 mb-6">
-                    活動 ID 遺失，無法顯示建立結果。
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => setCurrentStep(1)}
-                  >
-                    重新開始
-                  </button>
-                </div>
-              ))}
+            {currentStep === 5 && (
+              <EditSuccessPage
+                eventId={eventId}
+                onBackToActivities={handleBackToActivities}
+                onViewActivity={handleViewActivity}
+              />
+            )}
           </div>
         </div>
         
         {/* 固定底部導航 - 只在步驟1-4顯示 */}
         {currentStep < 5 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 px-6 py-4">
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E7E7E7] z-50 px-6 py-4">
             <div className="max-w-4xl mx-auto">
               <StepNavigation {...getStepButtonConfig()} />
             </div>
@@ -438,4 +361,4 @@ const CreateActivityForm: React.FC = () => {
   );
 };
 
-export default React.memo(CreateActivityForm);
+export default React.memo(EditActivityForm);

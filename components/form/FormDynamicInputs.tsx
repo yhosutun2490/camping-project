@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormData } from '../../app/create-activity/schema/formDataSchema';
 import FormInput from './FormInput';
@@ -23,11 +23,25 @@ function FormDynamicInputs({
   } = useFormContext<FormData>();
   const notifications = watch('eventInfo.event_notifications') || [];
   const [key, setKey] = useState(0); // 用於強制重新渲染
+  const lastInputRef = useRef<HTMLDivElement>(null); // 用於追蹤最新新增的輸入欄位
+
+  // 自動捲動到最新新增的欄位
+  const scrollToNewField = () => {
+    setTimeout(() => {
+      if (lastInputRef.current) {
+        lastInputRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }, 100); // 等待DOM更新後再捲動
+  };
 
   // 新增通知項目
   const handleAddNotification = () => {
     setValue('eventInfo.event_notifications', [...notifications, '']);
     setKey((prev) => prev + 1);
+    scrollToNewField(); // 新增後自動捲動
   };
 
   // 刪除通知項目
@@ -71,7 +85,11 @@ function FormDynamicInputs({
       {/* 動態輸入區域 */}
       <div className="flex flex-col self-stretch gap-6">
         {notifications.map((_, index) => (
-          <div key={index} className="flex flex-row items-center self-stretch gap-3">
+          <div 
+            key={index} 
+            className="flex flex-row items-center self-stretch gap-3"
+            ref={index === notifications.length - 1 ? lastInputRef : null} // 將ref指向最後一個元素
+          >
             <div className="flex flex-col flex-1 gap-1">
               <FormInput
                 name={`eventInfo.event_notifications.${index}`}

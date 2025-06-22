@@ -1,4 +1,4 @@
-import { SuccessResponse } from "@/types/api/response";
+import { SuccessResponse, SuccessResponseNoData } from "@/types/api/response";
 
 // 活動建立請求參數介面
 export interface CreateEventRequest {
@@ -140,6 +140,29 @@ export type CreateEventPlansResponse = SuccessResponse<{
   event_info_id: string;
   plans: EventPlan[];
 }>;
+
+// 更新活動方案項目介面（含 ID）
+export interface UpdateEventPlanRequest {
+  id?: string;  // 更新現有方案時需要提供 ID，新增方案時不需要
+  title: string;
+  price: number;
+  discounted_price?: number;
+  contents: string[];
+  addons: EventPlanAddon[];
+}
+
+// 更新活動方案請求參數介面
+export interface UpdateEventPlansRequest {
+  plans: UpdateEventPlanRequest[];
+}
+
+// 更新活動方案回應介面
+export type UpdateEventPlansResponse = SuccessResponse<{
+  message: string;
+}>;
+
+// 刪除活動方案回應介面
+export type DeleteEventPlanResponse = SuccessResponseNoData;
 
 // 更新活動請求參數介面
 export interface UpdateEventRequest {

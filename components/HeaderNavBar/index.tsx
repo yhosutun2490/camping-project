@@ -40,7 +40,7 @@ export default function HeaderNavBar({
   // Google 第三方登入的cookie
   useGoogleAuthRedirect();
   // 檢查使用者是否為主辦方
-  const isHost = userRole === "host";
+  const isHost = userRole === "host" || useMemberLogin.getState().member.role === "host";
   // 點擊外部就收起
   useClickOutside(headerSearchBarRef, () => setIsBarScaleUp(false));
   // 是否進入首頁置頂區塊
