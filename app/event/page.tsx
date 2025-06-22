@@ -2,8 +2,14 @@ import type { GetEventsParams } from "@/types/api/event/allEvents";
 import EventFilterShell from "@/components/EventFilterShell";
 import RestButton from "@/components/EventFilterShell/ResetButton";
 import { getEventTags } from "@/api/server-components/event/tags";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "活動列表 | 森森不息",
+  description: "探索各種露營活動，篩選符合您需求的活動",
+}
 
 export default async function EventPage({
   searchParams,
