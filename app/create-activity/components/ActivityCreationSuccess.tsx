@@ -42,12 +42,7 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
     router.push('/host/activities');
   };
 
-  /**
-   * 查看活動詳情
-   */
-  const handleViewEventDetail = () => {
-    router.push(`/event/${eventId}`);
-  };
+
 
   /**
    * 建立新的活動
@@ -234,18 +229,10 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
         )}
 
         {/* 操作按鈕 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={handleViewEventDetail}
-            className="flex items-center justify-center gap-2 bg-[#5C795F] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#354738] transition-colors shadow-sm"
-          >
-            <Icon icon="material-symbols:visibility" className="w-5 h-5" />
-            查看活動詳情
-          </button>
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={handleManageEvents}
-            className="flex items-center justify-center gap-2 bg-white text-[#354738] px-6 py-3 rounded-lg font-medium border border-[#354738] hover:bg-[#f3f6f3] transition-colors"
+            className="flex items-center justify-center gap-2 bg-[#5C795F] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#354738] transition-colors shadow-sm"
           >
             <Icon icon="material-symbols:settings" className="w-5 h-5" />
             管理我的活動
@@ -253,7 +240,7 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
           
           <button
             onClick={handleCreateNewEvent}
-            className="flex items-center justify-center gap-2 bg-[#f3f6f3] text-[#354738] px-6 py-3 rounded-lg font-medium hover:bg-[#e7f0e7] transition-colors border border-[#d1ddd1]"
+            className="flex items-center justify-center gap-2 bg-white text-[#354738] px-6 py-3 rounded-lg font-medium border border-[#354738] hover:bg-[#f3f6f3] transition-colors"
           >
             <Icon icon="material-symbols:add-circle" className="w-5 h-5" />
             建立新活動
