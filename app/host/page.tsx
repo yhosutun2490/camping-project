@@ -1,7 +1,10 @@
-"use client";
-
 import React from "react";
 import { HostProfile } from "./components/HostProfile";
+
+export const metadata = {
+  title: "主辦方資料 | 森森不息",
+  description: "查看和編輯您的主辦方資料，管理您的活動資訊",
+};
 
 export default function HostPage() {
   return (

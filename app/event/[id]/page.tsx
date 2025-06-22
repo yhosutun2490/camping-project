@@ -11,7 +11,40 @@ import EventNotice from "@/components/EventById/EventNotice";
 
 import { getEventById } from "@/api/server-components/event/eventId";
 import { redirect } from "next/navigation";
+import type { Metadata } from 'next';
 
+// 動態產生 metadata，根據活動名稱顯示標題
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Metadata> {
+  const { id } = await params;
+  const eventIdData = await getEventById(id);
+  if (!eventIdData) {
+    return {
+      title: '活動不存在 | 森森不息',
+      description: '找不到該活動資訊',
+      icons: { icon: '/header/logo_icon.svg' },
+    };
+  }
+  const coverImage = eventIdData.photos?.find((photo: { type: string }) => photo.type === 'cover')?.photo_url || '/main/main_bg_top_1.jpg';
+  return {
+    title: `${eventIdData.title} | 森森不息`,
+    description: eventIdData.description?.slice(0, 160) || '露營活動詳情',
+    openGraph: {
+      title: eventIdData.title,
+      description: eventIdData.description?.slice(0, 160) || '露營活動詳情',
+      images: [
+        {
+          url: coverImage,
+          width: 1200,
+          height: 630,
+          alt: eventIdData.title,
+        },
+      ],
+    },
+    icons: { icon: '/header/logo_icon.svg' },
+  };
+}
 // 假資料
 
 const sampleComment = [

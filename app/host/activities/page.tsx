@@ -1,7 +1,10 @@
-"use client";
-
 import React from "react";
 import HostActivities from "../components/HostActivities";
+
+export const metadata = {
+  title: "活動列表 | 森森不息",
+  description: "查看您主辦的所有活動，管理活動資訊和參與者",
+};
 
 export default function ActivitiesPage() {
   return (
