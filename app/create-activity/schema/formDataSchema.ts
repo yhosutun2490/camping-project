@@ -217,7 +217,7 @@ const PlanSchema = z
   .object({
     id: z.string().optional(), // 用於更新時的方案 ID
     title: z.string().min(1, '請輸入方案標題').max(100, '最多100字'),
-    price: z.number({ invalid_type_error: '請輸入有效的價格' }).min(0, '價格不可為負'),
+    price: z.number({ invalid_type_error: '請輸入有效的價格' }).min(1, '方案價格須大於0'),
     discountPrice: z.number({ invalid_type_error: '請輸入有效的價格' }).min(0, '價格不可為負').optional(),
     content: z.array(ContentSchema).min(1, '請至少新增一項方案內容'),
     addOns: z.array(AddOnSchema).optional(),
@@ -226,7 +226,7 @@ const PlanSchema = z
     (data) =>
       data.discountPrice === undefined || data.discountPrice === 0 || data.discountPrice <= data.price,
     {
-      message: '折扣價不可大於原價',
+      message: '折扣價格不可大於原價',
       path: ['discountPrice'],
     }
   );

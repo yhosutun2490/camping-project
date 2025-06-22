@@ -109,8 +109,8 @@ const CreateActivityForm: React.FC = () => {
       plans: [
         {
           title: '基本方案',
-          price: 100,
-          discountPrice: undefined,
+          price: 0,
+          discountPrice: 0,
           content: [],
           addOns: [],
         },

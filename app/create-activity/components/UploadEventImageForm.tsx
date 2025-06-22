@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, forwardRef, useImperativeHandle, useCallback } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useCallback, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
 import FileUploader from '../../../components/form/FileUploader';
@@ -44,6 +44,9 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
   // 新版本只需要圖片類型參數
   const { trigger: uploadImages, isMutating: isUploading } = useUploadEventImages('detail' as EventImageType);
 
+  // ref 用於追蹤最新新增的圖片預覽區域
+  const lastImageRef = useRef<HTMLDivElement>(null);
+
   // 本地狀態管理上傳的檔案
   const [eventImages, setEventImages] = useState<EventImage[]>(() => {
     // 從表單中獲取已有圖片資料
@@ -76,6 +79,18 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
     return file.size > 4 * 1024 * 1024; // 4MB
   };
 
+  // 自動捲動到最新新增的圖片
+  const scrollToNewImage = () => {
+    setTimeout(() => {
+      if (lastImageRef.current) {
+        lastImageRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }
+    }, 100); // 等待DOM更新後再捲動
+  };
+
   // 處理檔案選擇
   const handleFileSelect = (file: File) => {
     const newImage: EventImage = {
@@ -85,6 +100,7 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
     const updatedImages = [...eventImages, newImage];
     setEventImages(updatedImages);
     setValue('eventImages', updatedImages, { shouldValidate: true });
+    scrollToNewImage(); // 新增圖片後自動捲動
   };
 
   // 處理刪除圖片
@@ -248,7 +264,11 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
                 <h3 className="text-base font-medium text-[#4F4F4F]">已選擇的活動圖片</h3>
                 <div className="flex flex-col gap-4">
                   {eventImages.map((image, index) => (
-                    <div key={index} className="flex flex-col lg:flex-row gap-4 p-4 border border-[#E0E0E0] rounded-xl">
+                    <div 
+                      key={index} 
+                      className="flex flex-col lg:flex-row gap-4 p-4 border border-[#E0E0E0] rounded-xl"
+                      ref={index === eventImages.length - 1 ? lastImageRef : null} // 將ref指向最後一個圖片
+                    >
                       <div className="w-full lg:w-60 shrink-0">
                         <ImagePreview
                           src={image.file}

@@ -4,6 +4,7 @@ import React, {
   useCallback,
   forwardRef,
   useImperativeHandle,
+  useRef,
 } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { FormData } from '../schema/formDataSchema';
@@ -45,6 +46,9 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
     const { createEventPlans } = useCreateEventPlans();
     const { updateEventPlans } = useUpdateEventPlans();
     const { trigger: deleteEventPlan } = useDeleteEventPlan();
+
+    // ref 用於追蹤最新新增的方案
+    const lastPlanRef = useRef<HTMLDivElement>(null);
 
     /**
      * 將表單資料轉換為建立 API 請求格式
@@ -143,6 +147,18 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
     // 控制哪些方案面板是展開的
     const [expandedPlans, setExpandedPlans] = useState<number[]>([0]); // 默認第一個展開
 
+    // 自動捲動到最新新增的方案
+    const scrollToNewPlan = () => {
+      setTimeout(() => {
+        if (lastPlanRef.current) {
+          lastPlanRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+      }, 100); // 等待DOM更新後再捲動
+    };
+
     // 新增方案
     const handleAddPlan = useCallback(() => {
       if (fields.length >= 3) return;
@@ -159,6 +175,9 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       // 自動展開新添加的方案
       const newIndex = fields.length;
       setExpandedPlans((prev) => [...prev, newIndex]);
+      
+      // 新增方案後自動捲動
+      scrollToNewPlan();
     }, [append, fields.length]);
 
     // 刪除方案
@@ -266,14 +285,18 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           ) : (
             <div className="flex flex-col gap-4">
               {fields.map((field, index) => (
-                <PlanAccordionItem
+                <div
                   key={field.id}
-                  index={index}
-                  isExpanded={expandedPlans.includes(index)}
-                  onToggle={() => togglePlan(index)}
-                  onDelete={() => handleDeletePlan(index)}
-                  canDelete={canDeletePlan}
-                />
+                  ref={index === fields.length - 1 ? lastPlanRef : null} // 將ref指向最後一個方案
+                >
+                  <PlanAccordionItem
+                    index={index}
+                    isExpanded={expandedPlans.includes(index)}
+                    onToggle={() => togglePlan(index)}
+                    onDelete={() => handleDeletePlan(index)}
+                    canDelete={canDeletePlan}
+                  />
+                </div>
               ))}
 
               {/* 新增方案按鈕（在列表底部） */}
