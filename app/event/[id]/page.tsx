@@ -15,9 +15,9 @@ import type { Metadata } from 'next';
 
 // 動態產生 metadata，根據活動名稱顯示標題
 export async function generateMetadata(
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const eventIdData = await getEventById(id);
   if (!eventIdData) {
     return {
