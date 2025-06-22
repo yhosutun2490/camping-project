@@ -18,9 +18,19 @@ export async function GET(
       );
     }
 
+    // 取得查詢參數
+    const { searchParams } = new URL(request.url);
+    const tag = searchParams.get('tag');
+
+    // 建構後端 API URL
+    let apiUrl = "/host/events";
+    if (tag && tag.trim() !== '') {
+      apiUrl += `?tag=${encodeURIComponent(tag)}`;
+    }
+
     try {
       // 調用後端 API
-      const response = await axiosInstance.get<GetHostEventsResponse>("/host/events", {
+      const response = await axiosInstance.get<GetHostEventsResponse>(apiUrl, {
         headers: {
           Cookie: `access_token=${accessToken}`,
         },

@@ -36,7 +36,12 @@ export function useSubmitEvent() {
         );
         
         // 提交成功後，重新驗證相關的 SWR 快取
-        mutate('/api/host/events'); // 主辦方活動列表
+        mutate(
+          (key) => {
+            // 如果 key 是字串且以 '/api/host/events' 開頭，則重新驗證
+            return typeof key === 'string' && key.startsWith('/api/host/events');
+          }
+        );
         
         return response.data;
       } catch (error: unknown) {
