@@ -183,7 +183,6 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
           return true;
         } catch (error) {
           console.error('上傳活動圖片時發生錯誤:', error);
-          toast.error('上傳過程中發生錯誤，請稍後再試');
           return false;
         }
       } else {

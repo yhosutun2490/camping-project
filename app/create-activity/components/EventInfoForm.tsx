@@ -423,6 +423,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
             <FormField
               label="活動摘要"
               name="eventInfo.description"
+              required
               error={errors.eventInfo?.description?.message}
             >
               <div className="border border-[#B0B0B0] rounded-2xl overflow-hidden">

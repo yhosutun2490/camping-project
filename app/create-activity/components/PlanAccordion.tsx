@@ -151,8 +151,8 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       append({
         title: `方案 ${fields.length + 1}`,
         price: 0,
-        discountPrice: undefined,
-        content: [],
+        discountPrice: 0,
+        content: [{ value: '' }],
         addOns: [],
       });
 

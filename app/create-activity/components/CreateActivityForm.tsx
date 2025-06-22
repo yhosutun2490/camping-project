@@ -96,8 +96,8 @@ const CreateActivityForm: React.FC = () => {
         registration_startDate: getLocalDateString(1), // 報名開始：明天
         registration_startTime: '00:00',
         registration_endDate: getLocalDateString(6), // 報名結束：活動前1天
-        registration_endTime: '23:45',
-        max_participants: 1,
+        registration_endTime: '23:00',
+        max_participants: 10,
         price: 0, // 新增價格欄位
         description: '',
         tags: [],

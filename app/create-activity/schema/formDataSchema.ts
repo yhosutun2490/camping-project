@@ -33,7 +33,7 @@ export const EventInfoSchema = z
     title: z.string().min(1, '請輸入活動主題').max(100, '最多100字'),
     organizer: z.string().min(1, '請輸入主辦方名稱').max(50, '最多50字'),
     // 更改為 address
-    address: z.string().min(1, '請輸入活動地點').max(200, '最多200字'),
+    address: z.string().min(1, '請輸入活動地點').max(100, '最多100字'),
     
     // 活動日期時間 - 增加即時驗證
     startDate: z
@@ -74,9 +74,14 @@ export const EventInfoSchema = z
       .refine((val) => /^\d{2}:\d{2}$/.test(val), '格式需為HH:mm'),
     
     // 改為 max_participants
-    max_participants: z.number().min(1, '至少1人').max(10000, '最多10000人'),
+    max_participants: z
+      .number({ invalid_type_error: '請輸入有效的數字' })
+      .min(10, '上限人數至少10人')
+      .max(10000, '上限人數最多10000人'),
     // 新增價格
-    price: z.number().min(0, '價格不可為負'),
+    price: z
+      .number({ invalid_type_error: '請輸入有效的價格' })
+      .min(0, '價格不可為負'),
     description: z.string().min(1, '請輸入活動描述').max(5000, '最多5000字'),
     // 改為多選字串陣列
     tags: z.array(z.string()).min(1, '請至少選擇一個標籤'),
@@ -205,21 +210,21 @@ const ContentSchema = z.object({
 
 const AddOnSchema = z.object({
   name: z.string().min(1, '請輸入商品名稱'),
-  price: z.number().min(0, '價格不可為負'),
+  price: z.number({ invalid_type_error: '請輸入有效的價格' }).min(1, '價格必須大於 0 元'),
 });
 
 const PlanSchema = z
   .object({
     id: z.string().optional(), // 用於更新時的方案 ID
     title: z.string().min(1, '請輸入方案標題').max(100, '最多100字'),
-    price: z.number().min(0, '價格不可為負'),
-    discountPrice: z.number().min(0, '價格不可為負').optional(),
-    content: z.array(ContentSchema).optional(),
+    price: z.number({ invalid_type_error: '請輸入有效的價格' }).min(0, '價格不可為負'),
+    discountPrice: z.number({ invalid_type_error: '請輸入有效的價格' }).min(0, '價格不可為負').optional(),
+    content: z.array(ContentSchema).min(1, '請至少新增一項方案內容'),
     addOns: z.array(AddOnSchema).optional(),
   })
   .refine(
     (data) =>
-      data.discountPrice === undefined || data.discountPrice <= data.price,
+      data.discountPrice === undefined || data.discountPrice === 0 || data.discountPrice <= data.price,
     {
       message: '折扣價不可大於原價',
       path: ['discountPrice'],
