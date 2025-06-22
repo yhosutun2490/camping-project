@@ -9,7 +9,6 @@ import {
   HostProfileFormType,
 } from '@/schema/HostProfileForm';
 import { useCreateHostProfile } from '@/swr/host/useHostProfile';
-import { useRouter } from 'next/navigation';
 import {
   useHostAvatarUpload,
   useHostCoverUpload,
@@ -18,6 +17,7 @@ import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import FormField from '@/components/form/FormField';
 import toast from 'react-hot-toast';
+import { useMemberLogin } from '@/stores/useMemberLogin';
 
 // 不使用預設圖片，改用佔位符
 
@@ -43,7 +43,9 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
     // 檔案參照
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const backgroundInputRef = useRef<HTMLInputElement>(null);
-    const router = useRouter();
+
+    const setMember = useMemberLogin((state) => state.setMember);
+    const currentMember = useMemberLogin((state) => state.member);
 
     const {
       register,
@@ -164,6 +166,14 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
         // 先建立主辦方基本資料
         await createHost(createData);
 
+        // 立即更新 useMemberLogin store 中的會員角色
+        if (currentMember?.id) {
+          setMember({
+            ...currentMember,
+            role: 'host'
+          });
+        }
+
         // 處理頭像上傳
         if (avatarFile) {
           try {
@@ -182,9 +192,10 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
           }
         }
 
-        // 完成後關閉表單並重新整理
-        router.refresh();
-        onSuccess();
+        // 完成後關閉表單並執行成功回調
+        setTimeout(() => {
+          onSuccess();
+        }, 100);
       } catch (error) {
         console.error('建立主辦方資料錯誤:', error);
       } finally {
