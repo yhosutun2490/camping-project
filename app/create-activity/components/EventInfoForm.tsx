@@ -8,6 +8,7 @@ import FormCheckboxGroup from '../../../components/form/FormCheckboxGroup';
 import FormSwitch from '../../../components/form/FormSwitch';
 import FormDynamicInputs from '../../../components/form/FormDynamicInputs';
 import { useEventTags } from '@/swr/meta/useEventTags';
+import { useGetHostProfile } from '@/swr/host/useHostProfile';
 import { useCreateEvent } from '@/swr/events/useCreateEvent';
 import { useUpdateEvent } from '@/swr/events/useUpdateEvent';
 import { useUpdateEventNoticesTags } from '@/swr/events/useUpdateEventNoticesTags';
@@ -42,6 +43,9 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       isLoading: eventTagsLoading,
     } = useEventTags();
 
+    // 使用 useHostProfile 取得主辦方資訊
+    const { hostProfile, isLoading: hostProfileLoading } = useGetHostProfile();
+
     // 初始化 API Hooks
     const { trigger: triggerCreateEvent } = useCreateEvent();
     const { updateEvent: triggerUpdateEvent } = useUpdateEvent();
@@ -71,6 +75,11 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       trigger,
       formState: { errors },
     } = useFormContext<FormData>();
+
+    // 當有主辦方資料時，設定表單值
+    if (hostProfile?.name && !hostProfileLoading) {
+      setValue('eventInfo.organizer', hostProfile.name);
+    }
 
     // 建立欄位驗證器實例
     const fieldValidator = createFieldValidator();
@@ -268,7 +277,9 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
 
     return (
       <div className="flex flex-col gap-6 self-stretch px-4 py-6 md:px-0 md:py-0">
-        <h1 className="text-2xl font-semibold leading-normal text-[#121212]">創建活動</h1>
+        <h1 className="text-2xl font-semibold leading-normal text-[#121212]">
+          {eventId ? '編輯活動' : '建立活動'}
+        </h1>
 
         <div className="flex flex-col gap-6">
           {/* 活動主題 */}
@@ -290,7 +301,11 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
             required
             error={errors.eventInfo?.organizer?.message}
           >
-            <FormInput name="eventInfo.organizer" placeholder="主辦方名稱" />
+            <FormInput 
+              name="eventInfo.organizer" 
+              placeholder="主辦方名稱"
+              disabled
+            />
           </FormField>
 
           {/* 活動地點 */}
@@ -408,6 +423,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
             <FormField
               label="活動摘要"
               name="eventInfo.description"
+              required
               error={errors.eventInfo?.description?.message}
             >
               <div className="border border-[#B0B0B0] rounded-2xl overflow-hidden">

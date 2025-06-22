@@ -58,7 +58,7 @@ function PlanAccordionItem({
 
   // 添加加購商品
   const handleAddAddOn = () => {
-    addOnsArray.append({ name: '', price: 0 });
+    addOnsArray.append({ name: '', price: 1 });
   };
 
   return (
@@ -202,24 +202,32 @@ function PlanAccordionItem({
                       <p className="text-[#4F4F4F] text-sm">尚未新增方案內容</p>
                     </div>
                   ) : (
-                    contentArray.fields.map((field, contentIndex) => (
-                      <div key={field.id} className="flex gap-3 items-start">
-                        <div className="flex-1">
-                          <FormInput
-                            name={`plans.${index}.content.${contentIndex}.value`}
-                            placeholder="請輸入內容項目"
-                          />
+                    contentArray.fields.map((field, contentIndex) => {
+                      const contentError = planErrors?.content?.[contentIndex]?.value?.message;
+                      return (
+                        <div key={field.id} className="flex gap-3 items-start">
+                          <div className="flex-1">
+                            <FormInput
+                              name={`plans.${index}.content.${contentIndex}.value`}
+                              placeholder="請輸入內容項目"
+                            />
+                            {contentError && (
+                              <span className="text-xs font-normal text-[#AB5F5F] leading-[1.5em] font-[Noto_Sans_TC] mt-1 block">
+                                {contentError}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-[#AB5F5F] text-[#AB5F5F] hover:bg-[#AB5F5F] hover:text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
+                            onClick={() => contentArray.remove(contentIndex)}
+                            disabled={contentArray.fields.length <= 1}
+                          >
+                            <Icon icon="material-symbols:delete-outline" className="h-4 w-4" />
+                          </button>
                         </div>
-                        <button
-                          type="button"
-                          className="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-[#AB5F5F] text-[#AB5F5F] hover:bg-[#AB5F5F] hover:text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
-                          onClick={() => contentArray.remove(contentIndex)}
-                          disabled={contentArray.fields.length <= 1}
-                        >
-                          <Icon icon="material-symbols:delete-outline" className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </FormField>
@@ -264,19 +272,33 @@ function PlanAccordionItem({
                         className="flex flex-col gap-4 lg:flex-row lg:items-end p-4 bg-white rounded-xl border border-[#E0E6E0]"
                       >
                         <div className="flex-1">
-                          <FormInput
+                          <FormField
+                            label="商品名稱"
                             name={`plans.${index}.addOns.${addOnIndex}.name`}
-                            placeholder="商品名稱"
-                          />
+                            required
+                            error={planErrors?.addOns?.[addOnIndex]?.name?.message}
+                          >
+                            <FormInput
+                              name={`plans.${index}.addOns.${addOnIndex}.name`}
+                              placeholder="商品名稱"
+                            />
+                          </FormField>
                         </div>
                         <div className="flex gap-3 items-end">
                           <div className="w-32">
-                            <FormNumberInput
+                            <FormField
+                              label="商品價格"
                               name={`plans.${index}.addOns.${addOnIndex}.price`}
-                              min={0}
-                              step={1}
-                              placeholder="商品價格"
-                            />
+                              required
+                              error={planErrors?.addOns?.[addOnIndex]?.price?.message}
+                            >
+                              <FormNumberInput
+                                name={`plans.${index}.addOns.${addOnIndex}.price`}
+                                min={1}
+                                step={1}
+                                placeholder="商品價格"
+                              />
+                            </FormField>
                           </div>
                           <button
                             type="button"

@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useHostEvents } from '@/swr/host/useHostEvents';
 import { useEventTags } from '@/swr/meta/useEventTags';
 import { useSubmitEvent } from '@/swr/events/useSubmitEvent';
+import { useHostEventDetail } from '@/swr/events/useHostEventDetail';
 import type { EventStatus } from '@/types/api/host/events';
 
 // 不同狀態對應的樣式
@@ -27,8 +29,10 @@ const formatDate = (dateString: string) => {
 };
 
 function HostActivities() {
+  const router = useRouter();
   const [activeTag, setActiveTag] = useState<string>('');
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
 
   // 使用 API hook 取得主辦方活動資料和活動標籤
   const { events, error, isLoading } = useHostEvents();
@@ -38,6 +42,28 @@ function HostActivities() {
     isLoading: tagsLoading,
   } = useEventTags();
   const { submitEvent } = useSubmitEvent();
+  const { getEventDetail } = useHostEventDetail();
+
+  // 處理編輯活動
+  const handleEditEvent = async (eventId: string) => {
+    try {
+      setLoadingEventId(eventId);
+      // 先取得活動詳情
+      const response = await getEventDetail({ eventId });
+      
+      if (response?.data) {
+        // 如果成功取得活動資料，導向編輯頁面
+        router.push(`/edit-activity/${eventId}`);
+      } else {
+        toast.error('無法取得活動資料');
+      }
+    } catch (error) {
+      console.error('取得活動詳情失敗:', error);
+      toast.error('取得活動資料失敗，請稍後再試');
+    } finally {
+      setLoadingEventId(null);
+    }
+  };
 
   // 處理提交活動審核
   const handleSubmitEvent = async (eventId: string) => {
@@ -267,14 +293,15 @@ function HostActivities() {
                 {/* 編輯按鈕 */}
                 <div className="flex gap-2">
                   <button
+                    onClick={() => handleEditEvent(activity.event_id)}
                     className={`flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors ${
-                      activity.active !== '草稿'
+                      activity.active !== '草稿' || loadingEventId === activity.event_id
                         ? 'bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed'
                         : 'bg-white text-[#121212] hover:bg-gray-50 border border-gray-200'
                     }`}
-                    disabled={activity.active !== '草稿'}
+                    disabled={activity.active !== '草稿' || loadingEventId === activity.event_id}
                   >
-                    編輯
+                    {loadingEventId === activity.event_id ? '載入中...' : '編輯'}
                   </button>
 
                   {/* 上架按鈕 - 只有草稿狀態才顯示 */}
@@ -406,14 +433,15 @@ function HostActivities() {
                   </button>
                 )}
                 <button
+                  onClick={() => handleEditEvent(activity.event_id)}
                   className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-colors ${
-                    activity.active !== '草稿'
+                    activity.active !== '草稿' || loadingEventId === activity.event_id
                       ? 'bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed'
                       : 'bg-white text-[#121212] hover:bg-gray-50'
                   }`}
-                  disabled={activity.active !== '草稿'}
+                  disabled={activity.active !== '草稿' || loadingEventId === activity.event_id}
                 >
-                  編輯
+                  {loadingEventId === activity.event_id ? '載入中...' : '編輯'}
                 </button>
               </div>
             </div>
