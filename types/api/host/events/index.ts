@@ -1,7 +1,7 @@
 import { SuccessResponse } from '../../response';
 
-// 活動狀態
-export type EventStatus = "草稿" | "已發布" | "已取消" | "已結束";
+// 活動狀態 - 支援中英文對應
+export type EventStatus = "草稿" | "已發布" | "已取消" | "已結束" | "draft" | "pending" | "published" | "archived";
 
 // 通知型別
 export interface EventNotice {
