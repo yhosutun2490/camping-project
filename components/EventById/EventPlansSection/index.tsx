@@ -47,9 +47,9 @@ export default function EventPlansSection({
     resolver: zodResolver(eventPlanSchema),
     defaultValues: {
       plan: {
-        event_plan_id: selectedPlan?.id || data?.[0]?.id,
+        event_plan_id: selectedPlan?.id,
         quantity: 1,
-        event_plan_price: Number(selectedPlan?.discounted_price ?? data?.[0]?.discounted_price),
+        event_plan_price: Number(selectedPlan?.discounted_price),
       },
       plan_addons: defaultAddons,
     },

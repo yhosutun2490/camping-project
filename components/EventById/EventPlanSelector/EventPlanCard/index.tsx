@@ -12,6 +12,7 @@ import {
   usePatchMemberOrders,
 } from "@/swr/member/orders/useMemberOrders"; // 創建/修改會員訂單SWR
 import { usePostMemberOrdersPayment } from "@/swr/member/orders/payment/useMemberPayment"; // 會員付款SWR
+import { useGetMemberOrders } from "@/swr/member/orders/useMemberOrders"; // swr 取得會員db訂單實際資料(需要重新觸發更新狀態)
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams } from "next/navigation";
@@ -82,6 +83,9 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   // 會員付款API
   const { trigger: postPayment } = usePostMemberOrdersPayment();
 
+  // 資料庫中對應的訂單資料更新
+  const { mutate: mutateUpdateMemberOrderStatus } = useGetMemberOrders()
+
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
@@ -116,6 +120,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             }
           );
           toast.success("修改購物車品項成功");
+          mutateUpdateMemberOrderStatus()
         } else if (isEditing && !orderId) {
           toast.error("無效的訂單 ID，無法修改購物車品項");
         } else {
@@ -126,6 +131,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             event_addons: currentPlanAddonItems,
           });
           toast.success("新增購物車品項成功");
+          mutateUpdateMemberOrderStatus()
         }
       } catch (err) {
         if (axios.isAxiosError(err)) {

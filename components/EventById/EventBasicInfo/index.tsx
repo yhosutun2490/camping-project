@@ -18,7 +18,7 @@ interface EventBasicInfoProps {
     bookingCount?: number;
     maxParticipants?: number;
   };
-  registerStatus: string;
+  bookingStatus: string;
 }
 
 export default function EventBasicInfo(props: EventBasicInfoProps) {
@@ -33,24 +33,13 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
     bookingCount,
     maxParticipants,
   } = props.data;
-  const isPassedRegister = props.registerStatus === "passed";
-  const isOverParticipants =
-    maxParticipants !== undefined &&
-    bookingCount !== undefined &&
-    bookingCount >= maxParticipants;
-
-  const registerStatusText = isPassedRegister
-    ? "已截止報名"
-    : isOverParticipants
-    ? "已額滿"
-    : "報名中";
-
+ 
   return (
     <div className="event_basic_info">
       <div className="event_title flex flex-wrap items-center gap-5">
         <p className="heading-1">{eventName}</p>
         <p className="badge border-none bg-primary-500 text-white heading-5 px-2 py-1">
-          {registerStatusText}
+          {props.bookingStatus}
         </p>
       </div>
       <div className="event_info flex gap-2 flex-col md:flex-row flex-wrap justify-between mt-4">

@@ -109,16 +109,34 @@ export default async function EventByIdPage({
   // 報名狀態
   const currentTime = new Date();
 
-  // 定義報名狀態型別
-  type RegisterStatus = "incoming" | "registering" | "passed";
+  // 加入 "full" 狀態
+  type RegisterStatus = "incoming" | "registering" | "full" | "passed";
 
-  // 決定報名狀態
+  // 判斷是否額滿
+  const isOverParticipants =
+    eventIdData?.max_participants !== undefined &&
+    eventIdData?.bookingCounts !== undefined &&
+    eventIdData.bookingCounts >= eventIdData.max_participants;
+
+  // 根據時間與人數決定報名狀態
   const registerStatus: RegisterStatus =
     currentTime < new Date(eventIdData?.registration_open_time ?? "")
       ? "incoming"
       : currentTime > new Date(eventIdData?.registration_close_time ?? "")
       ? "passed"
+      : isOverParticipants
+      ? "full"
       : "registering";
+
+  // 對應顯示文字
+  const registerStatusTextMap: Record<RegisterStatus, string> = {
+    incoming: "尚未開始報名",
+    registering: "報名中",
+    full: "已額滿",
+    passed: "已截止報名",
+  };
+
+  const bookingStatus = registerStatusTextMap[registerStatus]
 
   // 3. 渲染活動資料 若無資料導回活動搜尋頁
   if (!eventIdData) {
@@ -164,7 +182,7 @@ export default async function EventByIdPage({
     address: eventIdData.address.slice(0, 3),
     policy: eventIdData.cancel_policy,
     bookingCounts: 0,
-    maxParticipants: eventIdData.max_participants
+    maxParticipants: eventIdData.max_participants,
   };
 
   // host 主辦方資訊
@@ -228,7 +246,10 @@ export default async function EventByIdPage({
                   discounts={discount_rates.map(String)}
                 />
               </div>
-              <EventBasicInfo data={event_basic_info} registerStatus={registerStatus}/>
+              <EventBasicInfo
+                data={event_basic_info}
+                bookingStatus={bookingStatus}
+              />
               <EventHost host={event_host_info} />
               <EventInfoDescription description={event_description} />
               <EventPlansSection

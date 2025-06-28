@@ -5,6 +5,7 @@ import EventPlanCard from "@/components/EventById/EventPlanSelector/EventPlanCar
 import type { PlanData } from "@/components/EventById/EventPlanSelector/EventPlanCard";
 import type { EventDetail } from "@/components/EventById/EventPlanSelector/EventPlanCard"
 
+
 type Props = {
   event: EventDetail
   name: string;
