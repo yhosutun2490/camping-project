@@ -2,6 +2,7 @@ import type { GetEventsParams } from "@/types/api/event/allEvents";
 import EventFilterShell from "@/components/EventFilterShell";
 import RestButton from "@/components/EventFilterShell/ResetButton";
 import { getEventTags } from "@/api/server-components/event/tags";
+import SelectTagsCounts from "@/components/TabListSection/TabList/SelectTagsCounts";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -68,6 +69,7 @@ export default async function EventPage({
           <span>{searchSummary}</span>
         )}
         <RestButton />
+        <SelectTagsCounts />
       </div>
       <EventFilterShell
         initialFilter={filter}

@@ -48,9 +48,6 @@ export default function TabList({ initialTagsList }: Props) {
 
   return (
     <div className="tag-list p-4 md:p-0 space-y-2">
-      {tags.length > 0 && (
-        <p className="text-primary-300"> 已選擇 {tags.length} 項標籤 </p>
-      )}
       <div className="flex flex-wrap gap-5 px-[10%] py-4 md:p-0">
         {eventTabLists?.map((item) => (
           <div
@@ -59,7 +56,7 @@ export default function TabList({ initialTagsList }: Props) {
           text-sm text-neutral-500 hover:scale-110`,
               tags.includes(item.name ?? "")
                 ? "text-primary-500 bg-primary-50 border-primary-500 border-2"
-                : "bg-transparent border-none bg-white"
+                : "bg-transparent border-transparent border-2 bg-white"
             )}
             key={item.name}
             onClick={() => handleClickTab(item.name as string)}
@@ -69,8 +66,8 @@ export default function TabList({ initialTagsList }: Props) {
               <Icon
                 icon="maki:cross"
                 className="text-primary-500"
-                width={18}
-                height={18}
+                width={16}
+                height={16}
               />
             )}
           </div>

@@ -162,7 +162,7 @@ export default function EventFilterShell({
   return (
     <div className="min-h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
-      <div className="border-b border-zinc-300 py-2 px-4">
+      <div className="border-b border-zinc-300 py-4 px-4">
         <div className="hidden lg:block">
           <TabList initialTagsList={initialEventTags} />
         </div>
