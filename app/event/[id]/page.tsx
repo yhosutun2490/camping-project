@@ -11,28 +11,33 @@ import EventNotice from "@/components/EventById/EventNotice";
 
 import { getEventById } from "@/api/server-components/event/eventId";
 import { redirect } from "next/navigation";
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
 // 動態產生 metadata，根據活動名稱顯示標題
-export async function generateMetadata(
-  { params }: { params: Promise<{ id: string }> },
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
   const eventIdData = await getEventById(id);
   if (!eventIdData) {
     return {
-      title: '活動不存在 | 森森不息',
-      description: '找不到該活動資訊',
-      icons: { icon: '/header/logo_icon.svg' },
+      title: "活動不存在 | 森森不息",
+      description: "找不到該活動資訊",
+      icons: { icon: "/header/logo_icon.svg" },
     };
   }
-  const coverImage = eventIdData.photos?.find((photo: { type: string }) => photo.type === 'cover')?.photo_url || '/main/main_bg_top_1.jpg';
+  const coverImage =
+    eventIdData.photos?.find(
+      (photo: { type: string }) => photo.type === "cover"
+    )?.photo_url || "/main/main_bg_top_1.jpg";
   return {
     title: `${eventIdData.title} | 森森不息`,
-    description: eventIdData.description?.slice(0, 160) || '露營活動詳情',
+    description: eventIdData.description?.slice(0, 160) || "露營活動詳情",
     openGraph: {
       title: eventIdData.title,
-      description: eventIdData.description?.slice(0, 160) || '露營活動詳情',
+      description: eventIdData.description?.slice(0, 160) || "露營活動詳情",
       images: [
         {
           url: coverImage,
@@ -42,7 +47,7 @@ export async function generateMetadata(
         },
       ],
     },
-    icons: { icon: '/header/logo_icon.svg' },
+    icons: { icon: "/header/logo_icon.svg" },
   };
 }
 // 假資料
@@ -101,6 +106,20 @@ export default async function EventByIdPage({
   // 2. api 取得單一活動資料
   const eventIdData = await getEventById(id);
 
+  // 報名狀態
+  const currentTime = new Date();
+
+  // 定義報名狀態型別
+  type RegisterStatus = "incoming" | "registering" | "passed";
+
+  // 決定報名狀態
+  const registerStatus: RegisterStatus =
+    currentTime < new Date(eventIdData?.registration_open_time ?? "")
+      ? "incoming"
+      : currentTime > new Date(eventIdData?.registration_close_time ?? "")
+      ? "passed"
+      : "registering";
+
   // 3. 渲染活動資料 若無資料導回活動搜尋頁
   if (!eventIdData) {
     redirect("/event");
@@ -138,13 +157,14 @@ export default async function EventByIdPage({
   // 活動基本資訊
   const event_basic_info = {
     eventName: eventIdData.title,
-    startTime: new Date(eventIdData.start_time).toISOString().slice(0, 10),
-    endTime: new Date(eventIdData.end_time).toISOString().slice(0, 10),
+    startTime: eventIdData.start_time,
+    endTime: eventIdData.end_time,
+    registerStart: eventIdData.registration_open_time,
+    registerClose: eventIdData.registration_close_time,
     address: eventIdData.address.slice(0, 3),
     policy: eventIdData.cancel_policy,
-    rating: 0,
-    ratingCount: 0,
-    commentCount: "",
+    bookingCounts: 0,
+    maxParticipants: eventIdData.max_participants
   };
 
   // host 主辦方資訊
@@ -181,8 +201,8 @@ export default async function EventByIdPage({
   const shopCartEventDetail = {
     event_info_id: eventIdData.id,
     event_photo_url: eventIdData.photos[0]?.photo_url,
-    event_name: eventIdData.title
-  }
+    event_name: eventIdData.title,
+  };
   return (
     <div className="relative bg-primary-50 pt-2 md:pt-0 text-black min-h-screen flex flex-col">
       <div
@@ -208,7 +228,7 @@ export default async function EventByIdPage({
                   discounts={discount_rates.map(String)}
                 />
               </div>
-              <EventBasicInfo data={event_basic_info} />
+              <EventBasicInfo data={event_basic_info} registerStatus={registerStatus}/>
               <EventHost host={event_host_info} />
               <EventInfoDescription description={event_description} />
               <EventPlansSection

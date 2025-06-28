@@ -4,3 +4,7 @@
     const day = date.getDate().toString().padStart(2, '0');
     return `${month}/${day}`;
   };
+
+export const formateDateTime = (dateStr: string) => {
+  return new Date(dateStr).toISOString().slice(0, 10)
+}
