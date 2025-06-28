@@ -12,7 +12,8 @@ import EventNotice from "@/components/EventById/EventNotice";
 import { getEventById } from "@/api/server-components/event/eventId";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-
+ // 加入 "full" 狀態
+export type RegisterStatus = "incoming" | "registering" | "full" | "passed";
 // 動態產生 metadata，根據活動名稱顯示標題
 export async function generateMetadata({
   params,
@@ -109,8 +110,6 @@ export default async function EventByIdPage({
   // 報名狀態
   const currentTime = new Date();
 
-  // 加入 "full" 狀態
-  type RegisterStatus = "incoming" | "registering" | "full" | "passed";
 
   // 判斷是否額滿
   const isOverParticipants =
@@ -256,6 +255,7 @@ export default async function EventByIdPage({
                 event={shopCartEventDetail}
                 data={event_plans}
                 close_Time={event_register_end}
+                registerStatus={registerStatus}
               />
               <EventNewComment
                 data={{

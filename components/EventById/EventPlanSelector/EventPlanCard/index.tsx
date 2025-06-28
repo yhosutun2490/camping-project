@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import type { AddonItem } from "@/components/EventById/EventPlanSelector/EventAddonCheckbox";
 import EventAddonCheckbox from "@/components/EventById/EventPlanSelector/EventAddonCheckbox";
+import type { RegisterStatus } from "@/app/event/[id]/page";
 import DiscountRate from "./DiscountRate";
 import clsx from "clsx";
 import { useFormContext } from "react-hook-form";
@@ -48,6 +49,7 @@ export type EventPlanCardProps = {
   plan: PlanData;
   isSelected?: boolean; // 是否選中
   unit?: string; // 單位（如每人、每組等）
+  registerStatus?: RegisterStatus; // 報名狀態
 };
 
 export default function EventPlanCard(props: EventPlanCardProps) {
@@ -55,6 +57,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     event,
     plan,
     unit = "NT$", // 預設單位為NT$
+    registerStatus,
   } = props;
   const { id, title, deadline, features, price, originalPrice } = plan;
   const { watch } = useFormContext(); // 設定表單選取資料
@@ -62,6 +65,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const modalId = `login-reminder-${plan.id}`; // modal id
   const memberData = useMemberLogin((state) => state.member);
   const isMemberLogin = !!memberData?.id; // 是否登入
+  const isOnRegistering = registerStatus === "registering"; // 開放報名狀態
 
   // 是否有訂單id
   const params = useParams();
@@ -84,7 +88,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const { trigger: postPayment } = usePostMemberOrdersPayment();
 
   // 資料庫中對應的訂單資料更新
-  const { mutate: mutateUpdateMemberOrderStatus } = useGetMemberOrders()
+  const { mutate: mutateUpdateMemberOrderStatus } = useGetMemberOrders();
 
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
@@ -113,14 +117,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         if (isEditing && orderId) {
           // 修改訂單
           await patchOrder({
-              orderId: orderId,
-              event_plan_id: plan.id,
-              quantity: 1,
-              event_addons: currentPlanAddonItems,
-            }
-          );
+            orderId: orderId,
+            event_plan_id: plan.id,
+            quantity: 1,
+            event_addons: currentPlanAddonItems,
+          });
           toast.success("修改購物車品項成功");
-          mutateUpdateMemberOrderStatus()
+          mutateUpdateMemberOrderStatus();
         } else if (isEditing && !orderId) {
           toast.error("無效的訂單 ID，無法修改購物車品項");
         } else {
@@ -131,7 +134,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             event_addons: currentPlanAddonItems,
           });
           toast.success("新增購物車品項成功");
-          mutateUpdateMemberOrderStatus()
+          mutateUpdateMemberOrderStatus();
         }
       } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -173,7 +176,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         }
 
         const newOrderId = [orderId];
-        console.log('報名取得新建id',newOrderId)
+        console.log("報名取得新建id", newOrderId);
 
         /* 2. 取得付款 HTML 表單 */
         const { data: paymentRes } = await postPayment({
@@ -222,7 +225,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         </div>
       </div>
       {/*加購選擇區*/}
-      <EventAddonCheckbox name="plan_addons" options={plan.addonBox} />
+      <EventAddonCheckbox
+        name="plan_addons"
+        options={plan.addonBox}
+        className={
+          isOnRegistering ?  undefined : "pointer-events-none opacity-60"
+        }
+      />
 
       {/*方案價格區*/}
       <div
@@ -242,34 +251,44 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         </div>
 
         <div className="btn_wrap md:ml-auto flex gap-4 justify-center lg:justify-between">
-          <button
-            className="cursor-pointer border-2 border-primary-700 bg-white 
+          {isOnRegistering ? (
+            <>
+              <button
+                className="cursor-pointer border-2 border-primary-700 bg-white 
             text-primary-700 py-2 px-4 rounded-md min-w-[100px] h-[40px]
             leading-[20px] hover:bg-primary-300"
-            onClick={(e) => {
-              e.preventDefault();
-              handleOnClickSignupEvent();
-            }}
-          >
-            {isBookingDirect ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              "直接報名"
-            )}
-          </button>
-          <button
-            className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
-            onClick={(e) => {
-              e.preventDefault();
-              handleOnClickAddCart();
-            }}
-          >
-            {(isMutating && !isBookingDirect) || isMutatingPatch ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              isEditing?"修改購物車":"加入購物車"
-            )}
-          </button>
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOnClickSignupEvent();
+                }}
+              >
+                {isBookingDirect ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  "直接報名"
+                )}
+              </button>
+              <button
+                className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOnClickAddCart();
+                }}
+              >
+                {(isMutating && !isBookingDirect) || isMutatingPatch ? (
+                  <span className="loading loading-spinner"></span>
+                ) : isEditing ? (
+                  "修改購物車"
+                ) : (
+                  "加入購物車"
+                )}
+              </button>
+            </>
+          ): (
+            <button  className="bg-grey-100 text-primary-300 py-2 px-4 rounded-md min-w-[100px] h-[40px]">
+              截止報名
+              </button>
+          )}
         </div>
       </div>
 

@@ -99,7 +99,7 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
         </section>
         {/*取消政策*/}
         <div className="policy register_counts flex flex-col">
-          <div className="policy flex items-center heading-5">
+          <div className="policy flex flex-col justify-start heading-5">
             {policy
               ?.split(/[,，、]/) // 同時支援中英文逗號
               .filter(Boolean) // 避免空字串

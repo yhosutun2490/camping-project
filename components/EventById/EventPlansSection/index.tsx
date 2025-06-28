@@ -9,19 +9,23 @@ import { eventPlanSchema } from "@/schema/EventPlanForm";
 import { PlanData } from "@/components/EventById/EventPlanSelector/EventPlanCard";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
+import type {RegisterStatus} from "@/app/event/[id]/page"
 
 type FormType = z.infer<typeof eventPlanSchema>;
+// 加入 "full" 狀態
 
 interface Props {
   event: EventDetail
   data?: EventPlan[];
   close_Time?: string; // 報名截止時間
+  registerStatus?: RegisterStatus;
 }
 // 集中方案表單資料 1.方案選項 2.加購選項
 export default function EventPlansSection({
   event,
   data,
   close_Time = "2025-07-30",
+  registerStatus
 }: Props) {
   // 預設有order編輯訂單資料
 
@@ -75,7 +79,7 @@ export default function EventPlansSection({
       <form>
         <div id="plan" className="event_plan_section space-y-10">
           <p className="heading-2">選擇方案</p>
-          <EventPlanSelector name="plan" plans={planData} event={event} />
+          <EventPlanSelector name="plan" plans={planData} event={event} registerStatus={registerStatus}/>
         </div>
       </form>
     </FormProvider>
