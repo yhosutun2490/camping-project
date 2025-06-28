@@ -14,7 +14,7 @@ export default function EventPriceCard({
   unit = "每人",
   discounts = [],
 }: EventPriceCardProps) {
- 
+
   function handleClickPlan() {
     const isMobile = window.innerWidth < 1024;
     const dynamicOffset = isMobile ? 52 : 90;
@@ -34,9 +34,9 @@ export default function EventPriceCard({
 
       <div className="flex items-center mb-4">
         <div className="flex space-x-3">
-          {discounts.map((discount) => (
+          {discounts.map((discount,index) => (
             <div
-              key={discount}
+              key={discount + index}
             >
               <DiscountRate rate={discount} />
             </div>

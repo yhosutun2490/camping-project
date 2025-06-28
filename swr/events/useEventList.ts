@@ -14,7 +14,7 @@ export const fetcher = (url: string) =>
  * @param filters 搜尋活動的query string 參數
  */
 export function useEventList(filters: GetEventsParams) {
-  const perPage = filters.per ?? 10;
+  const perPage = filters.per ?? 9;
 
   // key generator：捕獲外部 filters
   const getKey = (pageIndex: number, prev: EventListResponse | null) => {

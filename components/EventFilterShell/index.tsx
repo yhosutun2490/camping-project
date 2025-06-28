@@ -86,7 +86,7 @@ export default function EventFilterShell({
     setTags,
   ]);
   // 單純用observer 監控拉取新的活動資料
-    /* ---------- Intersection Observer sentinel ---------- */
+  /* ---------- Intersection Observer sentinel ---------- */
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!sentinelRef.current) return;
@@ -102,7 +102,6 @@ export default function EventFilterShell({
   const itemsPerRow = useItemsPerRow();
 
   // 無限載入實作
- 
 
   // 3. 判斷某筆 index 資料是否已經載入
   // const isItemLoaded = useCallback(
@@ -259,7 +258,11 @@ export default function EventFilterShell({
 
               {/* 載入更多 loading 動畫 */}
               {isLoadingMore && (
-                <p className="mt-4 text-center text-primary-400">載入中…</p>
+                <div className="grid grid-cols-1 justify-center lg:grid-cols-2 xl:grid-cols-3 gap-10 px-4">
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <SkeletonCard key={idx} />
+                  ))}
+                </div>
               )}
             </>
           )}

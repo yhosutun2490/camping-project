@@ -233,7 +233,7 @@ export default async function EventByIdPage({
               <div className="hidden lg:block md:sticky md:top-[100px]">
                 {/* 2. 活動價格卡片 */}
                 <EventPriceCard
-                  price={lowestPlan.discounted_price}
+                  price={lowestPlan.discounted_price || 0}
                   unit="每人"
                   discounts={discount_rates.map(String)}
                 />

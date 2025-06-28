@@ -88,7 +88,7 @@ export default function EventCard({
           <span className="text-xl text-primary-500 font-bold">
             NT$ {price}
           </span>
-          <span className="text-base text-neutral-700 pl-2">/ 最低每人</span>
+          <span className="text-base text-neutral-700 pl-2">/ 每人</span>
         </div>
         <div
           className="card-actions mt-auto"
