@@ -25,6 +25,7 @@ export default function EventHost({ host }: Props) {
   } = host ?? {};
 
   const router = useRouter();
+  console.log('活動host',host)
 
   return (
     <div className="event_host_info flex gap-4 bg-primary-100 rounded-full p-4">

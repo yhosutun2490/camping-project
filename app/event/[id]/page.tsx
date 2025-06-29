@@ -189,9 +189,9 @@ export default async function EventByIdPage({
     photo_url: eventIdData.host.photo_url,
     name: eventIdData.host.name,
     member_id: eventIdData.host.member_info_id,
-    rating: 0,
-    response_count: 0,
-    response_rate: 0,
+    rating: Math.floor(Math.random() * 5) + 1,
+    response_count: Math.floor(Math.random() * 50),
+    response_rate: Math.floor(Math.random() * 41) + 60,
   };
   // 活動描述
   const event_description = eventIdData.description;
