@@ -254,7 +254,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               {currentPlanAddonItems.length > 0 && (
                 <div className="absolute -top-5 left-0 w-fit text-primary-500 heading-7 rounded-2xl">含加購總價</div>
               )}
-              {unit} {(price + selectTotalPrice).toLocaleString() || "0"}
+              {unit} {(selectTotalPrice).toLocaleString() || "0"}
             </div>
             <div className="original text-gray-500 text-base line-through">
               {unit} {originalPrice?.toLocaleString() || "0"}
