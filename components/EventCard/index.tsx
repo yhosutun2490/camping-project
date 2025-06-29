@@ -14,8 +14,8 @@ interface Props {
   price?: string;
   address?: string;
   tags?: string[];
-  max_participants: number,
-  total_signup: number
+  max_participants?: number,
+  total_signup?: number
 }
 
 export default function EventCard({
