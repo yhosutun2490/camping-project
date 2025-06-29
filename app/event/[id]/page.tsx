@@ -8,11 +8,12 @@ import EventPlansSection from "@/components/EventById/EventPlansSection";
 import EventNewComment from "@/components/EventById/EventNewComment";
 import EventIntroduction from "@/components/EventById/EventIntroduction";
 import EventNotice from "@/components/EventById/EventNotice";
-
 import { getEventById } from "@/api/server-components/event/eventId";
 import { redirect } from "next/navigation";
+import type { TypeCommentCard } from "@/components/CommentCard";
+import sampleComments from "@/fakeData/sampleComments_richer"; // 評論假資料
 import type { Metadata } from "next";
- // 加入 "full" 狀態
+// 加入 "full" 狀態
 export type RegisterStatus = "incoming" | "registering" | "full" | "passed";
 // 動態產生 metadata，根據活動名稱顯示標題
 export async function generateMetadata({
@@ -51,50 +52,20 @@ export async function generateMetadata({
     icons: { icon: "/header/logo_icon.svg" },
   };
 }
-// 假資料
-
-const sampleComment = [
-  {
-    userInfo: {
-      user_id: "u001",
-      name: "陳明輝",
-      image: "/header/user_image.jpg",
-    },
-    eventInfo: {
-      event_id: "e101",
-      event_name: "松林谷地露營區",
-      host_id: "h1001",
-      host_name: "蔚然海岸",
-    },
-    comment: {
-      id: "c0001",
-      description:
-        "環境非常優美，樹木扶疏提供良好的遮蔭。營地平整且寬敞，方便帳篷搭建。廁所及淋浴設施乾淨整潔，管理人員服務態度親切。夜晚可以清楚看到滿天星斗，早晨還有機會看到壯麗的日出。絕對會再次造訪！",
-      date: "2025-01-01",
-      rating: 5,
-    },
-  },
-  {
-    userInfo: {
-      user_id: "u002",
-      name: "林佳穎",
-      image: "/header/user_image.jpg",
-    },
-    eventInfo: {
-      event_id: "e102",
-      event_name: "藍海灣露營地",
-      host_id: "h1002",
-      host_name: "嘎嘎作響",
-    },
-    comment: {
-      id: "c0002",
-      description:
-        "位置靠近海邊最好的，但風稍強平是白天的（防曬）。有防風牆和樹遮擋視野的山。廚房設施完善，有提供基本調味料。夜晚可以聽到海浪聲，非常放鬆。少了一顆星是因為衛浴設施數量不足，尖峰時段需要排隊",
-      date: "2025-05-05",
-      rating: 4,
-    },
-  },
-];
+// 隨機評論資料
+function getRandomComments(arr: TypeCommentCard[], count: number, host_name: string, event_name:string) {
+  const shuffled = [...arr]
+    .sort(() => 0.5 - Math.random())
+    .map(data => ({
+      ...data,
+      eventInfo: {
+        ...data.eventInfo,
+        host_name: host_name,
+        event_name: event_name
+      },
+    }));
+  return shuffled.slice(0, count).sort((a, b) => new Date(b.comment.date).getTime() - new Date(a.comment.date).getTime());
+}
 
 export default async function EventByIdPage({
   params,
@@ -109,7 +80,6 @@ export default async function EventByIdPage({
 
   // 報名狀態
   const currentTime = new Date();
-
 
   // 判斷是否額滿
   const isOverParticipants =
@@ -135,7 +105,7 @@ export default async function EventByIdPage({
     passed: "已截止報名",
   };
 
-  const bookingStatus = registerStatusTextMap[registerStatus]
+  const bookingStatus = registerStatusTextMap[registerStatus];
 
   // 3. 渲染活動資料 若無資料導回活動搜尋頁
   if (!eventIdData) {
@@ -189,7 +159,7 @@ export default async function EventByIdPage({
     photo_url: eventIdData.host.photo_url,
     name: eventIdData.host.name,
     member_id: eventIdData.host.member_info_id,
-    rating: Math.floor(Math.random() * 5) + 1,
+    rating: Math.floor(Math.random() * 4) + 3,
     response_count: Math.floor(Math.random() * 50),
     response_rate: Math.floor(Math.random() * 41) + 60,
   };
@@ -210,6 +180,24 @@ export default async function EventByIdPage({
     photo_url: event_detail_photo?.photo_url,
     detail: event_detail_photo?.description,
   };
+
+  // 活動評論
+  const randomComment = getRandomComments(
+    sampleComments,
+    Math.ceil(Math.random() * 40),
+    eventIdData?.host.name,
+    eventIdData?.title
+  );
+
+  const commentRating = Math.round(
+    randomComment.length > 0
+      ? randomComment.reduce(
+          (acc, currentItem: TypeCommentCard) =>
+            acc + currentItem.comment.rating,
+          0
+        ) / randomComment.length
+      : 0
+  );
 
   // 行前提醒notice
   const event_notices = eventIdData.notices;
@@ -249,7 +237,6 @@ export default async function EventByIdPage({
                 data={event_basic_info}
                 bookingStatus={bookingStatus}
                 registerStatus={registerStatus}
-                
               />
               <EventHost host={event_host_info} />
               <EventInfoDescription description={event_description} />
@@ -261,9 +248,9 @@ export default async function EventByIdPage({
               />
               <EventNewComment
                 data={{
-                  rating: 4,
-                  counts: 78,
-                  comment_data: sampleComment,
+                  rating: commentRating,
+                  counts: randomComment.length,
+                  comment_data: randomComment,
                 }}
               />
               <EventIntroduction
