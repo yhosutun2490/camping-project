@@ -25,7 +25,7 @@ export default function EventNewComment({ data }: Props) {
           <span className="heading-5">{rating}</span>
           <span className="text-base text-neutral-700">({counts})</span>
         </div>
-        <CheckCommentButton className="ml-auto" />
+        <CheckCommentButton className="ml-auto" comment_data={comment_data}/>
       </div>
       <div className="comment_cards grid gap-8 grid-cols-1 md:grid-cols-2">
         {comment_data?.slice(0, 2).map((item, idx) => (

@@ -1,5 +1,5 @@
 "use client";
-import AddFavoriteButton from "../AddFavoriteButton";
+// import AddFavoriteButton from "../AddFavoriteButton";
 import { Icon } from "@iconify/react";
 import { formateDateTime } from "@/utils/formateDate";
 import type { RegisterStatus } from "@/app/event/[id]/page"
@@ -48,7 +48,7 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
           {props.bookingStatus}
         </p>
       </div>
-      <div className="event_info flex gap-2 flex-col md:flex-row flex-wrap justify-between mt-4">
+      <div className="event_info flex space-x-8 flex-col md:flex-row flex-wrap justify-between mt-4">
         {/*基本資訊*/}
         <section className="basic_info_section">
           <div className="location flex space-x-2 items-center heading-5 h-10">
@@ -104,7 +104,7 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
           </div> */}
         </section>
         {/*取消政策*/}
-        <div className="policy register_counts flex flex-col">
+        <div className="policy register_counts flex flex-grow-1 flex-col">
           <div className="policy flex flex-col justify-start heading-5">
             {policy
               ?.split(/[,，、]/) // 同時支援中英文逗號
@@ -138,7 +138,7 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
         </div>
 
         {/*收藏*/}
-        <AddFavoriteButton isAddFavorite={false} className="mt-4 md:mt-0" />
+        {/* <AddFavoriteButton isAddFavorite={false} className="mt-4 md:mt-0" /> */}
       </div>
     </div>
   );
