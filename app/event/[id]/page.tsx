@@ -84,8 +84,8 @@ export default async function EventByIdPage({
   // 判斷是否額滿
   const isOverParticipants =
     eventIdData?.max_participants !== undefined &&
-    eventIdData?.bookingCounts !== undefined &&
-    eventIdData.bookingCounts >= eventIdData.max_participants;
+    eventIdData?.total_signup !== undefined &&
+    eventIdData.total_signup >= eventIdData.max_participants;
 
   // 根據時間與人數決定報名狀態
   const registerStatus: RegisterStatus =
@@ -150,7 +150,7 @@ export default async function EventByIdPage({
     registerClose: eventIdData.registration_close_time,
     address: eventIdData.address.slice(0, 3),
     policy: eventIdData.cancel_policy,
-    bookingCounts: 0,
+    bookingCounts: eventIdData.total_signup,
     maxParticipants: eventIdData.max_participants,
   };
 

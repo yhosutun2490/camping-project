@@ -11,7 +11,7 @@ export type GetApiV1EventsEventIdResponse = SuccessResponse<{
   description: string;
   start_time: string;
   end_time: string;
-  bookingCounts: number;
+  total_signup: number;
   max_participants: number;
   cancel_policy: string;
   active: string;
