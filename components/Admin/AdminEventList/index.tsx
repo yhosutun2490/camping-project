@@ -42,15 +42,15 @@ export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
       isTextCenter: true,
     },
   ];
-  type TabList = "待審核" | "已退回";
-  const [activeTab, setActiveTab] = useState<TabList>("待審核");
-  const selectList = activeTab === "待審核" ? pendingEvents : rejectEvents;
+  type TabList = "待審核上架" | "已退回";
+  const [activeTab, setActiveTab] = useState<TabList>("待審核上架");
+  const selectList = activeTab === "待審核上架" ? pendingEvents : rejectEvents;
 
   return (
     <>
       {/* 篩選器（選填） */}
       <div className="mb-4 flex gap-2 overflow-x-auto">
-        {["待審核"].map((label) => (
+        {["待審核上架","待審核下架"].map((label) => (
           <button
             key={label}
             className={clsx(
@@ -65,13 +65,13 @@ export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
       </div>
       {/* 桌機審核清單列表 */}
       <div className="pending_event_list hidden lg:block">
-        {selectList.length && (
+        {selectList.length? (
           <div className="grid grid-cols-[70px_2fr_50px_70px_80px_100px] items-center gap-4 border-b py-2 text-sm font-semibold text-neutral-500">
             {titleList.map((item) => (
               <span key={item.id}>{item.value}</span>
             ))}
-          </div>
-        )}
+          </div> 
+        ): ""}
 
         {/* 列表 */}
 

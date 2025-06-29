@@ -3,7 +3,7 @@ import { GetEventListSuccessResponse } from "@/types/api/admin"
 import { cookies } from "next/headers";
 import axiosInstance  from "@/api/axiosIntance"
 
-type status = 'pending' | 'reject'
+type status = 'pending' | 'reject' | 'unpublish_pending'
 export async function getAdminEvents(status: status): Promise<GetEventListSuccessResponse['data'] | null> {
     try {
       const cookieStore = await cookies()

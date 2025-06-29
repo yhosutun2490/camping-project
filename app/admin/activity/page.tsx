@@ -398,9 +398,11 @@ import AdminEventList from "@/components/Admin/AdminEventList";
 export default async function ActivityAuditPage() {
   const pending = await getAdminEvents('pending')
   const reject = await getAdminEvents('reject')
+  const unpublishPending= await getAdminEvents('unpublish_pending')
   const eventsPending = pending?.data_lists ?? [];
   const eventReject = reject?.data_lists?? [];
-  console.log('admin待審核', eventsPending, 'admin退回', eventReject)
+  const eventUnPublishPending = unpublishPending?.data_lists ?? []
+  console.log('admin待審核', eventsPending, 'admin待下架', eventUnPublishPending)
 
   return (
     <section className="mx-auto">
