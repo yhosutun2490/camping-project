@@ -248,6 +248,8 @@ export default async function EventByIdPage({
               <EventBasicInfo
                 data={event_basic_info}
                 bookingStatus={bookingStatus}
+                registerStatus={registerStatus}
+                
               />
               <EventHost host={event_host_info} />
               <EventInfoDescription description={event_description} />

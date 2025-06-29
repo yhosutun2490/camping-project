@@ -2,6 +2,8 @@
 import AddFavoriteButton from "../AddFavoriteButton";
 import { Icon } from "@iconify/react";
 import { formateDateTime } from "@/utils/formateDate";
+import type { RegisterStatus } from "@/app/event/[id]/page"
+import clsx from "clsx";
 
 interface EventBasicInfoProps {
   data: {
@@ -19,6 +21,7 @@ interface EventBasicInfoProps {
     maxParticipants?: number;
   };
   bookingStatus: string;
+  registerStatus: RegisterStatus
 }
 
 export default function EventBasicInfo(props: EventBasicInfoProps) {
@@ -33,12 +36,15 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
     bookingCount,
     maxParticipants,
   } = props.data;
+
+  const isOnRegistering = props.registerStatus === 'registering'
  
   return (
     <div className="event_basic_info">
       <div className="event_title flex flex-wrap items-center gap-5">
         <p className="heading-1">{eventName}</p>
-        <p className="badge border-none bg-primary-500 text-white heading-5 px-2 py-1">
+        <p className={clsx("badge border-none text-white heading-6", 
+        isOnRegistering? "bg-primary-500": "bg-orange-500")}>
           {props.bookingStatus}
         </p>
       </div>

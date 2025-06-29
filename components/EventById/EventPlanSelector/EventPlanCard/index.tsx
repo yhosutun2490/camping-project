@@ -17,7 +17,7 @@ import { useGetMemberOrders } from "@/swr/member/orders/useMemberOrders"; // swr
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import DialogModal from "@/components/DialogModal";
 import { injectAndSubmitECPayForm } from "@/utils/ecPayForm";
 
@@ -108,6 +108,15 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const discountedRate = originalPrice
     ? ((price / originalPrice) * 100).toFixed(0)
     : "100"; // 計算折扣價格比例
+
+  // 計算點選總價
+  const selectTotalPrice = useMemo(() => {
+    const addonPrice = (currentPlanAddonItems as AddonItem[]).reduce(
+      (acc: number, current: AddonItem) => acc + current.price,
+      0
+    );
+    return plan.price + addonPrice;
+  }, [currentPlanAddonItems, plan.price]);
 
   // 點擊購物車行為
   async function handleOnClickAddCart() {
@@ -229,7 +238,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         name="plan_addons"
         options={plan.addonBox}
         className={
-          isOnRegistering ?  undefined : "pointer-events-none opacity-60"
+          isOnRegistering ? undefined : "pointer-events-none opacity-60"
         }
       />
 
@@ -241,12 +250,15 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         <div className="discount_info flex items-center space-y-2 space-x-4">
           <DiscountRate rate={discountedRate} />
           <div className="event_price flex gap-2 items-start">
-            <p className="discount text-primary-500 heading-4 md:heading-3">
-              {unit} {price?.toLocaleString() || "0"}
-            </p>
-            <p className="original text-gray-500 text-base line-through">
+            <div className="discount relative text-primary-500 heading-4 md:heading-3">
+              {currentPlanAddonItems.length > 0 && (
+                <div className="absolute -top-5 left-0 w-fit text-primary-500 heading-7 rounded-2xl">含加購總價</div>
+              )}
+              {unit} {(price + selectTotalPrice).toLocaleString() || "0"}
+            </div>
+            <div className="original text-gray-500 text-base line-through">
               {unit} {originalPrice?.toLocaleString() || "0"}
-            </p>
+            </div>
           </div>
         </div>
 
@@ -284,10 +296,10 @@ export default function EventPlanCard(props: EventPlanCardProps) {
                 )}
               </button>
             </>
-          ): (
-            <button  className="bg-grey-100 text-primary-300 py-2 px-4 rounded-md min-w-[100px] h-[40px]">
-              截止報名
-              </button>
+          ) : (
+            <button className="bg-grey-100 text-primary-300 py-2 px-4 rounded-md min-w-[100px] h-[40px]">
+              {registerStatus === "incoming" ? "尚未開放報名" : "截止報名"}
+            </button>
           )}
         </div>
       </div>
