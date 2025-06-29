@@ -17,7 +17,7 @@ interface EventBasicInfoProps {
     rating?: number;
     ratingCount?: number;
     commentCount?: string;
-    bookingCount?: number;
+    bookingCounts?: number;
     maxParticipants?: number;
   };
   bookingStatus: string;
@@ -33,10 +33,10 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
     registerClose,
     address = "台灣・苗栗",
     policy = "15天前可免費取消,現場出示電子憑證",
-    bookingCount,
+    bookingCounts,
     maxParticipants,
   } = props.data;
-
+ 
   const isOnRegistering = props.registerStatus === 'registering'
  
   return (
@@ -131,7 +131,7 @@ export default function EventBasicInfo(props: EventBasicInfoProps) {
             <div className="flex gap-1">
               <p>已報名人數:</p>
               <p>
-                {bookingCount ?? 0} / {maxParticipants}
+                {bookingCounts} / {maxParticipants}
               </p>
             </div>
           </div>
