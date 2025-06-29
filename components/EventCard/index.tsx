@@ -12,12 +12,10 @@ interface Props {
   category?: string;
   title?: string;
   price?: string;
-  person?: {
-    subscribed: number;
-    max: number;
-  };
   address?: string;
   tags?: string[];
+  max_participants: number,
+  total_signup: number
 }
 
 export default function EventCard({
@@ -29,10 +27,8 @@ export default function EventCard({
   image,
   title = "",
   price = "",
-  person = {
-    subscribed: 0,
-    max: 30,
-  },
+  max_participants,
+  total_signup,
   address = "",
   tags = [],
 }: Props) {
@@ -51,7 +47,7 @@ export default function EventCard({
           {formatDate(date?.start)} - {formatDate(date?.end)}
         </p>
         <p className="text-primary-500 font-semibold">
-          報名人數: {person?.subscribed} / {person?.max}
+          報名人數: {total_signup} / {max_participants}
         </p>
       </div>
 

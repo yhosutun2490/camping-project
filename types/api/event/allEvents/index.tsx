@@ -12,6 +12,8 @@ export type Event = {
   start_time: string; // ISO string
   end_time: string;   // ISO string
   address: string;
+  max_participants: number,
+  total_signup: number,
   plans: EventPlan[];
   photos: string[];
   tags: string[];
