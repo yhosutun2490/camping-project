@@ -10,7 +10,7 @@ export type EventItem = {
   max_participants?: number;
   photos: string[];
 };
-
+export type topPlacesEvents = Record<string, EventItem[]>
 
 type EventAPIResponse = {
   popularEvents: EventItem[];
