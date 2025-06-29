@@ -208,6 +208,11 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     }
   }
 
+  // 未登入提示關閉
+  function handleCloseInfoModal() {
+    if (modalRef.current) modalRef.current.checked = false
+  }
+
   return (
     <div
       className={clsx(
@@ -306,11 +311,15 @@ export default function EventPlanCard(props: EventPlanCardProps) {
 
       <DialogModal id={modalId} modalRef={modalRef} modalWidth="max-w-md">
         <h3 className="font-bold heading-3 text-primary-500">請先登入</h3>
-        <p className="py-4 heading-5 text-black">登入後才能執行此操作</p>
+        <p className="py-4 heading-5 text-black">登入後才能執行報名操作</p>
         <div className="modal-action">
-          <label htmlFor={modalId} className="btn-primary">
-            關閉
-          </label>
+         <label
+          htmlFor="login"
+          className="btn-primary"
+          onClick={handleCloseInfoModal}
+        >
+          登入
+        </label>
         </div>
       </DialogModal>
     </div>
