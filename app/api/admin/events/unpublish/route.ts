@@ -39,7 +39,7 @@ export async function PATCH(
   try {
     /* 2. 轉呼後端 API */
     const res: AxiosResponse<PatchAdminUnpublishEventSuccessResponse> = await axiosInstance.patch(
-      `/admin/events/${eventId}/unpublish/review`,
+      `/admin/events/${eventId}/unpublish-review`,
       {isApprove, comment},
       {
         headers: { Cookie: `access_token=${token}` },

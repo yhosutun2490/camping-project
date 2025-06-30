@@ -36,8 +36,8 @@ export default function UnPublishButtonList({ className, eventId }: Props) {
   async function handleApproveUnPublishEvent() {
     try {
       await patchUnPublishEvent({ eventId, comment:approveReason, isApprove:true });
-      toast.success("活動下架成功");
       router.refresh();
+    toast.success("活動下架成功");
     } catch (err) {
       let message = "發生未知錯誤";
       if (err instanceof AxiosError && err.response) {
@@ -52,8 +52,8 @@ export default function UnPublishButtonList({ className, eventId }: Props) {
   async function handleRejectUnPublishEvent() {
     try {
       await patchUnPublishEvent({ eventId, comment:rejectReason, isApprove:false });
-      toast.success("活動下架審核退回成功");
       router.refresh();
+      toast.success("活動下架審核退回成功");
     } catch (err) {
       let message = "發生未知錯誤";
       if (err instanceof AxiosError && err.response) {
