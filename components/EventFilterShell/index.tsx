@@ -250,6 +250,7 @@ export default function EventFilterShell({
                       address={item.address.slice(0, 3)}
                       max_participants={item.max_participants}
                       total_signup={item.total_signup}
+                      status={item.status}
                     />
                   </div>
                 ))}

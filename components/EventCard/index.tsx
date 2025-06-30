@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import ImageSkeleton from "../ImageSkeleton";
+import type {Event} from "@/types/api/event/allEvents"
+import clsx from "clsx";
 
 interface Props {
   id?: string;
@@ -15,7 +17,8 @@ interface Props {
   address?: string;
   tags?: string[];
   max_participants?: number,
-  total_signup?: number
+  total_signup?: number,
+  status?: Event['status']
 }
 
 export default function EventCard({
@@ -31,6 +34,7 @@ export default function EventCard({
   total_signup,
   address = "",
   tags = [],
+  status
 }: Props) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -38,6 +42,17 @@ export default function EventCard({
     const day = date.getDate().toString().padStart(2, "0");
     return `${month}/${day}`;
   };
+
+   const registerStatusTextMap: Record<Event["status"], string> = {
+    preparing: "尚未開始報名",
+    registering: "報名中",
+    full: "已額滿",
+    expired: "已截止報名",
+    refunding: "退款中",
+    cancelled: "活動已取消",
+    finished: "活動已結束",
+  };
+
 
   const router = useRouter();
   return (
@@ -63,10 +78,16 @@ export default function EventCard({
         />
         <div
           className="absolute badge border-none bg-primary-100 text-primary-500 
-        top-6 right-0 rounded-r-none"
+        top-11 right-0 rounded-r-none"
         >
           {address.slice(0, 3)}
         </div>
+        {status && <div
+          className={clsx(`absolute badge border-none text-white
+        top-4 right-0 rounded-r-none`, status !=='registering'?'bg-orange-300':'bg-primary-500')}
+        >
+          {registerStatusTextMap[status]}
+        </div>}
       </figure>
 
       <div className="card-body p-0 flex flex-col gap-2">
