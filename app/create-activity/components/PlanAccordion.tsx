@@ -62,6 +62,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
             title: plan.title,
             price: plan.price,
             discounted_price: plan.discountPrice,
+            people_capacity: plan.people_capacity,
             contents: plan.content?.map((item) => item.value) || [],
             addons: plan.addOns || [],
           })),
@@ -84,6 +85,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
             title: plan.title,
             price: plan.price,
             discounted_price: plan.discountPrice,
+            people_capacity: plan.people_capacity,
             contents: plan.content?.map((item) => item.value) || [],
             addons: plan.addOns || [],
           })),
@@ -168,6 +170,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
         title: `方案 ${fields.length + 1}`,
         price: 0,
         discountPrice: 0,
+        people_capacity: 1, // 預設為 1 人方案
         content: [{ value: '' }],
         addOns: [],
       });

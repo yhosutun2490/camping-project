@@ -165,6 +165,24 @@ function PlanAccordionItem({
                         />
                       </FormField>
                     </div>
+
+                    {/* 方案人數 */}
+                    <div className="lg:w-40">
+                      <FormField
+                        label="方案人數"
+                        name={`plans.${index}.people_capacity`}
+                        required
+                        error={planErrors?.people_capacity?.message}
+                      >
+                        <FormNumberInput
+                          name={`plans.${index}.people_capacity`}
+                          min={1}
+                          max={20}
+                          step={1}
+                          placeholder="人數"
+                        />
+                      </FormField>
+                    </div>
                   </div>
                 </div>
               </div>

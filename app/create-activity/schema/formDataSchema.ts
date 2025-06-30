@@ -219,6 +219,7 @@ const PlanSchema = z
     title: z.string().min(1, '請輸入方案標題').max(100, '最多100字'),
     price: z.number({ invalid_type_error: '請輸入有效的價格' }).min(1, '方案價格須大於0'),
     discountPrice: z.number({ invalid_type_error: '請輸入有效的價格' }).min(0, '價格不可為負').optional(),
+    people_capacity: z.number({ invalid_type_error: '請輸入有效的人數' }).min(1, '方案人數須大於0').max(20, '方案人數不可超過20人'),
     content: z.array(ContentSchema).min(1, '請至少新增一項方案內容'),
     addOns: z.array(AddOnSchema).optional(),
   })
