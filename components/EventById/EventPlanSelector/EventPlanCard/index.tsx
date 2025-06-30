@@ -303,7 +303,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             </>
           ) : (
             <button className="bg-grey-100 text-primary-300 py-2 px-4 rounded-md min-w-[100px] h-[40px]">
-              {registerStatus === "incoming" ? "尚未開放報名" : "截止報名"}
+              {registerStatus === "preparing" ? "尚未開放報名" : "截止報名"}
             </button>
           )}
         </div>
