@@ -21,10 +21,10 @@ interface Props {
 }
 
 export default function PlaceEventSlider({ data }: Props) {
-  const router = useRouter()
+  const router = useRouter();
 
   function handleClickCard(eventId: string) {
-    router.push(`/event/${eventId}`)
+    router.push(`/event/${eventId}`);
   }
 
   return (
@@ -37,7 +37,33 @@ export default function PlaceEventSlider({ data }: Props) {
           <div key={idx} className="relative space-y-4 overflow-visible">
             <p className="heading-3 text-start">{item.location}</p>
             <div className="place_list_col space-y-4 max-w-[362px]">
-              {item.places.map((place, idx2) => {
+              {[
+                ...item.places,
+                ...Array(3 - item.places.length).fill(null),
+              ].map((place, idx2) => {
+                if (!place) {
+                  return (
+                    <div
+                      key={`placeholder-${idx2}`}
+                      className="place_info_card relative rounded-xl 
+                      w-full h-full aspect-[5/3] overflow-hidden"
+                    >
+                      <ImageSkeleton
+                        src={"/main/about/coming_soon.png"}
+                        alt="coming_soon"
+                        width={362}
+                        height={204}
+                        className="w-full h-full object-cover aspect-[5/3] rounded-xl opacity-80"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                        <p className="text-white heading-5">
+                          即將上架
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <div
                     className="place_info_card relative"
@@ -52,10 +78,12 @@ export default function PlaceEventSlider({ data }: Props) {
                         height={204}
                         fallbackSrc="/main/main_bg_top_3.jpg"
                         className="w-full h-full object-cover aspect-[5/3] rounded-xl overflow-hidden 
-                        hover:scale-115 hover:rounded-xl transition-transform duration-300 cursor-pointer"
+          hover:scale-115 hover:rounded-xl transition-transform duration-300 cursor-pointer"
                       />
                       <div className="place_info_text absolute w-[80%] text-start left-[5%] bottom-[10px]">
-                        <p className="heading-4 text-white line-clamp-1">{place.camp_name}</p>
+                        <p className="heading-4 text-white line-clamp-1">
+                          {place.camp_name}
+                        </p>
                         <p className="text-base text-white overflow-hidden truncate">
                           {place.description}
                         </p>
