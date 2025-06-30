@@ -14,6 +14,7 @@ export type Event = {
   end_time: string;   // ISO string
   address: string;
   max_participants: number,
+  status: "preparing" | "registering"| "expired" | "full"| "refunding"| "cancelled"| "finished"
   total_signup: number,
   plans: EventPlan[];
   photos: string[];

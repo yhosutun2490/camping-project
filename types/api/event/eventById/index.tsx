@@ -15,7 +15,7 @@ export type GetApiV1EventsEventIdResponse = SuccessResponse<{
   max_participants: number;
   cancel_policy: string;
   active: string;
-  status: string;
+  status: "preparing" | "registering"| "expired" | "full"| "refunding"| "cancelled"| "finished";
   registration_open_time: string;
   registration_close_time: string;
   latitude: number;

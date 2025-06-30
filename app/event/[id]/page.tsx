@@ -11,10 +11,11 @@ import EventNotice from "@/components/EventById/EventNotice";
 import { getEventById } from "@/api/server-components/event/eventId";
 import { redirect } from "next/navigation";
 import type { TypeCommentCard } from "@/components/CommentCard";
+import type { Event } from "@/types/api/event/allEvents"
 import sampleComments from "@/fakeData/sampleComments_richer"; // 評論假資料
 import type { Metadata } from "next";
-// 加入 "full" 狀態
-export type RegisterStatus = "incoming" | "registering" | "full" | "passed";
+// 加入報名狀態
+export type RegisterStatus = Event['status'];
 // 動態產生 metadata，根據活動名稱顯示標題
 export async function generateMetadata({
   params,
@@ -79,30 +80,26 @@ export default async function EventByIdPage({
   const eventIdData = await getEventById(id);
 
   // 報名狀態
-  const currentTime = new Date();
+  // const currentTime = new Date();
 
   // 判斷是否額滿
-  const isOverParticipants =
-    eventIdData?.max_participants !== undefined &&
-    eventIdData?.total_signup !== undefined &&
-    eventIdData.total_signup >= eventIdData.max_participants;
+  // const isOverParticipants =
+  //   eventIdData?.max_participants !== undefined &&
+  //   eventIdData?.total_signup !== undefined &&
+  //   eventIdData.total_signup >= eventIdData.max_participants;
 
   // 根據時間與人數決定報名狀態
-  const registerStatus: RegisterStatus =
-    currentTime < new Date(eventIdData?.registration_open_time ?? "")
-      ? "incoming"
-      : currentTime > new Date(eventIdData?.registration_close_time ?? "")
-      ? "passed"
-      : isOverParticipants
-      ? "full"
-      : "registering";
+  const registerStatus: RegisterStatus = eventIdData?.status ?? "preparing";
 
   // 對應顯示文字
-  const registerStatusTextMap: Record<RegisterStatus, string> = {
-    incoming: "尚未開始報名",
+  const registerStatusTextMap: Record<Event["status"], string> = {
+    preparing: "尚未開始報名",
     registering: "報名中",
     full: "已額滿",
-    passed: "已截止報名",
+    expired: "已截止報名",
+    refunding: "退款中",
+    cancelled: "活動已取消",
+    finished: "活動已結束",
   };
 
   const bookingStatus = registerStatusTextMap[registerStatus];
