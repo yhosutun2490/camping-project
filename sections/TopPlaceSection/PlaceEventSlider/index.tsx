@@ -22,7 +22,7 @@ interface Props {
 
 export default function PlaceEventSlider({ data }: Props) {
   const router = useRouter()
-  
+
   function handleClickCard(eventId: string) {
     router.push(`/event/${eventId}`)
   }
@@ -42,19 +42,19 @@ export default function PlaceEventSlider({ data }: Props) {
                   <div
                     className="place_info_card relative"
                     key={place.camp_name + idx2}
-                    onClick={()=>handleClickCard(place.event_Id)}
+                    onClick={() => handleClickCard(place.event_Id)}
                   >
-                    <figure className="w-full max-h-[180px] relative aspect-[3/2] overflow-hidden rounded-xl">
+                    <figure className="w-full relative overflow-hidden rounded-xl">
                       <ImageSkeleton
                         src={place.image}
                         alt={place.camp_name}
                         width={362}
                         height={204}
                         fallbackSrc="/main/main_bg_top_3.jpg"
-                        className="w-full object-cover aspect-[5/3] rounded-xl overflow-hidden 
+                        className="w-full h-full object-cover aspect-[5/3] rounded-xl overflow-hidden 
                         hover:scale-115 hover:rounded-xl transition-transform duration-300 cursor-pointer"
                       />
-                      <div className="place_info_text absolute w-[80%] text-start left-[5%] bottom-[10%]">
+                      <div className="place_info_text absolute w-[80%] text-start left-[5%] bottom-[10px]">
                         <p className="heading-4 text-white line-clamp-1">{place.camp_name}</p>
                         <p className="text-base text-white overflow-hidden truncate">
                           {place.description}
