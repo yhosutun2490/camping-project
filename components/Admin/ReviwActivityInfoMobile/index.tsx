@@ -2,6 +2,7 @@
 import ImageSkeleton from "@/components/ImageSkeleton";
 import BadgeStatus from "@/components/Admin/BadgeStatus";
 import ApproveButtonList from "@/components/Admin/ApproveButtonList";
+import UnPublishButtonList from "@/components/Admin/UnPublishButtonList";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
 import type { EventSummary, EventPhoto, EventDetail } from "@/types/api/admin";
@@ -10,8 +11,9 @@ import { useRef, useId, useState } from "react";
 
 interface Props {
   event: EventSummary;
+  list_type: "待審核上架" | "已退回" | "已下架" | "待審核下架";
 }
-export default function ReviewActivityInfoMobile({ event }: Props) {
+export default function ReviewActivityInfoMobile({ event, list_type }: Props) {
   const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
@@ -100,7 +102,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           >
             <ImageSkeleton
               key={event.id}
-              src={event.cover_photo_url ??  '/main/main_bg_top_3.jpg'}
+              src={event.cover_photo_url ?? "/main/main_bg_top_3.jpg"}
               alt={event.title}
               width={80}
               height={48}
@@ -116,9 +118,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           <div className="event_title_info space-y-2">
             <p className="text-neutral-950 text-sm">{event.title}</p>
             <div className="flex gap-4">
-              <BadgeStatus
-                status={event.active_status}
-              />
+              <BadgeStatus status={event.active_status} />
               <label
                 className="cursor-pointer pointer-events-auto"
                 onClick={handleOpenContentModal}
@@ -151,7 +151,8 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
             <span>{planMaxPrice}</span>
           </div>
         </div>
-        <ApproveButtonList eventId={event.id} className="flex-row justify-between mb-4 px-4" />
+        {list_type === "待審核上架" && <ApproveButtonList eventId={event.id} />}
+         {list_type === '待審核下架' && <UnPublishButtonList eventId={event.id}/>}
       </div>
       <DialogModal id={contentId} modalRef={eventContentModalRef}>
         <ActivityModalContent

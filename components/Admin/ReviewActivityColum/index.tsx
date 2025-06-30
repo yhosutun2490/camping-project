@@ -2,6 +2,7 @@
 import ImageSkeleton from "@/components/ImageSkeleton";
 import BadgeStatus from "@/components/Admin/BadgeStatus";
 import ApproveButtonList from "@/components/Admin/ApproveButtonList";
+import UnPublishButtonList from "@/components/Admin/UnPublishButtonList";
 import clsx from "clsx";
 import DialogModal from "@/components/DialogModal";
 import ActivityModalContent from "@/components/Admin/ActivityModalContent";
@@ -12,13 +13,14 @@ import { useAdminEventFetcher } from '@/swr/admin/event/useAdminEvent'
 
 interface Props {
   event: EventSummary;
+  list_type: "待審核上架" | "已退回" | "已下架" | "待審核下架";
 }
 
 function sliceDate(date: string): string {
   return date.slice(0, 10);
 }
 
-export default function ReviewActivityRow({ event }: Props) {
+export default function ReviewActivityRow({ event, list_type }: Props) {
   const planMaxPrice = event.max_price;
   const imagesModalRef = useRef<HTMLInputElement>(null);
   const eventContentModalRef = useRef<HTMLInputElement>(null);
@@ -201,7 +203,8 @@ export default function ReviewActivityRow({ event }: Props) {
       </div>
 
       {/* 操作按鈕 */}
-      <ApproveButtonList eventId={event.id}/>
+      {list_type === '待審核上架' && <ApproveButtonList eventId={event.id}/>}
+      {list_type === '待審核下架' && <UnPublishButtonList eventId={event.id}/>}
     </div>
   );
 }

@@ -85,7 +85,7 @@ export default function AdminEventList({ pendingEvents, rejectEvents, unpublishP
 
         {selectList.length ? (
           selectList.map((act) => (
-            <ReviewActivityRow key={act.id} event={act} />
+            <ReviewActivityRow key={act.id} event={act} list_type={activeTab} />
           ))
         ) : (
           <p className="heading-4 text-primary-500">尚無目前符合條件的活動</p>
@@ -95,7 +95,7 @@ export default function AdminEventList({ pendingEvents, rejectEvents, unpublishP
       <div className="pending_event_list_mobile space-y-4 lg:hidden">
         {selectList.length ? (
           selectList.map((act) => (
-            <ReviewActivityInfoMobile key={act.id} event={act} />
+            <ReviewActivityInfoMobile key={act.id} event={act} list_type={activeTab}/>
           ))
         ) : (
           <p className="heading-4 text-primary-500">尚無目前符合條件的活動</p>
