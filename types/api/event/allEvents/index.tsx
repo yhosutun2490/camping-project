@@ -3,6 +3,7 @@ import { SuccessResponse } from "@/types/api/response";
 export type EventPlan = {
   title: string;
   price: number;
+  discounted_price: number;
   people_capacity: number;
 };
 

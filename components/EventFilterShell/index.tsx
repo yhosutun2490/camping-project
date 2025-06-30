@@ -242,7 +242,7 @@ export default function EventFilterShell({
                       date={{ start: item.start_time, end: item.end_time }}
                       price={
                         item.plans?.length
-                          ? String(Math.min(...item.plans.map((p) => p.price)))
+                          ? String(Math.min(...item.plans.map((p) => p.discounted_price)))
                           : undefined
                       }
                       tags={item.tags}
