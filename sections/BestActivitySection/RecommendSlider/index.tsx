@@ -5,7 +5,7 @@ import EventCard from "@/components/EventCard";
 import type { EventItem } from "@/types/api/event/recommend"
 
 interface Props {
-    data: EventItem[]
+  data: EventItem[]
 }
 export default function RecommendSlider({ data }: Props) {
 
@@ -35,6 +35,8 @@ export default function RecommendSlider({ data }: Props) {
               }}
               title={event.title}
               image={event.photos}
+              price={String(event.discounted_price)}
+              address={event.address}
               total_signup={event.total_signup}
               max_participants={event.max_participants}
             />

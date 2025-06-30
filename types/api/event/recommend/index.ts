@@ -4,6 +4,9 @@ export type EventItem = {
   id: string;
   title: string;
   description: string;
+  price: number,
+  discounted_price: number,
+  address: string,
   start_time?: string;
   end_time?: string;
   total_signup?: number;
