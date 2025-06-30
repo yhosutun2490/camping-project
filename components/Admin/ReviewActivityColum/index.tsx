@@ -112,7 +112,7 @@ export default function ReviewActivityRow({ event }: Props) {
           <label className="cursor-pointer" onClick={handleOpenImageModal}>
             <ImageSkeleton
               key={event.id}
-              src={event.cover_photo_url}
+              src={event.cover_photo_url ?? '/main/main_bg_top_3.jpg'}
               alt={event.title}
               width={80}
               height={48}
@@ -144,7 +144,7 @@ export default function ReviewActivityRow({ event }: Props) {
                   key={item.id}
                 >
                   <ImageSkeleton
-                    src={item?.photo_url}
+                    src={item?.photo_url ?? '/main/main_bg_top_3.jpg'}
                     alt={item?.id}
                     width={80}
                     height={48}
@@ -196,7 +196,7 @@ export default function ReviewActivityRow({ event }: Props) {
       {/* 狀態 badge */}
       <div className="flex justify-start">
         <BadgeStatus
-          status={event.active_status === "待審核" ? "pending" : "reject"}
+          status={event.active_status}
         />
       </div>
 

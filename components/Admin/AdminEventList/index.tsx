@@ -8,8 +8,10 @@ import clsx from "clsx";
 interface Props {
   pendingEvents: EventSummary[];
   rejectEvents: EventSummary[];
+  unpublishPending: EventSummary[];
+  archivedEvents:EventSummary[];
 }
-export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
+export default function AdminEventList({ pendingEvents, rejectEvents, unpublishPending,archivedEvents }: Props) {
   const titleList = [
     {
       id: "1",
@@ -42,15 +44,21 @@ export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
       isTextCenter: true,
     },
   ];
-  type TabList = "待審核上架" | "已退回";
+  type TabList = "待審核上架" | "已退回" | "已下架" | "待審核下架";
   const [activeTab, setActiveTab] = useState<TabList>("待審核上架");
-  const selectList = activeTab === "待審核上架" ? pendingEvents : rejectEvents;
+  const selectMap: Record<TabList, EventSummary[]> = {
+    "待審核上架": pendingEvents,
+    "已退回": rejectEvents,
+    "已下架": archivedEvents, // 如果有已下架資料請替換此行
+    "待審核下架": unpublishPending
+  };
+  const selectList = selectMap[activeTab];
 
   return (
     <>
       {/* 篩選器（選填） */}
       <div className="mb-4 flex gap-2 overflow-x-auto">
-        {["待審核上架","待審核下架"].map((label) => (
+        {["待審核上架","待審核下架","已下架"].map((label) => (
           <button
             key={label}
             className={clsx(

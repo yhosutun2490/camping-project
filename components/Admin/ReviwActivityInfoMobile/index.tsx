@@ -100,7 +100,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
           >
             <ImageSkeleton
               key={event.id}
-              src={event.cover_photo_url}
+              src={event.cover_photo_url ??  '/main/main_bg_top_3.jpg'}
               alt={event.title}
               width={80}
               height={48}
@@ -117,7 +117,7 @@ export default function ReviewActivityInfoMobile({ event }: Props) {
             <p className="text-neutral-950 text-sm">{event.title}</p>
             <div className="flex gap-4">
               <BadgeStatus
-                status={event.active_status === "待審核" ? "pending" : "reject"}
+                status={event.active_status}
               />
               <label
                 className="cursor-pointer pointer-events-auto"

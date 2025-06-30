@@ -399,15 +399,21 @@ export default async function ActivityAuditPage() {
   const pending = await getAdminEvents('pending')
   const reject = await getAdminEvents('reject')
   const unpublishPending= await getAdminEvents('unpublish_pending')
+  const archived = await getAdminEvents('archived')
   const eventsPending = pending?.data_lists ?? [];
   const eventReject = reject?.data_lists?? [];
   const eventUnPublishPending = unpublishPending?.data_lists ?? []
-  console.log('admin待審核', eventsPending, 'admin待下架', eventUnPublishPending)
+  const eventArchived = archived?.data_lists?? []
 
   return (
     <section className="mx-auto">
-      <h1 className="mb-6 heading-2 text-neutral-950">待審核上架活動清單</h1>
-      <AdminEventList pendingEvents={eventsPending} rejectEvents={eventReject}/>
+      <h1 className="mb-6 heading-2 text-neutral-950">待審核活動清單</h1>
+      <AdminEventList 
+        pendingEvents={eventsPending} 
+        rejectEvents={eventReject} 
+        unpublishPending={eventUnPublishPending}
+        archivedEvents={eventArchived}
+      />
     </section>
   );
 }

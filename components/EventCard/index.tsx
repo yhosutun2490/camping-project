@@ -80,14 +80,14 @@ export default function EventCard({
             </div>
           ))}
         </div>
-        <div className="price flex items-baseline">
+        <div className="price flex items-baseline mt-auto">
           <span className="text-xl text-primary-500 font-bold">
             NT$ {price}
           </span>
           <span className="text-base text-neutral-700 pl-2">/ 每人</span>
         </div>
         <div
-          className="card-actions mt-auto"
+          className="card-actions"
           onClick={() => router.push(`event/${id}`)}
         >
           <button className="w-full btn-primary">更多資訊</button>
