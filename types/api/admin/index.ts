@@ -121,3 +121,57 @@ export type PatchUnpublishEventBody = {
   isApprove: boolean,
   comment: string,
 }
+
+/**AI 審核回傳 */
+
+export interface SensitiveCheck {
+  hasSensitiveContent: boolean;
+  sensitiveWords: string[];
+  issues: string[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface RegulatoryCheck {
+  hasRegulatoryIssues: boolean;
+  violations: string[];
+  missingElements: string[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface ImageCheck {
+  hasIssue: boolean;
+  issues: string[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface ImageRiskSummary {
+  hasRisk: boolean;
+  riskDetails: ImageRiskDetail[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface ImageRiskDetail {
+  url: string;
+  issue: string;
+  suggestion: string;
+}
+
+
+export interface AiCheckData {
+  success: boolean;
+  feedback: string; // markdown 格式建議用 string
+  sensitiveCheck: SensitiveCheck;
+  regulatoryCheck: RegulatoryCheck;
+  imageCheck: ImageCheck;
+  imageRiskSummary: ImageRiskSummary;
+}
+
+export type PostAiCheckSuccessResponse = SuccessResponse<AiCheckData>
