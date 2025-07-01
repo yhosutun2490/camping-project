@@ -1,7 +1,12 @@
 import axios from 'axios'
 import useSWR, { mutate } from 'swr'
 import useSWRMutation from 'swr/mutation'
-import type { GetAdminEventByIdSuccessResponse, PatchAdminApproveEventSuccessResponse } from '@/types/api/admin'
+import type { 
+  GetAdminEventByIdSuccessResponse, 
+  PatchAdminApproveEventSuccessResponse,
+  PatchUnpublishEventBody,
+  PatchAdminUnpublishEventSuccessResponse 
+} from '@/types/api/admin'
 
 
 /* 讓別的元件能直接用 SWR cache 讀取 */
@@ -71,4 +76,26 @@ export function useAdminRejectEvent() {
     data,
     error,
   };
+}
+
+/** Admin審核待下架活動*/
+export function useAdminUnpublishEvent() {
+    const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/admin/events/:id/unpublish",
+    async (_key: string, { arg: payload }: { arg: PatchUnpublishEventBody }) => {
+      const res = await axios.patch<PatchAdminUnpublishEventSuccessResponse>(
+        "/api/admin/events/unpublish",
+        payload
+      );
+      return res;
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+  };
+
 }

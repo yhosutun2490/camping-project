@@ -8,8 +8,10 @@ import clsx from "clsx";
 interface Props {
   pendingEvents: EventSummary[];
   rejectEvents: EventSummary[];
+  unpublishPending: EventSummary[];
+  archivedEvents:EventSummary[];
 }
-export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
+export default function AdminEventList({ pendingEvents, rejectEvents, unpublishPending,archivedEvents }: Props) {
   const titleList = [
     {
       id: "1",
@@ -42,15 +44,21 @@ export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
       isTextCenter: true,
     },
   ];
-  type TabList = "待審核" | "已退回";
-  const [activeTab, setActiveTab] = useState<TabList>("待審核");
-  const selectList = activeTab === "待審核" ? pendingEvents : rejectEvents;
+  type TabList = "待審核上架" | "已退回" | "已下架" | "待審核下架";
+  const [activeTab, setActiveTab] = useState<TabList>("待審核上架");
+  const selectMap: Record<TabList, EventSummary[]> = {
+    "待審核上架": pendingEvents,
+    "已退回": rejectEvents,
+    "已下架": archivedEvents, // 如果有已下架資料請替換此行
+    "待審核下架": unpublishPending
+  };
+  const selectList = selectMap[activeTab];
 
   return (
     <>
       {/* 篩選器（選填） */}
       <div className="mb-4 flex gap-2 overflow-x-auto">
-        {["待審核"].map((label) => (
+        {["待審核上架","待審核下架","已下架"].map((label) => (
           <button
             key={label}
             className={clsx(
@@ -65,19 +73,19 @@ export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
       </div>
       {/* 桌機審核清單列表 */}
       <div className="pending_event_list hidden lg:block">
-        {selectList.length && (
+        {selectList.length? (
           <div className="grid grid-cols-[70px_2fr_50px_70px_80px_100px] items-center gap-4 border-b py-2 text-sm font-semibold text-neutral-500">
             {titleList.map((item) => (
               <span key={item.id}>{item.value}</span>
             ))}
-          </div>
-        )}
+          </div> 
+        ): ""}
 
         {/* 列表 */}
 
         {selectList.length ? (
           selectList.map((act) => (
-            <ReviewActivityRow key={act.id} event={act} />
+            <ReviewActivityRow key={act.id} event={act} list_type={activeTab} />
           ))
         ) : (
           <p className="heading-4 text-primary-500">尚無目前符合條件的活動</p>
@@ -87,7 +95,7 @@ export default function AdminEventList({ pendingEvents, rejectEvents }: Props) {
       <div className="pending_event_list_mobile space-y-4 lg:hidden">
         {selectList.length ? (
           selectList.map((act) => (
-            <ReviewActivityInfoMobile key={act.id} event={act} />
+            <ReviewActivityInfoMobile key={act.id} event={act} list_type={activeTab}/>
           ))
         ) : (
           <p className="heading-4 text-primary-500">尚無目前符合條件的活動</p>

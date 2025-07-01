@@ -95,7 +95,7 @@ export const config = {
   matcher: [
     "/member/:path*",
     "/host/:path*",
-    "/create-event/:path*",
+    "/create-activity/:path*",
     "/orders/payment-success/:path*",
     "/edit-event/:path*",
     "/cart/:path*",

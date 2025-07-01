@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import type { Order } from "@/components/Cart/CartItem";
+import { useGetMemberOrders } from "@/swr/member/orders/useMemberOrders"; // swr 取得會員db訂單實際資料(需要重新觸發更新狀態)
 
 interface Props {
   modalId: string;
@@ -22,6 +23,7 @@ export default function DeleteCartItemModal({
   setSelectedOrders
 }: Props) {
   const { trigger: deleteOrders, isMutating } = useDeleteMemberOrders();
+  const { mutate:mutateUpdateMemberOrdersStatus } = useGetMemberOrders()
   const router = useRouter();
   /** 刪除並關閉 modal */
   async function handleDeleteConfirm() {
@@ -37,6 +39,7 @@ export default function DeleteCartItemModal({
       toast.success("成功刪除購物車品項");
       // 關閉 modal（checkbox 失焦）
       router.refresh()
+      mutateUpdateMemberOrdersStatus()
       if (modalRef.current) modalRef.current.checked = false;
       // 購物車選項狀態清空
       if (setSelectedOrders) setSelectedOrders([]);

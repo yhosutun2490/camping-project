@@ -26,6 +26,7 @@ export default function CartPreviewDropdown({
   }
   function handleDeleteCartItem(planId: string) {
     removeCartItem(planId);
+    setIsCartPreviewOpen(false);
     toast.success("刪除購物車品項成功");
   }
 

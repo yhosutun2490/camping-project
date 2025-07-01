@@ -10,7 +10,7 @@ export interface EventSummary {
   end_date: string;              // ISO 8601
   max_participants: number;
   max_price: number;
-  active_status: "待審核" | "公開中" | "已下架"; // 依實際後端列舉擴充
+  active_status: 'pending' | 'reject' | 'unpublish_pending' | '已結束'; // 依實際後端列舉擴充
 }
 
 /** 取得活動清單 API 回傳格式 */
@@ -109,3 +109,15 @@ export type PatchAdminRejectEventSuccessResponse = SuccessResponse<{
   status: 'error',
   message: "活動資訊缺少地點與報名限制，請補充後再送出審核"
 }>
+
+export type PatchAdminUnpublishEventSuccessResponse = SuccessResponse<{
+  status: 'error',
+  message: "下架審核通過，活動進入退款處理"
+}>
+
+
+export type PatchUnpublishEventBody = {
+  eventId: string
+  isApprove: boolean,
+  comment: string,
+}

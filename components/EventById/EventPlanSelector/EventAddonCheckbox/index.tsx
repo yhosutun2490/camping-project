@@ -1,6 +1,7 @@
 "use client";
 import { useFormContext, Controller } from "react-hook-form";
 import CheckboxStyle from "@/components/CheckBoxStyle";
+import clsx from "clsx";
 
 // 加購選項資料
 export type AddonItem = {
@@ -14,13 +15,14 @@ export type AddonItem = {
 
 type Props = {
   name: string;
-  options: AddonItem[];
+  options: AddonItem[]; 
+  className? :string
 };
 
-export default function EventAddonCheckbox({ name, options }: Props) {
+export default function EventAddonCheckbox({ name, options, className }: Props) {
   const { control } = useFormContext(); // React Hook Form 的控制器
   return (
-    <div className="form-control space-y-4">
+    <div className={clsx("form-control space-y-4",className)}>
       <label className="label">
         <span className="label-text heading-5">加購選項</span>
       </label>
