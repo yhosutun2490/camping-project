@@ -203,21 +203,42 @@ function ActivityCreationSuccess({ eventId, onCreateNewActivity }: ActivityCreat
                       )}
                     </div>
                   </div>
-                  <div className="text-sm text-[#4F4F4F] mb-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon icon="material-symbols:person-add" className="w-4 h-4 text-[#5C795F]" />
+                    <div className="flex items-center gap-1 font-medium text-xs text-[#4F4F4F]">
+                      方案人數：<span className="font-medium text-[#5C795F]">{plan.people_capacity}</span> 人
+                    </div>
+                  </div>
+                  <div className="text-xs text-[#4F4F4F] mb-2">
                     {plan.content && plan.content.length > 0 && (
-                      <ul className="list-disc list-inside space-y-1">
-                        {plan.content.map((item, idx) => (
-                          <li key={idx}>{item.value}</li>
-                        ))}
-                      </ul>
+                      <div>
+                        <div className="flex items-center gap-1 font-medium mb-2">
+                          <Icon icon="material-symbols:checklist" className="w-4 h-4 text-[#5C795F]" />
+                          方案內容：
+                        </div>
+                        <ul className="space-y-1 ml-5">
+                          {plan.content.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <Icon icon="material-symbols:check-circle" className="w-3 h-3 text-[#5C795F] mt-0.5 flex-shrink-0" />
+                              <span>{item.value}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                   </div>
                   {plan.addOns && plan.addOns.length > 0 && (
                     <div className="text-xs text-[#4F4F4F]">
-                      <div className="font-medium mb-1">加購項目：</div>
-                      <ul className="list-disc list-inside space-y-1">
+                      <div className="flex items-center gap-1 font-medium mb-2">
+                        <Icon icon="material-symbols:add-shopping-cart" className="w-4 h-4 text-[#5C795F]" />
+                        加購項目：
+                      </div>
+                      <ul className="space-y-1 ml-5">
                         {plan.addOns.map((addon, idx) => (
-                          <li key={idx}>{addon.name} (+{formatPrice(addon.price)})</li>
+                          <li key={idx} className="flex items-start gap-2">
+                            <Icon icon="material-symbols:add-circle" className="w-3 h-3 text-[#5C795F] mt-0.5 flex-shrink-0" />
+                            <span>{addon.name} (+{formatPrice(addon.price)})</span>
+                          </li>
                         ))}
                       </ul>
                     </div>

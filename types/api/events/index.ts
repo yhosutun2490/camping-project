@@ -116,6 +116,7 @@ export interface EventPlanRequest {
   title: string;
   price: number;
   discounted_price?: number;
+  people_capacity: number;
   contents: string[];
   addons: EventPlanAddon[];
 }
@@ -126,6 +127,7 @@ export interface EventPlan {
   title: string;
   price: number;
   discounted_price: number | null;
+  people_capacity: number;
   contents: string[];
   addons: EventPlanAddon[];
 }
@@ -147,6 +149,7 @@ export interface UpdateEventPlanRequest {
   title: string;
   price: number;
   discounted_price?: number;
+  people_capacity: number;
   contents: string[];
   addons: EventPlanAddon[];
 }

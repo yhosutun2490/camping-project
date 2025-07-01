@@ -40,6 +40,7 @@ function apiToFormData(apiData: GetHostEventDetailResponse['data']): FormDataEdi
     title: plan.title,
     price: plan.price,
     discountPrice: plan.discounted_price ?? 0,
+    people_capacity: plan.people_capacity ?? 1, // 新增 people_capacity 欄位，預設為 1
     content: plan.eventPlanContentBox?.map(content => ({
       value: content.content
     })) || [],
