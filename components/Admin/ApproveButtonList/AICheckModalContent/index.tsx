@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import clsx from "clsx";
 import { useAdminAICheckEvent } from "@/swr/admin/event/useAdminEvent";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -29,21 +30,25 @@ export default function AICheckModalContent({
       const res = await postAiCheck({ eventId }); // 呼叫 AI 審查
       if (res.success) {
         toast.success("AI審核通過");
-        router.refresh()
       } else {
-        toast.success("AI審核未通過");
+        toast.error("AI審核未通過");
       }
     } catch (e) {
       console.error("審核失敗", e);
       toast.success("AI審核服務中斷");
+      setHasStarted(false);
     }
   }
-
+  
+  function handleClickClose() {
+    onCloseAIModal()
+    router.refresh()
+  }
   return (
     <div className="reject_content flex flex-col space-y-4">
       <p className="heading-5 text-primary-500">AI智能審核小幫手</p>
       {!hasStarted && (
-        <div className="text-sm leading-relaxed space-y-3">
+        <div className="text-sm leading-relaxed space-y-3 text-neutral-950">
           <p>為加速審核工作流程，AI助手會針對單一活動內容進行以下自動審查:</p>
           <ul className="list-disc list-inside space-y-1">
             <li>
@@ -76,37 +81,49 @@ export default function AICheckModalContent({
       )}
       {isDone && (
         <div>
-          <p>審核結果: {}</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>
+          <div className="space-x-1">審核結果: 
+            <span className={clsx(AiCheckResult.success? 'text-primary-500': 'text-red-500')}>
+                {AiCheckResult.success? "通過":"未通過"}
+            </span>
+          </div>
+          <ul className="list-disc list-inside space-y-2">
+            <li className="space-y-1">
               <strong className="heading-5 text-neutral-950">
                 文字內容審核：
               </strong>
-              <p className="heading-6 text-primary-500">
+              <p className={clsx("heading-6",
+                AiCheckResult.sensitiveCheck.hasSensitiveContent?'text-red-500': 'text-primary-500' 
+                )}>
                 {AiCheckResult.sensitiveCheck.summary}
               </p>
             </li>
-            <li>
+            <li className="space-y-1">
               <strong className="heading-5 text-neutral-950">
                 圖片內容審核：
               </strong>
-              <p className="heading-6 text-primary-500">
+              <p className={clsx("heading-6",
+                AiCheckResult.imageRiskSummary.hasRisk?'text-red-500': 'text-primary-500' 
+                )}>
                 {AiCheckResult.imageRiskSummary.summary}
               </p>
             </li>
-            <li>
+            <li className="space-y-1">
               <strong className="heading-5 text-neutral-950">
                 圖片描述審核：
               </strong>
-              <p className="heading-6 text-primary-500">
+              <p className={clsx("heading-6",
+                AiCheckResult.imageCheck.hasIssue?'text-red-500': 'text-primary-500' 
+                )}>
                 {AiCheckResult.imageCheck.summary}
               </p>
             </li>
-            <li>
+            <li className="space-y-1">
               <strong className="heading-5 text-neutral-950">
                 法規合規性：
               </strong>
-              <p className="heading-6 text-primary-500">
+              <p className={clsx("heading-6",
+                AiCheckResult.regulatoryCheck.hasRegulatoryIssues?'text-red-500': 'text-primary-500' 
+                )}>
                 {AiCheckResult.regulatoryCheck.summary}
               </p>
             </li>
@@ -124,7 +141,7 @@ export default function AICheckModalContent({
           </button>
         )}
         {isDone && (
-          <button className="btn-outline" onClick={onCloseAIModal}>
+          <button className="btn-primary" onClick={handleClickClose}>
             <span>關閉</span>
           </button>
         )}

@@ -107,7 +107,7 @@ export function useAdminAICheckEvent() {
     "/api/admin/events/:id/ai-check",
     async (_key: string, { arg: payload }: { arg: {eventId:string} }) => {
       const res = await axios.post<PostAiCheckSuccessResponse>(
-        "/api/admin/events/unpublish",
+        "/api/admin/events/ai-check",
         payload
       );
       return res.data.data;
