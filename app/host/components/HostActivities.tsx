@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
 import { useRouter } from 'next/navigation';
@@ -9,20 +9,24 @@ import { useHostEvents } from '@/swr/host/useHostEvents';
 import { useEventTags } from '@/swr/meta/useEventTags';
 import { useSubmitEvent } from '@/swr/events/useSubmitEvent';
 import { useHostEventDetail } from '@/swr/events/useHostEventDetail';
+import { useRequestUnpublishEvent } from '@/swr/host/useRequestUnpublishEvent';
+import RejectEventModal from '@/components/Host/RejectEventModal';
 import type { EventStatus } from '@/types/api/host/events';
 
 // 狀態映射對照表 - 將英文狀態轉換為中文顯示
 const statusMapping: Record<string, string> = {
   // 英文狀態
-  'draft': '草稿',
-  'pending': '審核中', 
-  'published': '已發佈',
-  'archived': '已下架',
+  draft: '草稿',
+  pending: '審核中',
+  published: '已發佈',
+  archived: '已下架',
+  unpublish_pending: '下架申請中',
   // 中文狀態（直接對應）
-  '草稿': '草稿',
-  '審核中': '審核中',
-  '已發佈': '已發佈', 
-  '已下架': '已下架',
+  草稿: '草稿',
+  審核中: '審核中',
+  已發佈: '已發佈',
+  已下架: '已下架',
+  下架申請中: '下架申請中',
 };
 
 // 狀態轉換函式
@@ -32,10 +36,12 @@ const getDisplayStatus = (status: EventStatus): string => {
 
 // 不同狀態對應的樣式 - 全新設計
 const statusStyles: Record<string, string> = {
-  '草稿': 'bg-[#F6F6F6] text-[#6D6D6D] border border-[#E7E7E7]',
-  '審核中': 'bg-[#FFF7E6] text-[#D4A056] border border-[#F0D999]',
-  '已發佈': 'bg-[#E3E9E2] text-[#5C795F] border border-[#A1B4A2]',
-  '已下架': 'bg-[#FFEBEE] text-[#AB5F5F] border border-[#D4A5A5]'
+  草稿: 'bg-[#F6F6F6] text-[#6D6D6D] border border-[#E7E7E7]',
+  審核中: 'bg-[#FFF7E6] text-[#D4A056] border border-[#F0D999]',
+  已發佈: 'bg-[#E3E9E2] text-[#5C795F] border border-[#A1B4A2]',
+  已下架: 'bg-[#FFEBEE] text-[#AB5F5F] border border-[#D4A5A5]',
+  下架申請中:
+    'bg-[#FFF7E6] text-[#D4A056] border border-[#F0D999] text-xs whitespace-nowrap min-w-fit',
 };
 
 // 日期格式化函式
@@ -51,7 +57,15 @@ function HostActivities() {
   const router = useRouter();
   const [activeTag, setActiveTag] = useState<string>('');
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
-  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [submittingEventId, setSubmittingEventId] = useState<string | null>(null);
+
+  // 退件 Modal 相關狀態
+  const [selectedEventForReject, setSelectedEventForReject] = useState<{
+    eventId: string;
+    eventTitle: string;
+  } | null>(null);
+  const rejectModalRef = useRef<HTMLInputElement>(null);
 
   // 使用 API hook 取得主辦方活動資料和活動標籤
   const { events, error, isLoading } = useHostEvents(activeTag);
@@ -62,14 +76,15 @@ function HostActivities() {
   } = useEventTags();
   const { submitEvent } = useSubmitEvent();
   const { getEventDetail } = useHostEventDetail();
+  const { isMutating: isRequestingUnpublish } = useRequestUnpublishEvent();
 
   // 處理編輯活動
   const handleEditEvent = async (eventId: string) => {
     try {
-      setLoadingEventId(eventId);
+      setEditingEventId(eventId);
       // 先取得活動詳情
       const response = await getEventDetail({ eventId });
-      
+
       if (response?.data) {
         // 如果成功取得活動資料，導向編輯頁面
         router.push(`/edit-activity/${eventId}`);
@@ -80,30 +95,43 @@ function HostActivities() {
       console.error('取得活動詳情失敗:', error);
       toast.error('取得活動資料失敗，請稍後再試');
     } finally {
-      setLoadingEventId(null);
+      setEditingEventId(null);
     }
   };
 
   // 處理提交活動審核
   const handleSubmitEvent = async (eventId: string) => {
     try {
+      setSubmittingEventId(eventId);
       await submitEvent(eventId);
       // 提交成功，顯示成功訊息
       toast.success('活動已提交審核，請等待審核結果');
     } catch (error: unknown) {
       // 處理錯誤，使用後端實際回應的錯誤訊息
       console.error('提交活動失敗:', error);
-      
+
       let errorMessage = '提交活動失敗，請稍後再試';
-      
+
       // 嘗試從錯誤物件中獲取具體的錯誤訊息
       if (error && typeof error === 'object') {
-        const err = error as { response?: { data?: { message?: string } }; message?: string };
-        errorMessage = err.response?.data?.message || err.message || errorMessage;
+        const err = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        errorMessage =
+          err.response?.data?.message || err.message || errorMessage;
       }
-      
+
       toast.error(errorMessage);
+    } finally {
+      setSubmittingEventId(null);
     }
+  };
+
+  // 處理退件按鈕點擊
+  const handleRejectEvent = (eventId: string, eventTitle: string) => {
+    setSelectedEventForReject({ eventId, eventTitle });
+    rejectModalRef.current?.click();
   };
 
   // 取得標籤列表
@@ -279,7 +307,9 @@ function HostActivities() {
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-[#6D6D6D]">報名期間</span>
                         <div className="flex items-center gap-1 text-xs text-[#121212]">
-                          <span>{formatDate(activity.registration_open_time)}</span>
+                          <span>
+                            {formatDate(activity.registration_open_time)}
+                          </span>
                           <span>~</span>
                           <span>
                             {formatDate(activity.registration_close_time)}
@@ -304,23 +334,45 @@ function HostActivities() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEditEvent(activity.event_id)}
-                        className={`flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors ${
-                          getDisplayStatus(activity.active) !== '草稿'
-                            ? 'bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed'
-                            : 'bg-white text-[#121212] hover:bg-gray-50 border border-gray-200'
-                        }`}
-                        disabled={getDisplayStatus(activity.active) !== '草稿'}
+                        className="flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors bg-white text-[#121212] hover:bg-gray-50 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={getDisplayStatus(activity.active) !== '草稿' || editingEventId === activity.event_id}
                       >
-                        {loadingEventId === activity.event_id ? '載入中...' : '編輯'}
+                        {editingEventId === activity.event_id ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                          "編輯"
+                        )}
                       </button>
 
                       {/* 上架按鈕 - 只有草稿狀態才顯示 */}
                       {getDisplayStatus(activity.active) === '草稿' && (
                         <button
                           onClick={() => handleSubmitEvent(activity.event_id)}
-                          className="flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors bg-[#5C795F] text-white hover:bg-[#4A6B4D]"
+                          className="flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors bg-[#5C795F] text-white hover:bg-[#4A6B4D] disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={submittingEventId === activity.event_id}
                         >
-                          上架
+                          {submittingEventId === activity.event_id ? (
+                            <span className="loading loading-spinner loading-sm"></span>
+                          ) : (
+                            "上架"
+                          )}
+                        </button>
+                      )}
+
+                      {/* 退件按鈕 - 只有已發佈狀態才顯示 */}
+                      {getDisplayStatus(activity.active) === '已發佈' && (
+                        <button
+                          onClick={() =>
+                            handleRejectEvent(activity.event_id, activity.title)
+                          }
+                          className="flex-1 py-2 px-4 rounded-2xl text-sm font-semibold transition-colors bg-[#AB5F5F] text-white hover:bg-[#9B5555] disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={isRequestingUnpublish}
+                        >
+                          {isRequestingUnpublish ? (
+                            <span className="loading loading-spinner loading-sm"></span>
+                          ) : (
+                            "申請下架"
+                          )}
                         </button>
                       )}
                     </div>
@@ -420,13 +472,10 @@ function HostActivities() {
                   </div>
 
                   {/* 標籤 */}
-                  <div className="flex justify-center">
+                  <div>
                     {activity.tags.map((tag, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-2 bg-transparent rounded-2xl"
-                      >
-                        <span className="text-sm text-[#121212]">{tag}</span>
+                      <div key={i}>
+                        <div className="text-sm text-[#121212]">{tag}</div>
                       </div>
                     ))}
                   </div>
@@ -437,21 +486,44 @@ function HostActivities() {
                     {getDisplayStatus(activity.active) === '草稿' && (
                       <button
                         onClick={() => handleSubmitEvent(activity.event_id)}
-                        className="px-4 py-2 rounded-2xl text-sm font-semibold transition-colors bg-[#5C795F] text-white hover:bg-[#4A6B4D]"
+                        className="px-4 py-2 rounded-2xl text-sm font-semibold transition-colors bg-[#5C795F] text-white hover:bg-[#4A6B4D] disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={submittingEventId === activity.event_id}
                       >
-                        上架
+                        {submittingEventId === activity.event_id ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                          "上架"
+                        )}
                       </button>
                     )}
+
+                    {/* 退件按鈕 - 只有已發佈狀態才顯示 */}
+                    {getDisplayStatus(activity.active) === '已發佈' && (
+                      <button
+                        onClick={() =>
+                          handleRejectEvent(activity.event_id, activity.title)
+                        }
+                        className="px-4 py-2 rounded-2xl text-sm font-semibold transition-colors bg-[#AB5F5F] text-white hover:bg-[#9B5555] disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isRequestingUnpublish}
+                      >
+                        {isRequestingUnpublish ? (
+                          <span className="loading loading-spinner loading-sm"></span>
+                        ) : (
+                          "下架"
+                        )}
+                      </button>
+                    )}
+
                     <button
                       onClick={() => handleEditEvent(activity.event_id)}
-                      className={`px-4 py-2 rounded-2xl text-sm font-semibold transition-colors ${
-                        getDisplayStatus(activity.active) !== '草稿'
-                          ? 'bg-[#E7E7E7] text-[#B0B0B0] cursor-not-allowed'
-                          : 'bg-white text-[#121212] hover:bg-gray-50'
-                      }`}
-                      disabled={getDisplayStatus(activity.active) !== '草稿'}
+                      className="px-4 py-2 rounded-2xl text-sm font-semibold transition-colors bg-white text-[#121212] hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={getDisplayStatus(activity.active) !== '草稿' || editingEventId === activity.event_id}
                     >
-                      {loadingEventId === activity.event_id ? '載入中...' : '編輯'}
+                      {editingEventId === activity.event_id ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        "編輯"
+                      )}
                     </button>
                   </div>
                 </div>
@@ -460,6 +532,13 @@ function HostActivities() {
           </div>
         </>
       )}
+
+      <RejectEventModal
+        modalId="reject-event-modal"
+        modalRef={rejectModalRef}
+        eventId={selectedEventForReject?.eventId || ''}
+        eventTitle={selectedEventForReject?.eventTitle || ''}
+      />
     </div>
   );
 }

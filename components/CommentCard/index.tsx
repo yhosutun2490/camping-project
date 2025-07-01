@@ -2,7 +2,7 @@ import Image from "next/image";
 import RatingStar from "../RatingStar";
 
 export interface TypeCommentCard  {
-    userInfo: {
+  userInfo: {
     user_id: string;
     name: string;
     image: string;
@@ -44,8 +44,8 @@ export default function CommentCard({ userInfo, eventInfo, comment }: TypeCommen
         <RatingStar rating={comment.rating} ratingSizeClass="rating-xs self-center"/>
       </div>
       <div className="event_info flex justify-between rounded-2xl bg-primary-50 px-3 py-2">
-        <p className="heading-7"> {eventInfo.event_name}</p>
-        <p className="text-xs"> 主辦方- {eventInfo.host_name}</p>
+        <p className="truncate max-w-[40%] heading-7"> {eventInfo.event_name}</p>
+        <p className="truncate max-w-[50%] text-xs"> 主辦方- {eventInfo.host_name}</p>
       </div>
       <div className="comment text-sm text-start text-neutral-700 line-clamp-4">
         <p> {comment.description} </p>

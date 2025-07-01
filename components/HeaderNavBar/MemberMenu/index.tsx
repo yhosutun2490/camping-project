@@ -9,6 +9,7 @@ import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
 import { useShoppingCartStore } from "@/stores/useShoppingCartStore"; // 登出需清空購物車store
 import { useMemberLogin } from "@/stores/useMemberLogin"; // 判斷使用者role
+import { useGetMemberOrders } from "@/swr/member/orders/useMemberOrders";
 
 type OpenState = true | false;
 type PropsType = {
@@ -22,6 +23,7 @@ export default function MemberMenu({ user }: PropsType) {
   });
   const router = useRouter();
   const { trigger } = useUserLogout();
+  const { clearOrdersCache } = useGetMemberOrders() // 登出時更新購物狀態歸零
   const resetShoppingCartStore = useShoppingCartStore((state) => state.reset);
   const memberRole = useMemberLogin((state) => state.member.role);
 
@@ -30,6 +32,7 @@ export default function MemberMenu({ user }: PropsType) {
       await trigger(null);
       toast.success("登出成功");
       resetShoppingCartStore();
+      clearOrdersCache(); // false = 不重新 fetch
       router.push("/");
       // 重新整理所有 app-router 的 data fetching
       router.refresh();

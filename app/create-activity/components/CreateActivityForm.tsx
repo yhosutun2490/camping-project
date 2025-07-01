@@ -111,6 +111,7 @@ const CreateActivityForm: React.FC = () => {
           title: '基本方案',
           price: 0,
           discountPrice: 0,
+          people_capacity: 1, // 預設為 1 人方案
           content: [],
           addOns: [],
         },

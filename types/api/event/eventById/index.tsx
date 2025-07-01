@@ -11,10 +11,11 @@ export type GetApiV1EventsEventIdResponse = SuccessResponse<{
   description: string;
   start_time: string;
   end_time: string;
+  total_signup: number;
   max_participants: number;
   cancel_policy: string;
   active: string;
-  status: string;
+  status: "preparing" | "registering"| "expired" | "full"| "refunding"| "cancelled"| "finished";
   registration_open_time: string;
   registration_close_time: string;
   latitude: number;
@@ -190,6 +191,7 @@ export interface EventInfo {
   start_time: string;                 // ISO 8601
   end_time: string;                   // ISO 8601
   max_participants: number;
+  bookingCounts: number;
   cancel_policy: string;
   active: string;                
   status: string;
@@ -199,6 +201,7 @@ export interface EventInfo {
   longitude: number;
   created_at: string;
   updated_at: string;
+
 
   /* 關聯資料 */
   host: Host;

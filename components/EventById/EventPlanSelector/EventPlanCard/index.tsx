@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import type { AddonItem } from "@/components/EventById/EventPlanSelector/EventAddonCheckbox";
 import EventAddonCheckbox from "@/components/EventById/EventPlanSelector/EventAddonCheckbox";
+import type { RegisterStatus } from "@/app/event/[id]/page";
 import DiscountRate from "./DiscountRate";
 import clsx from "clsx";
 import { useFormContext } from "react-hook-form";
@@ -12,10 +13,11 @@ import {
   usePatchMemberOrders,
 } from "@/swr/member/orders/useMemberOrders"; // 創建/修改會員訂單SWR
 import { usePostMemberOrdersPayment } from "@/swr/member/orders/payment/useMemberPayment"; // 會員付款SWR
+import { useGetMemberOrders } from "@/swr/member/orders/useMemberOrders"; // swr 取得會員db訂單實際資料(需要重新觸發更新狀態)
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useParams, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import DialogModal from "@/components/DialogModal";
 import { injectAndSubmitECPayForm } from "@/utils/ecPayForm";
 
@@ -47,6 +49,7 @@ export type EventPlanCardProps = {
   plan: PlanData;
   isSelected?: boolean; // 是否選中
   unit?: string; // 單位（如每人、每組等）
+  registerStatus?: RegisterStatus; // 報名狀態
 };
 
 export default function EventPlanCard(props: EventPlanCardProps) {
@@ -54,6 +57,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     event,
     plan,
     unit = "NT$", // 預設單位為NT$
+    registerStatus,
   } = props;
   const { id, title, deadline, features, price, originalPrice } = plan;
   const { watch } = useFormContext(); // 設定表單選取資料
@@ -61,6 +65,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   const modalId = `login-reminder-${plan.id}`; // modal id
   const memberData = useMemberLogin((state) => state.member);
   const isMemberLogin = !!memberData?.id; // 是否登入
+  const isOnRegistering = registerStatus === "registering"; // 開放報名狀態
 
   // 是否有訂單id
   const params = useParams();
@@ -82,6 +87,9 @@ export default function EventPlanCard(props: EventPlanCardProps) {
   // 會員付款API
   const { trigger: postPayment } = usePostMemberOrdersPayment();
 
+  // 資料庫中對應的訂單資料更新
+  const { mutate: mutateUpdateMemberOrderStatus } = useGetMemberOrders();
+
   // shopping cart store
   const addStorePlan = useShoppingCartStore((state) => state.addPlan);
   /**
@@ -101,6 +109,15 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     ? ((price / originalPrice) * 100).toFixed(0)
     : "100"; // 計算折扣價格比例
 
+  // 計算點選總價
+  const selectTotalPrice = useMemo(() => {
+    const addonPrice = (currentPlanAddonItems as AddonItem[]).reduce(
+      (acc: number, current: AddonItem) => acc + current.price,
+      0
+    );
+    return plan.price + addonPrice;
+  }, [currentPlanAddonItems, plan.price]);
+
   // 點擊購物車行為
   async function handleOnClickAddCart() {
     // 需登入才有member id 進行訂單創建
@@ -109,13 +126,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         if (isEditing && orderId) {
           // 修改訂單
           await patchOrder({
-              orderId: orderId,
-              event_plan_id: plan.id,
-              quantity: 1,
-              event_addons: currentPlanAddonItems,
-            }
-          );
+            orderId: orderId,
+            event_plan_id: plan.id,
+            quantity: 1,
+            event_addons: currentPlanAddonItems,
+          });
           toast.success("修改購物車品項成功");
+          mutateUpdateMemberOrderStatus();
         } else if (isEditing && !orderId) {
           toast.error("無效的訂單 ID，無法修改購物車品項");
         } else {
@@ -126,6 +143,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
             event_addons: currentPlanAddonItems,
           });
           toast.success("新增購物車品項成功");
+          mutateUpdateMemberOrderStatus();
         }
       } catch (err) {
         if (axios.isAxiosError(err)) {
@@ -167,7 +185,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         }
 
         const newOrderId = [orderId];
-        console.log('報名取得新建id',newOrderId)
+        console.log("報名取得新建id", newOrderId);
 
         /* 2. 取得付款 HTML 表單 */
         const { data: paymentRes } = await postPayment({
@@ -188,6 +206,11 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     } else {
       modalRef.current?.click(); // 未登入提醒modal
     }
+  }
+
+  // 未登入提示關閉
+  function handleCloseInfoModal() {
+    if (modalRef.current) modalRef.current.checked = false
   }
 
   return (
@@ -216,7 +239,13 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         </div>
       </div>
       {/*加購選擇區*/}
-      <EventAddonCheckbox name="plan_addons" options={plan.addonBox} />
+      <EventAddonCheckbox
+        name="plan_addons"
+        options={plan.addonBox}
+        className={
+          isOnRegistering ? undefined : "pointer-events-none opacity-60"
+        }
+      />
 
       {/*方案價格區*/}
       <div
@@ -226,54 +255,71 @@ export default function EventPlanCard(props: EventPlanCardProps) {
         <div className="discount_info flex items-center space-y-2 space-x-4">
           <DiscountRate rate={discountedRate} />
           <div className="event_price flex gap-2 items-start">
-            <p className="discount text-primary-500 heading-4 md:heading-3">
-              {unit} {price?.toLocaleString() || "0"}
-            </p>
-            <p className="original text-gray-500 text-base line-through">
+            <div className="discount relative text-primary-500 heading-4 md:heading-3">
+              {currentPlanAddonItems.length > 0 && (
+                <div className="absolute -top-5 left-0 w-fit text-primary-500 heading-7 rounded-2xl">含加購總價</div>
+              )}
+              {unit} {(selectTotalPrice).toLocaleString() || "0"}
+            </div>
+            <div className="original text-gray-500 text-base line-through">
               {unit} {originalPrice?.toLocaleString() || "0"}
-            </p>
+            </div>
           </div>
         </div>
 
         <div className="btn_wrap md:ml-auto flex gap-4 justify-center lg:justify-between">
-          <button
-            className="cursor-pointer border-2 border-primary-700 bg-white 
+          {isOnRegistering ? (
+            <>
+              <button
+                className="cursor-pointer border-2 border-primary-700 bg-white 
             text-primary-700 py-2 px-4 rounded-md min-w-[100px] h-[40px]
             leading-[20px] hover:bg-primary-300"
-            onClick={(e) => {
-              e.preventDefault();
-              handleOnClickSignupEvent();
-            }}
-          >
-            {isBookingDirect ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              "直接報名"
-            )}
-          </button>
-          <button
-            className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
-            onClick={(e) => {
-              e.preventDefault();
-              handleOnClickAddCart();
-            }}
-          >
-            {(isMutating && !isBookingDirect) || isMutatingPatch ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              isEditing?"修改購物車":"加入購物車"
-            )}
-          </button>
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOnClickSignupEvent();
+                }}
+              >
+                {isBookingDirect ? (
+                  <span className="loading loading-spinner"></span>
+                ) : (
+                  "直接報名"
+                )}
+              </button>
+              <button
+                className="btn-primary text-white py-2 px-4 rounded-md min-w-[100px] h-[40px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleOnClickAddCart();
+                }}
+              >
+                {(isMutating && !isBookingDirect) || isMutatingPatch ? (
+                  <span className="loading loading-spinner"></span>
+                ) : isEditing ? (
+                  "修改購物車"
+                ) : (
+                  "加入購物車"
+                )}
+              </button>
+            </>
+          ) : (
+            <button className="bg-grey-100 text-primary-300 py-2 px-4 rounded-md min-w-[100px] h-[40px]">
+              {registerStatus === "preparing" ? "尚未開放報名" : "截止報名"}
+            </button>
+          )}
         </div>
       </div>
 
       <DialogModal id={modalId} modalRef={modalRef} modalWidth="max-w-md">
         <h3 className="font-bold heading-3 text-primary-500">請先登入</h3>
-        <p className="py-4 heading-5 text-black">登入後才能執行此操作</p>
+        <p className="py-4 heading-5 text-black">登入後才能執行報名操作</p>
         <div className="modal-action">
-          <label htmlFor={modalId} className="btn-primary">
-            關閉
-          </label>
+         <label
+          htmlFor="login"
+          className="btn-primary"
+          onClick={handleCloseInfoModal}
+        >
+          登入
+        </label>
         </div>
       </DialogModal>
     </div>

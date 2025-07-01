@@ -174,22 +174,35 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
           });
         }
 
-        // 處理頭像上傳
+        // 同時上傳頭像和背景圖片
+        const uploadPromises: Promise<unknown>[] = [];
+        
         if (avatarFile) {
-          try {
-            await avatarUpload.trigger(avatarFile);
-          } catch (err) {
-            console.error('頭像上傳錯誤:', err);
-          }
+          uploadPromises.push(
+            avatarUpload.trigger(avatarFile)
+              .catch(err => {
+                console.error('頭像上傳錯誤:', err);
+                toast.error('頭像上傳失敗，但您的主辦方資料已建立');
+                // 返回 null 而不是拋出錯誤，這樣其他上傳仍可繼續
+                return null;
+              })
+          );
         }
-
-        // 處理背景圖片上傳
+        
         if (backgroundFile) {
-          try {
-            await coverUpload.trigger(backgroundFile);
-          } catch (err) {
-            console.error('背景圖片上傳錯誤:', err);
-          }
+          uploadPromises.push(
+            coverUpload.trigger(backgroundFile)
+              .catch(err => {
+                console.error('背景圖片上傳錯誤:', err);
+                toast.error('背景圖片上傳失敗，但您的主辦方資料已建立');
+                return null;
+              })
+          );
+        }
+        
+        // 等待所有上傳完成
+        if (uploadPromises.length > 0) {
+          await Promise.all(uploadPromises);
         }
 
         // 完成後關閉表單並執行成功回調
@@ -198,6 +211,7 @@ export default React.forwardRef<FormHandle, Omit<CreateHostFormProps, 'ref'>>(
         }, 100);
       } catch (error) {
         console.error('建立主辦方資料錯誤:', error);
+        toast.error('建立主辦方資料失敗，請稍後再試');
       } finally {
         setIsSubmitting(false);
       }

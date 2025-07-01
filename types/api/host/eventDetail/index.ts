@@ -67,6 +67,7 @@ export interface EventPlanDetail {
   title: string;
   price: number;
   discounted_price: number | null;
+  people_capacity: number;
   created_at: string;
   updated_at: string;
   eventPlanContentBox: EventPlanContentDetail[];

@@ -3,6 +3,7 @@ import { SuccessResponse } from "@/types/api/response";
 export type EventPlan = {
   title: string;
   price: number;
+  discounted_price: number;
   people_capacity: number;
 };
 
@@ -12,6 +13,9 @@ export type Event = {
   start_time: string; // ISO string
   end_time: string;   // ISO string
   address: string;
+  max_participants: number,
+  status: "preparing" | "registering"| "expired" | "full"| "refunding"| "cancelled"| "finished"
+  total_signup: number,
   plans: EventPlan[];
   photos: string[];
   tags: string[];

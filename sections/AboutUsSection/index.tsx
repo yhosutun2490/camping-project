@@ -1,6 +1,6 @@
 
 import AboutUsCard from "./AboutUsCard"
-
+import ImmediateCreateEventButton from "./ImmediateCreateEventButton"
 export default function AboutUsSection() {
     const aboutCardData = [
         {
@@ -46,6 +46,6 @@ export default function AboutUsSection() {
                     )
                 })}
             </div>
-            <button className="btn-primary w-[144px] mx-auto">立刻發起活動</button>
+            <ImmediateCreateEventButton />
         </main>)
 }

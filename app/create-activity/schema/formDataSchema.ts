@@ -219,6 +219,7 @@ const PlanSchema = z
     title: z.string().min(1, '請輸入方案標題').max(100, '最多100字'),
     price: z.number({ invalid_type_error: '請輸入有效的價格' }).min(1, '方案價格須大於0'),
     discountPrice: z.number({ invalid_type_error: '請輸入有效的價格' }).min(0, '價格不可為負').optional(),
+    people_capacity: z.number({ invalid_type_error: '請輸入有效的人數' }).min(1, '方案人數須大於0'),
     content: z.array(ContentSchema).min(1, '請至少新增一項方案內容'),
     addOns: z.array(AddOnSchema).optional(),
   })
@@ -241,6 +242,18 @@ export const FormDataSchema = z.object({
   coverImages: CoverImageSchema,
   eventImages: EventImagesSchema,
   plans: PlanArraySchema,
+}).superRefine((data, ctx) => {
+  // 驗證每個方案的人數不得超過活動上限人數
+  const maxParticipants = data.eventInfo.max_participants;
+  data.plans.forEach((plan, index) => {
+    if (plan.people_capacity > maxParticipants) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `方案人數不得超過活動上限人數 ${maxParticipants} 人`,
+        path: ['plans', index, 'people_capacity'],
+      });
+    }
+  });
 });
 
 // 編輯模式的表單 schema（圖片為非必填）
@@ -249,6 +262,18 @@ export const FormDataSchemaEdit = z.object({
   coverImages: CoverImageSchemaEdit,
   eventImages: EventImagesSchemaEdit,
   plans: PlanArraySchema,
+}).superRefine((data, ctx) => {
+  // 驗證每個方案的人數不得超過活動上限人數
+  const maxParticipants = data.eventInfo.max_participants;
+  data.plans.forEach((plan, index) => {
+    if (plan.people_capacity > maxParticipants) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `不得超過活動上限人數 ${maxParticipants} 人`,
+        path: ['plans', index, 'people_capacity'],
+      });
+    }
+  });
 });
 
 export type FormData = z.infer<typeof FormDataSchema>;

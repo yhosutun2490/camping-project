@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+  GetMemberOrdersResponse,
   PostMemberOrderRequest,
   PostMemberOrderResponse,
   DeleteMemberOrderResponse,
@@ -7,6 +8,29 @@ import {
   PatchMemberOrderResponse,
 } from "@/types/api/member/orders";
 import useSWRMutation from "swr/mutation";
+import useSWR ,{ mutate as globalMutate }from "swr";
+
+/** 取得會員訂單資料 */
+export function useGetMemberOrders() {
+  const key = '/api/member/orders';
+  const { error, data, mutate } = useSWR(
+    key,
+    async (url: string = '/api/member/orders') => {
+      const res = await axios.get<GetMemberOrdersResponse>(url);
+      return res.data.data.orders;
+    }
+  );
+  function clearOrdersCache() {
+    globalMutate(key, null, false); // 清空快取，不重新 fetch
+  }
+
+  return {
+    mutate, // 可用來重新 fetch
+    clearOrdersCache,
+    data,
+    error,
+  };
+}
 
 /** 創建會員訂單 */
 export function usePostMemberOrders() {

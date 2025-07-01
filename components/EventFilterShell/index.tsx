@@ -86,7 +86,7 @@ export default function EventFilterShell({
     setTags,
   ]);
   // 單純用observer 監控拉取新的活動資料
-    /* ---------- Intersection Observer sentinel ---------- */
+  /* ---------- Intersection Observer sentinel ---------- */
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!sentinelRef.current) return;
@@ -102,7 +102,6 @@ export default function EventFilterShell({
   const itemsPerRow = useItemsPerRow();
 
   // 無限載入實作
- 
 
   // 3. 判斷某筆 index 資料是否已經載入
   // const isItemLoaded = useCallback(
@@ -163,7 +162,7 @@ export default function EventFilterShell({
   return (
     <div className="min-h-screen flex flex-col bg-primary-50">
       {/* ——— 頁面頂部：標籤 & Portal 按鈕 ——— */}
-      <div className="border-b border-zinc-300 py-2 px-4">
+      <div className="border-b border-zinc-300 py-4 px-4">
         <div className="hidden lg:block">
           <TabList initialTagsList={initialEventTags} />
         </div>
@@ -243,12 +242,15 @@ export default function EventFilterShell({
                       date={{ start: item.start_time, end: item.end_time }}
                       price={
                         item.plans?.length
-                          ? String(Math.min(...item.plans.map((p) => p.price)))
+                          ? String(Math.min(...item.plans.map((p) => p.discounted_price)))
                           : undefined
                       }
                       tags={item.tags}
                       image={item.photos || []}
                       address={item.address.slice(0, 3)}
+                      max_participants={item.max_participants}
+                      total_signup={item.total_signup}
+                      status={item.status}
                     />
                   </div>
                 ))}
@@ -259,7 +261,11 @@ export default function EventFilterShell({
 
               {/* 載入更多 loading 動畫 */}
               {isLoadingMore && (
-                <p className="mt-4 text-center text-primary-400">載入中…</p>
+                <div className="grid grid-cols-1 justify-center lg:grid-cols-2 xl:grid-cols-3 gap-10 px-4">
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <SkeletonCard key={idx} />
+                  ))}
+                </div>
               )}
             </>
           )}
