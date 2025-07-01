@@ -10,7 +10,7 @@ export interface EventSummary {
   end_date: string;              // ISO 8601
   max_participants: number;
   max_price: number;
-  active_status: 'pending' | 'reject' | 'unpublish_pending' | '已結束'; // 依實際後端列舉擴充
+  active_status: '待審核' | 'reject' | 'unpublish_pending' | '已結束'; // 依實際後端列舉擴充
 }
 
 /** 取得活動清單 API 回傳格式 */

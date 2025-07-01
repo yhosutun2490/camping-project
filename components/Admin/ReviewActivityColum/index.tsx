@@ -198,7 +198,7 @@ export default function ReviewActivityRow({ event, list_type }: Props) {
       {/* 狀態 badge */}
       <div className="flex justify-center">
         <BadgeStatus
-          status={event.active_status === "pending" ? "待審核" : event.active_status}
+          status={event.active_status}
         />
       </div>
 
