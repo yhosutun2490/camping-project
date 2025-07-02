@@ -118,6 +118,16 @@ export default function EventPlanCard(props: EventPlanCardProps) {
     return plan.price + addonPrice;
   }, [currentPlanAddonItems, plan.price]);
 
+  // 計算點選後原價
+  const selectTotalOriginalPrice = useMemo(() => {
+    const addonPrice = (currentPlanAddonItems as AddonItem[]).reduce(
+      (acc: number, current: AddonItem) => acc + current.price,
+      0
+    );
+    return (plan.originalPrice ?? 0) + addonPrice;
+  }, [currentPlanAddonItems, plan.originalPrice]);
+
+
   // 點擊購物車行為
   async function handleOnClickAddCart() {
     // 需登入才有member id 進行訂單創建
@@ -262,7 +272,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               {unit} {(selectTotalPrice).toLocaleString() || "0"}
             </div>
             <div className="original text-gray-500 text-base line-through">
-              {unit} {originalPrice?.toLocaleString() || "0"}
+              {unit} {selectTotalOriginalPrice?.toLocaleString() || "0"}
             </div>
           </div>
         </div>
