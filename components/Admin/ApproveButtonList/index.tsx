@@ -1,5 +1,6 @@
 "use client";
 import IconWrapper from "@/components/ClientIcon/IconWrapper";
+import AICheckModalContent from "./AICheckModalContent";
 import clsx from "clsx";
 import { useRef, useState, useId } from "react";
 import { AxiosError } from "axios";
@@ -20,6 +21,11 @@ export default function ApproveButtonList({ className, eventId }: Props) {
   const randomId = useId();
   const modalId = `${eventId}-reject-${randomId}`;
   const rejectModalRef = useRef<HTMLInputElement>(null);
+  /** AI說明彈窗 */
+  const aiModalId = `${eventId}-ai-check-${randomId}`;
+  const aiModalRef = useRef<HTMLInputElement>(null);
+
+
   /** 退回原因 */
   const [reason, setReason] = useState("");
 
@@ -29,7 +35,9 @@ export default function ApproveButtonList({ className, eventId }: Props) {
   // reject swr
   const { trigger: patchRejectEvent, isMutating: isLoadingReject } =
     useAdminRejectEvent();
-
+  function onCloseAIModal () {
+    if (aiModalRef.current) aiModalRef.current.checked = false
+  }
   async function handleApproveEvent() {
     try {
       await patchApproveEvent({ eventId });
@@ -63,10 +71,10 @@ export default function ApproveButtonList({ className, eventId }: Props) {
   }
 
   return (
-    <div className={clsx("flex flex-col gap-4", className)}>
+    <div className={clsx("flex flex-col gap-4 pb-4 px-4 lg:p-0", className)}>
       <button
         className="btn-primary flex-grow-1 text-xs h-8 
-        flex justify-center items-center gap-1"
+        flex justify-center lg:justify-start items-center gap-1"
         onClick={handleApproveEvent}
       >
         {isLoadingApprove ? (
@@ -74,13 +82,27 @@ export default function ApproveButtonList({ className, eventId }: Props) {
         ) : (
           <div className="flex items-center">
             <IconWrapper icon="mdi:check" className="text-white"></IconWrapper>
-            <span>通過</span>
+            <span>人工通過</span>
           </div>
         )}
       </button>
+      {/**AI 智能審核按鈕 */}
+      <label htmlFor={aiModalId} className="flex-grow">
+        <div
+          className="flex justify-center lg:justify-start gap-1 items-center text-xs h-8 w-full font-bold px-4 py-2 bg-amber-500
+                 rounded-2xl text-white hover:bg-orange-700 cursor-pointer"
+        >
+          <IconWrapper icon="humbleicons:ai" className="text-white" />
+          AI小幫手
+        </div>
+      </label>
+      <DialogModal id={aiModalId} modalRef={aiModalRef}>
+          <AICheckModalContent onCloseAIModal={onCloseAIModal} eventId={eventId}/>
+      </DialogModal>
+      {/** 退回按鈕 */}
       <label htmlFor={modalId} className="flex-grow">
         <div
-          className="flex justify-center items-center text-xs h-8 w-full font-bold px-4 py-2 bg-orange-500
+          className="flex justify-center lg:justify-start gap-1 items-center text-xs h-8 w-full font-bold px-4 py-2 bg-orange-500
                  rounded-2xl text-white hover:bg-orange-700 cursor-pointer"
         >
           <IconWrapper icon="mdi:close" className="text-white" />

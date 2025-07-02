@@ -98,7 +98,7 @@ export default function ReviewActivityRow({ event, list_type }: Props) {
   return (
     <div
       className={clsx(
-        "grid grid-cols-[70px_2fr_50px_70px_80px_100px]",
+        "grid grid-cols-[100px_2fr_50px_70px_80px_110px]",
         "items-center gap-4 border-b py-4 text-neutral-950"
       )}
     >
@@ -191,12 +191,12 @@ export default function ReviewActivityRow({ event, list_type }: Props) {
       </div>
 
       {/* 名額  */}
-      <div className="text-start font-medium">{event.max_participants}</div>
+      <div className="text-center font-medium">{event.max_participants}</div>
       {/* 方案最大價格 */}
-      <div className="text-start">{planMaxPrice}</div>
+      <div className="text-center ">{planMaxPrice || 0}</div>
 
       {/* 狀態 badge */}
-      <div className="flex justify-start">
+      <div className="flex justify-center">
         <BadgeStatus
           status={event.active_status}
         />
