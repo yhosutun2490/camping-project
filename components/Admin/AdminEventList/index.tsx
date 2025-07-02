@@ -74,9 +74,9 @@ export default function AdminEventList({ pendingEvents, rejectEvents, unpublishP
       {/* 桌機審核清單列表 */}
       <div className="pending_event_list hidden lg:block">
         {selectList.length? (
-          <div className="grid grid-cols-[70px_2fr_50px_70px_80px_100px] items-center gap-4 border-b py-2 text-sm font-semibold text-neutral-500">
+          <div className="grid grid-cols-[100px_2fr_50px_70px_80px_110px] items-center gap-4 border-b py-2 text-sm font-semibold text-neutral-500">
             {titleList.map((item) => (
-              <span key={item.id}>{item.value}</span>
+              <span key={item.id} className={item.isTextCenter ? 'text-center' : undefined}>{item.value}</span>
             ))}
           </div> 
         ): ""}

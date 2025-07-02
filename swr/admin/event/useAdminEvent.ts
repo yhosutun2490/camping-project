@@ -5,7 +5,8 @@ import type {
   GetAdminEventByIdSuccessResponse, 
   PatchAdminApproveEventSuccessResponse,
   PatchUnpublishEventBody,
-  PatchAdminUnpublishEventSuccessResponse 
+  PatchAdminUnpublishEventSuccessResponse,
+  PostAiCheckSuccessResponse
 } from '@/types/api/admin'
 
 
@@ -97,5 +98,26 @@ export function useAdminUnpublishEvent() {
     data,
     error,
   };
+}
 
+/** Admin ai 智能審核活動上架*/
+
+export function useAdminAICheckEvent() {
+    const { isMutating, trigger, error, data } = useSWRMutation(
+    "/api/admin/events/:id/ai-check",
+    async (_key: string, { arg: payload }: { arg: {eventId:string} }) => {
+      const res = await axios.post<PostAiCheckSuccessResponse>(
+        "/api/admin/events/ai-check",
+        payload
+      );
+      return res.data.data;
+    }
+  );
+
+  return {
+    isMutating,
+    trigger,
+    data,
+    error,
+  };
 }

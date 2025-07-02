@@ -10,7 +10,7 @@ export interface EventSummary {
   end_date: string;              // ISO 8601
   max_participants: number;
   max_price: number;
-  active_status: 'pending' | 'reject' | 'unpublish_pending' | '已結束'; // 依實際後端列舉擴充
+  active_status: '待審核' | 'reject' | 'unpublish_pending' | '已結束'; // 依實際後端列舉擴充
 }
 
 /** 取得活動清單 API 回傳格式 */
@@ -121,3 +121,57 @@ export type PatchUnpublishEventBody = {
   isApprove: boolean,
   comment: string,
 }
+
+/**AI 審核回傳 */
+
+export interface SensitiveCheck {
+  hasSensitiveContent: boolean;
+  sensitiveWords: string[];
+  issues: string[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface RegulatoryCheck {
+  hasRegulatoryIssues: boolean;
+  violations: string[];
+  missingElements: string[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface ImageCheck {
+  hasIssue: boolean;
+  issues: string[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface ImageRiskSummary {
+  hasRisk: boolean;
+  riskDetails: ImageRiskDetail[];
+  summary: string;
+  analysis: string;
+  pass: boolean;
+}
+
+export interface ImageRiskDetail {
+  url: string;
+  issue: string;
+  suggestion: string;
+}
+
+
+export interface AiCheckData {
+  success: boolean;
+  feedback: string; // markdown 格式建議用 string
+  sensitiveCheck: SensitiveCheck;
+  regulatoryCheck: RegulatoryCheck;
+  imageCheck: ImageCheck;
+  imageRiskSummary: ImageRiskSummary;
+}
+
+export type PostAiCheckSuccessResponse = SuccessResponse<AiCheckData>
