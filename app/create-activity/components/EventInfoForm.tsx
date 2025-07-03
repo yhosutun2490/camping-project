@@ -74,6 +74,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       setValue,
       trigger,
       formState: { errors },
+      getFieldState
     } = useFormContext<FormData>();
 
     // 當有主辦方資料時，設定表單值
@@ -143,6 +144,72 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       return customErrors[field] || errors.eventInfo?.[field]?.message;
     };
 
+    // 取得欄位中文標籤
+    const getFieldLabel = (field: string): string => {
+      const fieldLabels: Record<string, string> = {
+        title: '活動主題',
+        organizer: '主辦方名稱',
+        address: '活動地點',
+        startDate: '活動開始日期',
+        startTime: '活動開始時間',
+        endDate: '活動結束日期',
+        endTime: '活動結束時間',
+        registration_startDate: '報名開始日期',
+        registration_startTime: '報名開始時間',
+        registration_endDate: '報名結束日期',
+        registration_endTime: '報名結束時間',
+        max_participants: '上限人數',
+        price: '價格',
+        description: '活動摘要',
+        tags: '活動標籤',
+        cancel_policy: '取消政策',
+        event_notifications: '行前通知',
+      };
+      return fieldLabels[field] || field;
+    };
+
+    // 滾動到錯誤欄位並聚焦
+    const scrollToErrorField = (fieldName: string) => {
+      // 欄位名稱到 DOM 選擇器的對應
+      const fieldToSelector: Record<string, string> = {
+        title: 'input[name="eventInfo.title"]',
+        organizer: 'input[name="eventInfo.organizer"]',
+        address: 'input[name="eventInfo.address"]',
+        startDate: 'input[name="eventInfo.startDate"]',
+        startTime: 'input[name="eventInfo.startTime"]',
+        endDate: 'input[name="eventInfo.endDate"]',
+        endTime: 'input[name="eventInfo.endTime"]',
+        registration_startDate: 'input[name="eventInfo.registration_startDate"]',
+        registration_startTime: 'input[name="eventInfo.registration_startTime"]',
+        registration_endDate: 'input[name="eventInfo.registration_endDate"]',
+        registration_endTime: 'input[name="eventInfo.registration_endTime"]',
+        max_participants: 'input[name="eventInfo.max_participants"]',
+        description: 'textarea[name="eventInfo.description"]',
+        tags: '[data-field="eventInfo.tags"]',
+        cancel_policy: '[data-field="eventInfo.cancel_policy"]',
+        event_notifications: '[data-field="eventInfo.event_notifications"]',
+      };
+
+      const selector = fieldToSelector[fieldName];
+      if (selector) {
+        const element = document.querySelector(selector) as HTMLElement;
+        if (element) {
+          // 滾動到元素位置，並留一些上方空間
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          
+          // 延遲一下再聚焦，確保滾動完成
+          setTimeout(() => {
+            if (element.focus) {
+              element.focus();
+            }
+          }, 500);
+        }
+      }
+    };
+
     // 處理表單資料轉換為 API 請求格式
     const prepareCreateEventData = (
       formData: FormData['eventInfo']
@@ -198,7 +265,76 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
       const isValid = await trigger('eventInfo');
 
       if (!isValid) {
-        toast.error('請檢查表單內容是否正確填寫');
+        const fieldState = getFieldState('eventInfo');
+        console.error('表單驗證失敗:', fieldState);
+        
+        // 收集錯誤訊息
+        const errorMessages: string[] = [];
+        let firstErrorField: string | null = null;
+        
+        if (fieldState.error) {
+          Object.entries(fieldState.error).forEach(([field, error]) => {
+            // 處理一般錯誤物件
+            if (error && typeof error === 'object' && 'message' in error && error.message) {
+              const fieldLabel = getFieldLabel(field);
+              errorMessages.push(`• ${fieldLabel}：${error.message}`);
+              
+              // 記錄第一個錯誤欄位
+              if (!firstErrorField) {
+                firstErrorField = field;
+              }
+            }
+            // 處理陣列錯誤（如 event_notifications）
+            else if (Array.isArray(error)) {
+              const fieldLabel = getFieldLabel(field);
+              
+              // 收集陣列中的錯誤訊息
+              const arrayErrors: string[] = [];
+              error.forEach((item, index) => {
+                if (item && typeof item === 'object' && 'message' in item && item.message) {
+                  arrayErrors.push(`  - 第 ${index + 1} 項：${item.message}`);
+                }
+              });
+              
+              if (arrayErrors.length > 0) {
+                // 將陣列錯誤分行顯示，更易閱讀
+                errorMessages.push(`• ${fieldLabel}：\n${arrayErrors.join('\n')}`);
+                
+                // 記錄第一個錯誤欄位
+                if (!firstErrorField) {
+                  firstErrorField = field;
+                }
+              }
+            }
+          });
+        }
+        
+        // 顯示具體錯誤訊息
+        if (errorMessages.length > 0) {
+          // 先關閉所有現有的 toast
+          toast.dismiss();
+          
+          // 顯示所有錯誤，無論數量多少
+          const summary = errorMessages.length === 1 ? '請修正以下問題：' : `請修正以下 ${errorMessages.length} 個問題：`;
+          const errorText = `${summary}\n${errorMessages.join('\n')}`;
+          toast.error(errorText, { 
+            duration: 3000,
+            style: {
+              whiteSpace: 'pre-line',
+              maxWidth: '500px',
+              textAlign: 'left'
+            }
+          });
+          
+          // 滾動到第一個錯誤欄位並聚焦
+          if (firstErrorField) {
+            scrollToErrorField(firstErrorField);
+          }
+        } else {
+          // 先關閉所有現有的 toast
+          toast.dismiss();
+          toast.error('請檢查表單內容是否正確填寫');
+        }
         return false;
       }
 
@@ -439,7 +575,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
           </div>
 
           {/* 活動標籤 */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3" data-field="eventInfo.tags">
             <FormField
               label="活動標籤"
               name="eventInfo.tags"
@@ -464,7 +600,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
           </div>
 
           {/* 取消政策 */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3" data-field="eventInfo.cancel_policy">
             <FormField
               label="取消政策"
               name="eventInfo.cancel_policy"
@@ -485,7 +621,7 @@ const EventInfoForm = forwardRef<EventInfoFormRef, EventInfoFormProps>(
             name="eventInfo.event_notifications"
             error={errors.eventInfo?.event_notifications?.message}
           >
-            <div>
+            <div data-field="eventInfo.event_notifications">
               <FormDynamicInputs
                 addButtonLabel="新增"
                 placeholder="請輸入行前提醒"

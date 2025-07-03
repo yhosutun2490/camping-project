@@ -23,16 +23,26 @@ function FormDynamicInputs({
   } = useFormContext<FormData>();
   const notifications = watch('eventInfo.event_notifications') || [];
   const [key, setKey] = useState(0); // 用於強制重新渲染
-  const lastInputRef = useRef<HTMLDivElement>(null); // 用於追蹤最新新增的輸入欄位
+  const lastInputRef = useRef<HTMLDivElement>(null); // 用於追蹤最新新增的輸入欄位容器
 
-  // 自動捲動到最新新增的欄位
+  // 自動捲動到最新新增的欄位並聚焦
   const scrollToNewField = () => {
     setTimeout(() => {
       if (lastInputRef.current) {
+        // 先滾動到欄位位置
         lastInputRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
         });
+        
+        // 延遲聚焦，確保滾動完成
+        setTimeout(() => {
+          // 找到該容器內的 input 元素並聚焦
+          const inputElement = lastInputRef.current?.querySelector('input');
+          if (inputElement) {
+            inputElement.focus();
+          }
+        }, 300);
       }
     }, 100); // 等待DOM更新後再捲動
   };

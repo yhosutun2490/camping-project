@@ -34,7 +34,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
     const isEditMode = pathname.includes('/edit-activity');
 
     // 從 formContext 獲取方法
-    const { control, trigger, getValues } = useFormContext<FormData>();
+    const { control, trigger, getValues, getFieldState } = useFormContext<FormData>();
 
     // 使用 useFieldArray 管理多方案
     const { fields, append, remove } = useFieldArray({
@@ -47,8 +47,53 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
     const { updateEventPlans } = useUpdateEventPlans();
     const { trigger: deleteEventPlan } = useDeleteEventPlan();
 
+    // 控制哪些方案面板是展開的
+    const [expandedPlans, setExpandedPlans] = useState<number[]>([0]); // 默認第一個展開
+
     // ref 用於追蹤最新新增的方案
     const lastPlanRef = useRef<HTMLDivElement>(null);
+
+  // 滾動到錯誤欄位並聚焦
+  const scrollToErrorField = useCallback((planIndex: number, fieldName: string) => {
+    // 欄位名稱到 DOM 選擇器的對應
+    const fieldToSelector: Record<string, string> = {
+      title: `input[name="plans.${planIndex}.title"]`,
+      price: `input[name="plans.${planIndex}.price"]`,
+      discountPrice: `input[name="plans.${planIndex}.discountPrice"]`,
+      people_capacity: `input[name="plans.${planIndex}.people_capacity"]`,
+      content: `input[name="plans.${planIndex}.content.0.value"]`,
+      addOns: `input[name="plans.${planIndex}.addOns.0.name"]`,
+    };
+
+    const selector = fieldToSelector[fieldName];
+    if (selector) {
+      const element = document.querySelector(selector) as HTMLElement;
+      if (element) {
+        // 先確保該方案面板是展開的
+        setExpandedPlans(prev => {
+          if (!prev.includes(planIndex)) {
+            return [...prev, planIndex];
+          }
+          return prev;
+        });
+        
+        // 延遲滾動，確保面板展開動畫完成
+        setTimeout(() => {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+          
+          // 延遲一下再聚焦，確保滾動完成
+          setTimeout(() => {
+            if (element.focus) {
+              element.focus();
+            }
+          }, 500);
+        }, 300);
+      }
+    }
+  }, [setExpandedPlans]);
 
     /**
      * 將表單資料轉換為建立 API 請求格式
@@ -102,42 +147,154 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           // 先執行 React Hook Form 驗證
           const isValid = await trigger('plans');
 
-          if (isValid) {
-            if (eventId) {
-              try {
-                // 取得表單資料
-                const formData = getValues('plans');
-
-                if (isEditMode) {
-                  // 編輯模式：使用更新 API (PATCH)
-                  const updatePayload = convertFormDataToUpdateApiFormat(formData);
-                  
-                  await updateEventPlans(updatePayload, eventId);
-                } else {
-                  // 建立模式：使用建立 API (POST)
-                  const createPayload = convertFormDataToCreateApiFormat(formData);
-                  
-                  await createEventPlans(createPayload, eventId);
+          if (!isValid) {
+            const fieldState = getFieldState('plans');
+            console.error('方案驗證失敗:', fieldState);
+            
+            // 收集錯誤訊息，按方案群組化
+            const planErrors: Record<number, string[]> = {};
+            let firstErrorPlan: number | null = null;
+            let firstErrorField: string | null = null;
+            
+            if (fieldState.error && Array.isArray(fieldState.error)) {
+              fieldState.error.forEach((planError, planIndex) => {
+                if (planError && typeof planError === 'object') {
+                  Object.entries(planError).forEach(([field, error]) => {
+                    if (error && typeof error === 'object' && 'message' in error && error.message) {
+                      if (!planErrors[planIndex]) planErrors[planIndex] = [];
+                      
+                      const fieldLabels: Record<string, string> = {
+                        title: '方案標題',
+                        price: '方案價格',
+                        discountPrice: '折扣價格',
+                        people_capacity: '方案人數',
+                        content: '方案內容',
+                        addOns: '加購商品',
+                      };
+                      
+                      const fieldLabel = fieldLabels[field] || field;
+                      planErrors[planIndex].push(`  - ${fieldLabel}: ${error.message}`);
+                      
+                      // 記錄第一個錯誤位置
+                      if (firstErrorPlan === null) {
+                        firstErrorPlan = planIndex;
+                        firstErrorField = field;
+                      }
+                    }
+                    // 處理陣列錯誤（如 content 或 addOns）
+                    else if (Array.isArray(error)) {
+                      error.forEach((itemError, itemIndex) => {
+                        if (itemError && typeof itemError === 'object') {
+                          Object.entries(itemError).forEach(([, subError]) => {
+                            if (subError && typeof subError === 'object' && 'message' in subError && subError.message) {
+                              if (!planErrors[planIndex]) planErrors[planIndex] = [];
+                              
+                              const fieldLabels: Record<string, string> = {
+                                title: '方案標題',
+                                price: '方案價格',
+                                discountPrice: '折扣價格',
+                                people_capacity: '方案人數',
+                                content: '方案內容',
+                                addOns: '加購商品',
+                              };
+                              
+                              const fieldLabel = fieldLabels[field] || field;
+                              planErrors[planIndex].push(`  - ${fieldLabel} (第 ${itemIndex + 1} 項): ${subError.message}`);
+                              
+                              // 記錄第一個錯誤位置
+                              if (firstErrorPlan === null) {
+                                firstErrorPlan = planIndex;
+                                firstErrorField = field;
+                              }
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
                 }
-
-                return true;
-              } catch (error) {
-                console.error('❌ 方案操作失敗:', error);
-                toast.error(isEditMode ? '方案更新過程中發生錯誤，請稍後再試' : '方案建立過程中發生錯誤，請稍後再試');
-                return false;
+              });
+            }
+            
+            // 顯示具體錯誤訊息
+            if (Object.keys(planErrors).length > 0) {
+              // 先關閉所有現有的 toast
+              toast.dismiss();
+              
+              // 建立群組化的錯誤訊息
+              const groupedErrorMessages: string[] = [];
+              
+              Object.entries(planErrors).forEach(([planIndex, errors]) => {
+                groupedErrorMessages.push(`• 方案 ${Number(planIndex) + 1}:`);
+                groupedErrorMessages.push(...errors);
+                groupedErrorMessages.push(''); // 空行分隔
+              });
+              
+              // 移除最後一個空行
+              if (groupedErrorMessages[groupedErrorMessages.length - 1] === '') {
+                groupedErrorMessages.pop();
+              }
+              
+              const errorText = `請修正以下問題\n${groupedErrorMessages.join('\n')}`;
+              
+              toast.error(errorText, { 
+                duration: 5000,
+                style: {
+                  whiteSpace: 'pre-line',
+                  maxWidth: '700px',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  lineHeight: '1.5'
+                }
+              });
+              
+              // 滾動到第一個錯誤欄位並聚焦
+              if (firstErrorPlan !== null && firstErrorField) {
+                scrollToErrorField(firstErrorPlan, firstErrorField);
               }
             } else {
-              // 如果沒有活動ID，則只是儲存表單資料到狀態
-              return true;
+              // 先關閉所有現有的 toast
+              toast.dismiss();
+              toast.error('請檢查方案內容是否正確填寫');
             }
+            return false;
           }
-          return false;
+
+          if (eventId) {
+            try {
+              // 取得表單資料
+              const formData = getValues('plans');
+
+              if (isEditMode) {
+                // 編輯模式：使用更新 API (PATCH)
+                const updatePayload = convertFormDataToUpdateApiFormat(formData);
+                
+                await updateEventPlans(updatePayload, eventId);
+              } else {
+                // 建立模式：使用建立 API (POST)
+                const createPayload = convertFormDataToCreateApiFormat(formData);
+                
+                await createEventPlans(createPayload, eventId);
+              }
+
+              return true;
+            } catch (error) {
+              console.error('❌ 方案操作失敗:', error);
+              toast.error(isEditMode ? '方案更新過程中發生錯誤，請稍後再試' : '方案建立過程中發生錯誤，請稍後再試');
+              return false;
+            }
+          } else {
+            // 如果沒有活動ID，則只是儲存表單資料到狀態
+            return true;
+          }
         },
       }),
       [
         eventId,
         trigger,
         getValues,
+        getFieldState,
+        scrollToErrorField,
         isEditMode,
         convertFormDataToCreateApiFormat,
         convertFormDataToUpdateApiFormat,
@@ -146,11 +303,8 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       ]
     );
 
-    // 控制哪些方案面板是展開的
-    const [expandedPlans, setExpandedPlans] = useState<number[]>([0]); // 默認第一個展開
-
     // 自動捲動到最新新增的方案
-    const scrollToNewPlan = () => {
+    const scrollToNewPlan = useCallback(() => {
       setTimeout(() => {
         if (lastPlanRef.current) {
           lastPlanRef.current.scrollIntoView({
@@ -159,7 +313,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           });
         }
       }, 100); // 等待DOM更新後再捲動
-    };
+    }, []);
 
     // 新增方案
     const handleAddPlan = useCallback(() => {
@@ -181,7 +335,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
       
       // 新增方案後自動捲動
       scrollToNewPlan();
-    }, [append, fields.length]);
+    }, [append, fields.length, setExpandedPlans, scrollToNewPlan]);
 
     // 刪除方案
     const handleDeletePlan = useCallback(
@@ -224,7 +378,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           }
         }
       },
-      [fields, isEditMode, eventId, deleteEventPlan, remove, getValues]
+      [fields, isEditMode, eventId, deleteEventPlan, remove, getValues, setExpandedPlans]
     );
 
     // 切換方案面板展開/收起
@@ -234,7 +388,7 @@ const PlanAccordion = forwardRef<PlanAccordionRef, PlanAccordionProps>(
           ? prev.filter((i) => i !== index)
           : [...prev, index]
       );
-    }, []);
+    }, [setExpandedPlans]);
 
     // 控制是否可以添加更多方案
     const canAddMorePlan = fields.length < 3;
