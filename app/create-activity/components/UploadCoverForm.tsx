@@ -83,6 +83,7 @@ const UploadCoverForm = forwardRef<UploadCoverFormRef, UploadCoverFormProps>(({ 
     // 先觸發驗證
     const isValid = await trigger('coverImages');
     if (!isValid) {
+      toast.error('請至少上傳一張封面圖片');
       return false; // 驗證失敗，不繼續執行
     }
     
