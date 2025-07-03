@@ -1900,5 +1900,14 @@ const sampleComments = [
     }
   },
 ];
-
-export default sampleComments;
+const updatedComments = sampleComments.map(comment => {
+  const random = Math.floor(Math.random() * 1000);
+  return {
+    ...comment,
+    userInfo: {
+      ...comment.userInfo,
+      image: `https://i.pravatar.cc/150?u=${random}`
+    }
+  };
+});
+export default updatedComments;
