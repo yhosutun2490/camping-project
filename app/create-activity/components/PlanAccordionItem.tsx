@@ -36,6 +36,10 @@ function PlanAccordionItem({
   // 監聽方案標題，用於顯示在摺疊面板標題上
   const planTitle = watch(`plans.${index}.title`) || `方案 ${index + 1}`;
 
+  // 方案錯誤訊息
+  const planErrors = errors.plans?.[index];
+
+
   // 設置方案內容的 useFieldArray
   const contentArray = useFieldArray({
     control,
@@ -47,9 +51,6 @@ function PlanAccordionItem({
     control,
     name: `plans.${index}.addOns`,
   });
-
-  // 方案錯誤訊息
-  const planErrors = errors.plans?.[index];
 
   // 添加內容項
   const handleAddContent = () => {
@@ -82,10 +83,12 @@ function PlanAccordionItem({
         </div>
         <div className="flex items-center gap-2 ml-3">
           {planErrors && (
-            <Icon
-              icon="material-symbols:error"
-              className="w-5 h-5 text-[#AB5F5F] animate-pulse"
-            />
+            <div className="flex items-center gap-1">
+              <Icon
+                icon="material-symbols:error"
+                className="w-5 h-5 text-[#AB5F5F] animate-pulse"
+              />
+            </div>
           )}
           <Icon
             icon="material-symbols:keyboard-arrow-down"

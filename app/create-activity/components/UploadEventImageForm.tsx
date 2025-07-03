@@ -79,14 +79,24 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
     return file.size > 4 * 1024 * 1024; // 4MB
   };
 
-  // 自動捲動到最新新增的圖片
+  // 自動捲動到最新新增的圖片並聚焦描述欄位
   const scrollToNewImage = () => {
     setTimeout(() => {
       if (lastImageRef.current) {
+        // 先滾動到圖片位置
         lastImageRef.current.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
         });
+        
+        // 延遲聚焦，確保滾動完成
+        setTimeout(() => {
+          // 找到該容器內的 textarea 元素並聚焦
+          const textareaElement = lastImageRef.current?.querySelector('textarea');
+          if (textareaElement) {
+            textareaElement.focus();
+          }
+        }, 300);
       }
     }, 100); // 等待DOM更新後再捲動
   };
@@ -162,6 +172,7 @@ const UploadEventImageForm = forwardRef<UploadEventImageFormRef, UploadEventImag
       // 先執行 React Hook Form 驗證
       const isValid = await trigger('eventImages');
       if (!isValid) {
+        toast.error('請至少上傳一張活動圖片');
         return false; // 驗證失敗，不繼續執行
       }
       
