@@ -11,11 +11,11 @@ import EventNotice from "@/components/EventById/EventNotice";
 import { getEventById } from "@/api/server-components/event/eventId";
 import { redirect } from "next/navigation";
 import type { TypeCommentCard } from "@/components/CommentCard";
-import type { Event } from "@/types/api/event/allEvents"
+import type { Event } from "@/types/api/event/allEvents";
 import sampleComments from "@/fakeData/sampleComments_richer"; // 評論假資料
 import type { Metadata } from "next";
 // 加入報名狀態
-export type RegisterStatus = Event['status'];
+export type RegisterStatus = Event["status"];
 // 動態產生 metadata，根據活動名稱顯示標題
 export async function generateMetadata({
   params,
@@ -54,18 +54,28 @@ export async function generateMetadata({
   };
 }
 // 隨機評論資料
-function getRandomComments(arr: TypeCommentCard[], count: number, host_name: string, event_name:string) {
+function getRandomComments(
+  arr: TypeCommentCard[],
+  count: number,
+  host_name: string,
+  event_name: string
+) {
   const shuffled = [...arr]
     .sort(() => 0.5 - Math.random())
-    .map(data => ({
+    .map((data) => ({
       ...data,
       eventInfo: {
         ...data.eventInfo,
         host_name: host_name,
-        event_name: event_name
+        event_name: event_name,
       },
     }));
-  return shuffled.slice(0, count).sort((a, b) => new Date(b.comment.date).getTime() - new Date(a.comment.date).getTime());
+  return shuffled
+    .slice(0, count)
+    .sort(
+      (a, b) =>
+        new Date(b.comment.date).getTime() - new Date(a.comment.date).getTime()
+    );
 }
 
 export default async function EventByIdPage({
@@ -126,6 +136,7 @@ export default async function EventByIdPage({
   // 最低方案和價格
 
   const discount_rates = eventIdData.plans
+    .filter((plan)=>plan.discounted_price > 0)
     .map((plan) => {
       const discountRate = plan.discounted_price / plan.price;
       return (discountRate * 100).toFixed(0); // 幾折
@@ -134,9 +145,14 @@ export default async function EventByIdPage({
     .sort((a, b) => a - b);
 
   // ➤ 找出最低價格方案
-  const lowestPlan = eventIdData.plans.reduce((prev, current) => {
-    return current.discounted_price < prev.discounted_price ? current : prev;
-  });
+  const lowestPlan = eventIdData.plans
+    .filter((plan) => (plan.discounted_price ?? plan.price) > 0) // 先排除價格 0
+    .reduce((prev, current) => {
+      const prevPrice = prev.discounted_price ?? prev.price;
+      const currentPrice = current.discounted_price ?? current.price;
+
+      return currentPrice < prevPrice ? current : prev;
+    }, eventIdData.plans[0]); // 設定初始值避免空陣列報錯
 
   // 活動基本資訊
   const event_basic_info = {

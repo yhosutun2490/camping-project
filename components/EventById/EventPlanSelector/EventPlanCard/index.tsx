@@ -115,8 +115,18 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       (acc: number, current: AddonItem) => acc + current.price,
       0
     );
-    return plan.price + addonPrice;
-  }, [currentPlanAddonItems, plan.price]);
+    return (plan.price ?? plan.originalPrice)  + addonPrice;
+  }, [currentPlanAddonItems, plan.price, plan.originalPrice]);
+
+  // 計算點選後原價
+  const selectTotalOriginalPrice = useMemo(() => {
+    const addonPrice = (currentPlanAddonItems as AddonItem[]).reduce(
+      (acc: number, current: AddonItem) => acc + current.price,
+      0
+    );
+    return (plan.originalPrice ?? 0) + addonPrice;
+  }, [currentPlanAddonItems, plan.originalPrice]);
+
 
   // 點擊購物車行為
   async function handleOnClickAddCart() {
@@ -253,7 +263,7 @@ export default function EventPlanCard(props: EventPlanCardProps) {
       flex flex-col md:flex-row flex-wrap gap-2 justify-between items-start"
       >
         <div className="discount_info flex items-center space-y-2 space-x-4">
-          <DiscountRate rate={discountedRate} />
+          {discountedRate!=='0' &&　<DiscountRate rate={discountedRate} />}
           <div className="event_price flex gap-2 items-start">
             <div className="discount relative text-primary-500 heading-4 md:heading-3">
               {currentPlanAddonItems.length > 0 && (
@@ -261,9 +271,9 @@ export default function EventPlanCard(props: EventPlanCardProps) {
               )}
               {unit} {(selectTotalPrice).toLocaleString() || "0"}
             </div>
-            <div className="original text-gray-500 text-base line-through">
-              {unit} {originalPrice?.toLocaleString() || "0"}
-            </div>
+            {plan.price && <div className="original text-gray-500 text-base line-through">
+              {unit} {selectTotalOriginalPrice?.toLocaleString() || "0"}
+            </div>}
           </div>
         </div>
 

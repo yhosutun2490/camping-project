@@ -35,7 +35,7 @@ export default function AICheckModalContent({
       }
     } catch (e) {
       console.error("審核失敗", e);
-      toast.success("AI審核服務中斷");
+      toast.error("AI審核服務中斷，請洽服務人員");
       setHasStarted(false);
     }
   }
@@ -81,7 +81,7 @@ export default function AICheckModalContent({
       )}
       {isDone && (
         <div>
-          <div className="space-x-1">審核結果: 
+          <div className="space-x-1 text-neutral-950">審核結果: 
             <span className={clsx(AiCheckResult.success? 'text-primary-500': 'text-red-500')}>
                 {AiCheckResult.success? "通過":"未通過"}
             </span>

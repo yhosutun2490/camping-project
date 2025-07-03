@@ -242,7 +242,15 @@ export default function EventFilterShell({
                       date={{ start: item.start_time, end: item.end_time }}
                       price={
                         item.plans?.length
-                          ? String(Math.min(...item.plans.map((p) => p.discounted_price)))
+                          ? String(
+                              item.plans.reduce((min, p) => {
+                                const price = p.discounted_price ?? p.price; // 折扣價為 null 時取原價
+                                if (price > 0 && price < min) {
+                                  return price;
+                                }
+                                return min;
+                              }, Infinity) // 初始值設 Infinity 方便取最小
+                            )
                           : undefined
                       }
                       tags={item.tags}

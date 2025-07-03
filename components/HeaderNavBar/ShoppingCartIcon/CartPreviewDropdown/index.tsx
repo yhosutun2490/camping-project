@@ -36,7 +36,7 @@ export default function CartPreviewDropdown({
       (sum, addon) => sum + addon.price,
       0
     );
-    return plan.price + addonsTotal;
+    return (plan.price ?? plan.originalPrice) + addonsTotal;
   }
 
   return (
