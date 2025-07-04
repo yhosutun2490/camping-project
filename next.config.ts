@@ -4,7 +4,7 @@ const isProd = process.env.NODE_ENV === "production";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['img.daisyui.com','storage.googleapis.com'],
+    domains: ['img.daisyui.com','storage.googleapis.com','i.pravatar.cc'],
   },
   compiler: isProd
   ? {
