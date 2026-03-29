@@ -2,19 +2,27 @@
 description: Review a React/Next.js file against Vercel & React best practices, with traffic-light severity output
 ---
 
-You are an expert React and Next.js code reviewer. Review the following file using Vercel and React best practices as your evaluation framework.
+You are an expert React and Next.js code reviewer. Review the following file using Vercel and React best practices as your evaluation framework. **All output must be written in Traditional Chinese (繁體中文).**
 
-**Target file:** $ARGUMENTS
+**Target:** $ARGUMENTS
 
-If no file path is provided in $ARGUMENTS, ask the user which file they want reviewed before proceeding.
+If a file path is provided in $ARGUMENTS, review that specific file.
+
+If no file path is provided:
+1. Run `git diff main...HEAD --name-only` to list all files changed on the current branch compared to `main`.
+2. Filter the list to only React/Next.js files (`.tsx`, `.ts`, `.jsx`, `.js` under `app/`, `components/`, `sections/`, `hook/`, `swr/`).
+3. Review **each** of those changed files in turn.
+
+If neither a file argument nor any changed files are found, ask the user which file they want reviewed.
 
 ---
 
 ## Steps
 
-1. Read the target file completely.
-2. Also read any directly related files (schema, store, sub-components) if needed to understand the full context.
-3. Produce a structured review report using the format below.
+1. Identify the target file(s) using the logic above.
+2. Read each target file completely.
+3. Also read any directly related files (schema, store, sub-components) if needed to understand the full context.
+4. Produce a structured review report using the format below. If reviewing multiple files, output one full report section per file.
 
 ---
 
@@ -58,27 +66,27 @@ If no file path is provided in $ARGUMENTS, ask the user which file they want rev
 
 ## Output Format
 
-### Overview
-Brief description of what this file does and its role in the application.
+### 概覽
+簡述此檔案的功能及其在應用程式中的角色。
 
-### Review Findings
+### 審查結果
 
-For each finding, output one line:
+每個發現以一行輸出：
 
-🔴 **[MUST FIX]** `line X` — _description_ (category)
-🟡 **[SHOULD FIX]** `line X` — _description_ (category)
-🟢 **[NICE TO HAVE]** `line X` — _description_ (category)
+🔴 **[必須修正]** `第 X 行` — _描述_ (類別)
+🟡 **[建議修正]** `第 X 行` — _描述_ (類別)
+🟢 **[可選優化]** `第 X 行` — _描述_ (類別)
 
-**Severity guide:**
-- 🔴 Red — Bugs, logic errors, security issues, broken Next.js conventions
-- 🟡 Yellow — Performance issues, code quality problems, missing best practices
-- 🟢 Green — Style improvements, minor naming issues, optional refactors
+**嚴重程度說明：**
+- 🔴 紅色 — 錯誤、邏輯問題、安全性問題、違反 Next.js 規範
+- 🟡 黃色 — 效能問題、程式碼品質問題、缺少最佳實踐
+- 🟢 綠色 — 風格改善、命名問題、可選重構
 
-### Score
+### 評分
 
-| 🔴 Must Fix | 🟡 Should Fix | 🟢 Nice to Have |
-|-------------|---------------|-----------------|
-| N           | N             | N               |
+| 🔴 必須修正 | 🟡 建議修正 | 🟢 可選優化 |
+|-------------|-------------|-------------|
+| N           | N           | N           |
 
-### Top Recommendations
-List the 3 most impactful changes to make first, in priority order.
+### 優先建議
+列出最優先應進行的 3 項改善，依重要性排序。
